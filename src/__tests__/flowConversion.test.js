@@ -28,3 +28,4 @@ test('negative weight returns NaN', () => {
   expect(convertDoseToRate(0.1, -5)).toBeNaN();
   expect(convertRateToDose(3, -5)).toBeNaN();
 });
+

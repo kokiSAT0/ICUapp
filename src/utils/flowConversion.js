@@ -12,6 +12,7 @@ const CONCENTRATION_UG_PER_ML = 100;
  */
 export function convertDoseToRate(dose, weight) {
   // 体重が 0 以下なら計算できない
+
   if (weight <= 0) {
     return NaN;
   }
@@ -32,6 +33,7 @@ export function convertRateToDose(rate, weight) {
   if (weight <= 0) {
     return NaN;
   }
+
   const ugPerHour = rate * CONCENTRATION_UG_PER_ML; // ml/hr から µg/hr へ
   const ugPerMin = ugPerHour / 60; // 1時間60分で割る
   // 体重で割って µg/kg/min を算出
