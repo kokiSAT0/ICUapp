@@ -7,9 +7,12 @@
 
 ## セットアップ方法
 
-1. 依存関係をインストールする前に `package-lock.json` が存在する場合は削除します。
-   その後 `npm install --legacy-peer-deps` を実行してください。
-   これで `@react-navigation` 関連の依存関係エラーを回避できます。
+
+1. 依存関係の衝突を避けるため `package-lock.json` を削除してから
+   `npm install --legacy-peer-deps` を実行します。
+   Web 版を利用する場合は次のパッケージも追加でインストールしてください。
+   `npx expo install react-dom react-native-web @expo/metro-runtime`
+
 2. `npm run lint` でコードの静的解析 (エラー検出) を行います。
 3. `npm test` でテストを実行します。
 4. 開発を開始するには `npm start` を実行します。

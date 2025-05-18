@@ -11,6 +11,7 @@ const CONCENTRATION_UG_PER_ML = 100;
  * @returns {number} ml/hr
  */
 export function convertDoseToRate(dose, weight) {
+  // 体重が 0 以下なら計算できない
 
   if (weight <= 0) {
     return NaN;
@@ -28,6 +29,7 @@ export function convertDoseToRate(dose, weight) {
  * @returns {number} µg/kg/min
  */
 export function convertRateToDose(rate, weight) {
+  // 体重が 0 以下なら計算できない
   if (weight <= 0) {
     return NaN;
   }
