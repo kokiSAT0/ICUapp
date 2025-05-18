@@ -16,3 +16,9 @@ test('convert rate to dose', () => {
   const dose = convertRateToDose(3, 50);
   expect(dose).toBeCloseTo(0.1);
 });
+// 体重が 0kg の場合は NaN を返すことを確認
+test('invalid weight returns NaN', () => {
+  expect(convertDoseToRate(0.1, 0)).toBeNaN();
+  expect(convertRateToDose(3, -5)).toBeNaN();
+});
+
