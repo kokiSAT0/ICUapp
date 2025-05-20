@@ -1,67 +1,121 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, Platform, ToastAndroid, Alert } from 'react-native';
 import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion';
+import CircularDial from './CircularDial';
 
-// 流量計算コンポーネント
-// ノルアドレナリン(2mg/20ml)
-// µg/kg/min と ml/hr の相互換算のみを実装しています
+// Toast 表示をプラットフォーム別に行う簡易関数
+function showToast(message) {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  } else {
+    Alert.alert(message);
+  }
+}
+
+// 刻み幅で四捨五入するユーティリティ
+function roundStep(value, step) {
+  return Math.round(value / step) * step;
+}
+
+// 各ダイアルの設定値
+const WEIGHT_MIN = 2;
+const WEIGHT_MAX = 200;
+const DOSE_MIN = 0;
+const DOSE_MAX = 5;
+const RATE_MIN = 0;
+const RATE_MAX = 100;
+
 export default function FlowRateConverter() {
-  const [weight, setWeight] = useState('');
-  const [dose, setDose] = useState('');
-  const [rate, setRate] = useState('');
+  // 初期値: 体重50kg、投与量0.03µg/kg/min
+  const [weight, setWeight] = useState(50);
+  const [dose, setDose] = useState(0.03);
+  const [rate, setRate] = useState(roundStep(convertDoseToRate(0.03, 50), 0.1));
 
-  // µg/kg/min から ml/hr へ計算
-  const handleToRate = () => {
-    const w = parseFloat(weight);
-    const d = parseFloat(dose);
-    if (!Number.isNaN(w) && !Number.isNaN(d)) {
-      const result = convertDoseToRate(d, w);
-      // 小数点2桁で表示
-      setRate(result.toFixed(2));
+  // 体重変更時の処理
+  const handleWeightChange = (w) => {
+    let value = roundStep(w, 1);
+    if (value < WEIGHT_MIN || value > WEIGHT_MAX) {
+      showToast('体重は2\u2013200kgの範囲です');
+      value = Math.max(WEIGHT_MIN, Math.min(WEIGHT_MAX, value));
     }
+    setWeight(value);
+    const r = roundStep(convertDoseToRate(dose, value), 0.1);
+    if (r < RATE_MIN || r > RATE_MAX) {
+      showToast('流量は0\u2013100ml/hrの範囲です');
+    }
+    setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
   };
 
-  // ml/hr から µg/kg/min へ計算
-  const handleToDose = () => {
-    const w = parseFloat(weight);
-    const r = parseFloat(rate);
-    if (!Number.isNaN(w) && !Number.isNaN(r)) {
-      const result = convertRateToDose(r, w);
-      setDose(result.toFixed(2));
+  // 投与量変更時の処理
+  const handleDoseChange = (d) => {
+    let value = roundStep(d, 0.01);
+    if (value < DOSE_MIN || value > DOSE_MAX) {
+      showToast('投与量は0\u20135\u00b5g/kg/minの範囲です');
+      value = Math.max(DOSE_MIN, Math.min(DOSE_MAX, value));
     }
+    setDose(value);
+    const r = roundStep(convertDoseToRate(value, weight), 0.1);
+    if (r < RATE_MIN || r > RATE_MAX) {
+      showToast('流量は0\u2013100ml/hrの範囲です');
+    }
+    setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
+  };
+
+  // 流量変更時の処理
+  const handleRateChange = (r) => {
+    let value = roundStep(r, 0.1);
+    if (value < RATE_MIN || value > RATE_MAX) {
+      showToast('流量は0\u2013100ml/hrの範囲です');
+      value = Math.max(RATE_MIN, Math.min(RATE_MAX, value));
+    }
+    setRate(value);
+    const d = roundStep(convertRateToDose(value, weight), 0.01);
+    if (d < DOSE_MIN || d > DOSE_MAX) {
+      showToast('投与量は0\u20135\u00b5g/kg/minの範囲です');
+    }
+    setDose(Math.max(DOSE_MIN, Math.min(DOSE_MAX, d)));
   };
 
   return (
-    <View>
-      <Text>ノルアドレナリン(2mg/20ml) 換算ツール</Text>
-
-      <Text>体重(kg)</Text>
-      <TextInput
+    <View style={styles.container}>
+      <Text style={styles.title}>ノルアドレナリン換算ツール</Text>
+      <CircularDial
         value={weight}
-        onChangeText={setWeight}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, marginBottom: 8, padding: 4 }}
+        onChange={handleWeightChange}
+        min={WEIGHT_MIN}
+        max={WEIGHT_MAX}
+        step={1}
+        unit="kg"
+        digits={0}
       />
-
-      <Text>投与量(µg/kg/min)</Text>
-      <TextInput
+      <CircularDial
         value={dose}
-        onChangeText={setDose}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, marginBottom: 8, padding: 4 }}
+        onChange={handleDoseChange}
+        min={DOSE_MIN}
+        max={DOSE_MAX}
+        step={0.01}
+        unit="µg/kg/min"
+        digits={2}
       />
-
-      <Text>流量(ml/hr)</Text>
-      <TextInput
+      <CircularDial
         value={rate}
-        onChangeText={setRate}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, marginBottom: 8, padding: 4 }}
+        onChange={handleRateChange}
+        min={RATE_MIN}
+        max={RATE_MAX}
+        step={0.1}
+        unit="ml/hr"
+        digits={1}
       />
-
-      {/* 換算ボタン */}
-      <Button title="→ ml/hr" onPress={handleToRate} />
-      <Button title="→ µg/kg/min" onPress={handleToDose} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center'
+  },
+  title: {
+    fontSize: 16,
+    marginBottom: 8
+  }
+});
