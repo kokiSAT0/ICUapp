@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, ToastAndroid, Alert } from 'react-native';
-import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion';
-import CircularDial from './CircularDial';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  ToastAndroid,
+  Alert,
+} from "react-native";
+// スライダーコンポーネントを利用する
+import Slider from "@react-native-community/slider";
+import { convertDoseToRate, convertRateToDose } from "../utils/flowConversion";
 
 // Toast 表示をプラットフォーム別に行う簡易関数
 function showToast(message) {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   } else {
     Alert.alert(message);
@@ -35,13 +43,13 @@ export default function FlowRateConverter() {
   const handleWeightChange = (w) => {
     let value = roundStep(w, 1);
     if (value < WEIGHT_MIN || value > WEIGHT_MAX) {
-      showToast('体重は2\u2013200kgの範囲です');
+      showToast("体重は2\u2013200kgの範囲です");
       value = Math.max(WEIGHT_MIN, Math.min(WEIGHT_MAX, value));
     }
     setWeight(value);
     const r = roundStep(convertDoseToRate(dose, value), 0.1);
     if (r < RATE_MIN || r > RATE_MAX) {
-      showToast('流量は0\u2013100ml/hrの範囲です');
+      showToast("流量は0\u2013100ml/hrの範囲です");
     }
     setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
   };
@@ -50,13 +58,13 @@ export default function FlowRateConverter() {
   const handleDoseChange = (d) => {
     let value = roundStep(d, 0.01);
     if (value < DOSE_MIN || value > DOSE_MAX) {
-      showToast('投与量は0\u20135\u00b5g/kg/minの範囲です');
+      showToast("投与量は0\u20135\u00b5g/kg/minの範囲です");
       value = Math.max(DOSE_MIN, Math.min(DOSE_MAX, value));
     }
     setDose(value);
     const r = roundStep(convertDoseToRate(value, weight), 0.1);
     if (r < RATE_MIN || r > RATE_MAX) {
-      showToast('流量は0\u2013100ml/hrの範囲です');
+      showToast("流量は0\u2013100ml/hrの範囲です");
     }
     setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
   };
@@ -65,13 +73,13 @@ export default function FlowRateConverter() {
   const handleRateChange = (r) => {
     let value = roundStep(r, 0.1);
     if (value < RATE_MIN || value > RATE_MAX) {
-      showToast('流量は0\u2013100ml/hrの範囲です');
+      showToast("流量は0\u2013100ml/hrの範囲です");
       value = Math.max(RATE_MIN, Math.min(RATE_MAX, value));
     }
     setRate(value);
     const d = roundStep(convertRateToDose(value, weight), 0.01);
     if (d < DOSE_MIN || d > DOSE_MAX) {
-      showToast('投与量は0\u20135\u00b5g/kg/minの範囲です');
+      showToast("投与量は0\u20135\u00b5g/kg/minの範囲です");
     }
     setDose(Math.max(DOSE_MIN, Math.min(DOSE_MAX, d)));
   };
@@ -79,32 +87,35 @@ export default function FlowRateConverter() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>ノルアドレナリン換算ツール</Text>
-      <CircularDial
+      {/* 体重調整用スライダー */}
+      <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
+      <Slider
+        style={styles.slider}
         value={weight}
-        onChange={handleWeightChange}
-        min={WEIGHT_MIN}
-        max={WEIGHT_MAX}
+        onValueChange={handleWeightChange}
+        minimumValue={WEIGHT_MIN}
+        maximumValue={WEIGHT_MAX}
         step={1}
-        unit="kg"
-        digits={0}
       />
-      <CircularDial
+      {/* 投与量調整用スライダー */}
+      <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
+      <Slider
+        style={styles.slider}
         value={dose}
-        onChange={handleDoseChange}
-        min={DOSE_MIN}
-        max={DOSE_MAX}
+        onValueChange={handleDoseChange}
+        minimumValue={DOSE_MIN}
+        maximumValue={DOSE_MAX}
         step={0.01}
-        unit="µg/kg/min"
-        digits={2}
       />
-      <CircularDial
+      {/* 流量調整用スライダー */}
+      <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
+      <Slider
+        style={styles.slider}
         value={rate}
-        onChange={handleRateChange}
-        min={RATE_MIN}
-        max={RATE_MAX}
+        onValueChange={handleRateChange}
+        minimumValue={RATE_MIN}
+        maximumValue={RATE_MAX}
         step={0.1}
-        unit="ml/hr"
-        digits={1}
       />
     </View>
   );
@@ -112,10 +123,19 @@ export default function FlowRateConverter() {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center'
+    alignItems: "center",
   },
   title: {
     fontSize: 16,
-    marginBottom: 8
-  }
+    marginBottom: 8,
+  },
+  // スライダー用の共通スタイル
+  slider: {
+    width: "80%",
+    marginVertical: 8,
+  },
+  label: {
+    fontSize: 14,
+    marginTop: 12,
+  },
 });
