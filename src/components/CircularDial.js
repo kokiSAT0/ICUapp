@@ -50,7 +50,16 @@ export default function CircularDial({
         {...panResponder.panHandlers}
       >
         {/* 針を回転させて表示 */}
-        <View style={[styles.pointer, { transform: [{ rotate: `${angle}deg` }] }]} />
+        <View
+          style={[
+            styles.pointer,
+            {
+              height: size * 0.45,
+              top: size * 0.05,
+              transform: [{ rotate: `${angle}deg` }]
+            }
+          ]}
+        />
         {/* 中央に現在値と単位を表示 */}
         <Text style={styles.valueText}>
           {value.toFixed(digits)} {unit}
@@ -76,9 +85,7 @@ const styles = StyleSheet.create({
   pointer: {
     position: 'absolute',
     width: 2,
-    height: '45%',
-    backgroundColor: '#f00',
-    top: '5%'
+    backgroundColor: '#f00'
   },
   valueText: {
     fontSize: 18,
