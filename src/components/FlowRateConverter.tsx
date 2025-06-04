@@ -11,6 +11,8 @@ import {
   Text,
   TextInput,
   Snackbar,
+  Menu,
+  Button,
   RadioButton,
 } from 'react-native-paper';
 // スライダーコンポーネントを利用する
@@ -82,6 +84,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   );
   // Snackbar 用の状態管理
   const [snackbar, setSnackbar] = useState('');
+  // 薬剤選択メニューの表示状態
+  const [menuVisible, setMenuVisible] = useState(false);
 
   // 投与量範囲から流量範囲を計算する共通処理
   const updateRateRange = (w: number, conc: number, range: Range): void => {
@@ -219,19 +223,31 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     setRate(Math.max(minRate, Math.min(maxRate, r)));
   };
 
+  // メニューから薬剤を選択したときの処理
+  const handleDrugSelect = (value: DrugType): void => {
+    handleDrugChange(value);
+    setMenuVisible(false);
+  };
+
   return (
     // Surface は Paper の View 相当コンポーネント
     <Surface style={styles.container}>
       <Text style={styles.title}>{DRUGS[drug].label}換算ツール</Text>
       {/* 薬剤選択 */}
-      <RadioButton.Group
-        onValueChange={handleDrugChange}
-        value={drug}
-        style={styles.radioGroup}
+      <Menu
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        anchor={<Button mode="outlined" onPress={() => setMenuVisible(true)}>{DRUGS[drug].label}</Button>}
       >
-        <RadioButton.Item label="ノルアドレナリン" value="norepinephrine" />
-        <RadioButton.Item label="ドパミン" value="dopamine" />
-      </RadioButton.Group>
+        <Menu.Item
+          onPress={() => handleDrugSelect('norepinephrine')}
+          title="ノルアドレナリン"
+        />
+        <Menu.Item
+          onPress={() => handleDrugSelect('dopamine')}
+          title="ドパミン"
+        />
+      </Menu>
       {/* 体重調整用スライダー */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
       <PaperSlider
