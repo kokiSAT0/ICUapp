@@ -62,6 +62,8 @@ export type DrugInfo = {
   solutionVolume: number;
   doseMin: number;
   doseMax: number;
+  // 危険域とみなす投与量(µg/kg/min)。未設定なら表示しない
+  dangerDose?: number;
 };
 
 // 対応する薬剤リスト
@@ -73,6 +75,7 @@ export const DRUGS: Record<DrugType, DrugInfo> = {
     solutionVolume: 50,
     doseMin: 0,
     doseMax: 0.3,
+    dangerDose: 0.2,
   },
   dopamine: {
     label: 'ドパミン',
@@ -81,6 +84,7 @@ export const DRUGS: Record<DrugType, DrugInfo> = {
     solutionVolume: 200,
     doseMin: 0,
     doseMax: 20,
+    dangerDose: 15,
   },
 };
 
