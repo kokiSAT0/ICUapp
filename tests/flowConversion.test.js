@@ -8,6 +8,7 @@ const {
   convertDoseToRate,
   convertRateToDose,
   DEFAULT_CONCENTRATION,
+  formatComposition,
 } = require('../src/utils/flowConversion');
 
 test('dose-rate roundtrip', () => {
@@ -15,4 +16,9 @@ test('dose-rate roundtrip', () => {
   assert.ok(Math.abs(rate - 0.9) < 1e-6);
   const dose = convertRateToDose(rate, 50, DEFAULT_CONCENTRATION);
   assert.ok(Math.abs(dose - 0.03) < 1e-6);
+});
+
+test('format composition string', () => {
+  const result = formatComposition(5, 'mg', 50);
+  assert.strictEqual(result, '5 mg / 50 ml');
 });

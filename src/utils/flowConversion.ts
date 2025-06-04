@@ -10,6 +10,22 @@ export const DEFAULT_SOLUTE_UNIT: SoluteUnit = 'mg';
 export const DEFAULT_SOLUTION_VOLUME = 50;
 
 /**
+ * 溶質量・単位・溶液量を一行の文字列にまとめる
+ * 例: 5 mg / 50 ml
+ * @param {number} amount - 溶質量
+ * @param {SoluteUnit} unit - 溶質量の単位
+ * @param {number} volume - 溶液量(ml)
+ * @returns {string} 組成を表す文字列
+ */
+export function formatComposition(
+  amount: number,
+  unit: SoluteUnit,
+  volume: number,
+): string {
+  return `${amount} ${unit} / ${volume} ml`;
+}
+
+/**
  * 溶質量と溶液量から濃度(µg/ml)を計算
  * @param {number} amount - 溶質量
  * @param {SoluteUnit} unit - 溶質量の単位
@@ -46,6 +62,8 @@ export type DrugInfo = {
   solutionVolume: number;
   doseMin: number;
   doseMax: number;
+  // 危険域とみなす投与量(µg/kg/min)。未設定なら表示しない
+  dangerDose?: number;
 };
 
 // 対応する薬剤リスト
@@ -57,6 +75,7 @@ export const DRUGS: Record<DrugType, DrugInfo> = {
     solutionVolume: 50,
     doseMin: 0,
     doseMax: 0.3,
+    dangerDose: 0.2,
   },
   dopamine: {
     label: 'ドパミン',
@@ -65,6 +84,7 @@ export const DRUGS: Record<DrugType, DrugInfo> = {
     solutionVolume: 200,
     doseMin: 0,
     doseMax: 20,
+    dangerDose: 15,
   },
 };
 
