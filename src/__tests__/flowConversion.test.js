@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion.js';
+// sucrase を使って TypeScript ファイルを読み込む設定
+import 'sucrase/register/ts.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const {
+  convertDoseToRate,
+  convertRateToDose,
+} = require('../utils/flowConversion.ts');
 
 // 投与量->流量の換算テスト
 // 例: 50kg の患者に 0.1µg/kg/min 投与する場合
