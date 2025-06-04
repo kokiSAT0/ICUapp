@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "strict": false,
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*", "App.tsx", "index.js"]
+}

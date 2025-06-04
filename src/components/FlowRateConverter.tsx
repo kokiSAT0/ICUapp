@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   Platform,
   ToastAndroid,
   Alert,
-} from "react-native";
+} from 'react-native';
+// UI 表示には react-native-paper の Text コンポーネントを使用
+import { Text } from 'react-native-paper';
 // スライダーコンポーネントを利用する
-import Slider from "@react-native-community/slider";
-import { convertDoseToRate, convertRateToDose } from "../utils/flowConversion";
+import Slider from '@react-native-community/slider';
+import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
-function showToast(message) {
+// 簡易的なメッセージ表示
+function showToast(message: string): void {
   if (Platform.OS === "android") {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   } else {
@@ -21,7 +23,8 @@ function showToast(message) {
 }
 
 // 刻み幅で四捨五入するユーティリティ
-function roundStep(value, step) {
+// 任意の刻み幅で四捨五入する
+function roundStep(value: number, step: number): number {
   return Math.round(value / step) * step;
 }
 
@@ -33,14 +36,17 @@ const DOSE_MAX = 5;
 const RATE_MIN = 0;
 const RATE_MAX = 100;
 
-export default function FlowRateConverter() {
+export type FlowRateConverterProps = {};
+
+// メインコンポーネント
+export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、投与量0.03µg/kg/min
   const [weight, setWeight] = useState(50);
   const [dose, setDose] = useState(0.03);
   const [rate, setRate] = useState(roundStep(convertDoseToRate(0.03, 50), 0.1));
 
   // 体重変更時の処理
-  const handleWeightChange = (w) => {
+  const handleWeightChange = (w: number): void => {
     let value = roundStep(w, 1);
     if (value < WEIGHT_MIN || value > WEIGHT_MAX) {
       showToast("体重は2\u2013200kgの範囲です");
@@ -55,7 +61,7 @@ export default function FlowRateConverter() {
   };
 
   // 投与量変更時の処理
-  const handleDoseChange = (d) => {
+  const handleDoseChange = (d: number): void => {
     let value = roundStep(d, 0.01);
     if (value < DOSE_MIN || value > DOSE_MAX) {
       showToast("投与量は0\u20135\u00b5g/kg/minの範囲です");
@@ -70,7 +76,7 @@ export default function FlowRateConverter() {
   };
 
   // 流量変更時の処理
-  const handleRateChange = (r) => {
+  const handleRateChange = (r: number): void => {
     let value = roundStep(r, 0.1);
     if (value < RATE_MIN || value > RATE_MAX) {
       showToast("流量は0\u2013100ml/hrの範囲です");
