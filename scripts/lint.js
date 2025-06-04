@@ -12,7 +12,13 @@ function walk(dir) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       walk(fullPath);
-    } else if (entry.name.endsWith('.js') || entry.name.endsWith('.jsx')) {
+    } else if (
+      entry.name.endsWith('.js') ||
+      entry.name.endsWith('.jsx') ||
+      // TypeScript ファイルも検査できるように拡張子を追加
+      entry.name.endsWith('.ts') ||
+      entry.name.endsWith('.tsx')
+    ) {
       checkFile(fullPath);
     }
   }
