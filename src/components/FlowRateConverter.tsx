@@ -4,6 +4,7 @@ import {
   Platform,
   ToastAndroid,
   Alert,
+  View,
 } from 'react-native';
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
 import {
@@ -24,6 +25,7 @@ import {
   DEFAULT_SOLUTE_AMOUNT,
   DEFAULT_SOLUTE_UNIT,
   DEFAULT_SOLUTION_VOLUME,
+  formatComposition,
   computeConcentration,
   SoluteUnit,
   DRUGS,
@@ -272,37 +274,44 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         dangerThreshold={DRUGS[drug].dangerDose}
         step={0.01}
       />
-      {/* 溶質量入力欄 */}
-      <Text style={styles.label}>溶質量: {soluteAmount} {soluteUnit}</Text>
-      <TextInput
-        mode="outlined"
-        style={styles.input}
-        value={String(soluteAmount)}
-        keyboardType="numeric"
-        onChangeText={handleAmountChange}
-      />
-      {/* mg/µg 選択用プルダウン */}
-      <Menu
-        visible={unitMenuVisible}
-        onDismiss={() => setUnitMenuVisible(false)}
-        anchor={
-          <Button mode="outlined" onPress={() => setUnitMenuVisible(true)}>
-            {soluteUnit}
-          </Button>
-        }
-      >
-        <Menu.Item onPress={() => handleUnitChange('mg')} title="mg" />
-        <Menu.Item onPress={() => handleUnitChange('µg')} title="µg" />
-      </Menu>
-      {/* 溶液量入力欄 */}
-      <Text style={styles.label}>溶液量: {solutionVolume} ml</Text>
-      <TextInput
-        mode="outlined"
-        style={styles.input}
-        value={String(solutionVolume)}
-        keyboardType="numeric"
-        onChangeText={handleVolumeChange}
-      />
+      {/* 溶質量・単位・溶液量を横並びで入力する */}
+      <Text style={styles.label}>
+        組成: {formatComposition(soluteAmount, soluteUnit, solutionVolume)}
+      </Text>
+      <View style={styles.compositionRow}>
+        <TextInput
+          mode="outlined"
+          style={styles.compInput}
+          value={String(soluteAmount)}
+          keyboardType="numeric"
+          onChangeText={handleAmountChange}
+        />
+        <Menu
+          visible={unitMenuVisible}
+          onDismiss={() => setUnitMenuVisible(false)}
+          anchor={
+            <Button
+              mode="outlined"
+              onPress={() => setUnitMenuVisible(true)}
+              style={styles.compInput}
+            >
+              {soluteUnit}
+            </Button>
+          }
+        >
+          <Menu.Item onPress={() => handleUnitChange('mg')} title="mg" />
+          <Menu.Item onPress={() => handleUnitChange('µg')} title="µg" />
+        </Menu>
+        <Text style={styles.inlineText}>/</Text>
+        <TextInput
+          mode="outlined"
+          style={styles.compInput}
+          value={String(solutionVolume)}
+          keyboardType="numeric"
+          onChangeText={handleVolumeChange}
+        />
+        <Text style={styles.inlineText}>ml</Text>
+      </View>
       {/* 濃度表示 */}
       <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
       {/* 流量調整用スライダー */}
@@ -343,6 +352,22 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     marginVertical: 8,
+  },
+  // 溶質量・単位・溶液量の入力行
+  compositionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  // 組成入力用の小さなテキスト入力
+  compInput: {
+    width: 70,
+    marginHorizontal: 4,
+  },
+  // 行内表示用のテキスト
+  inlineText: {
+    fontSize: 14,
+    marginHorizontal: 4,
   },
   label: {
     fontSize: 14,
