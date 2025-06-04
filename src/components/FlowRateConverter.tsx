@@ -13,7 +13,6 @@ import {
   Snackbar,
   Menu,
   Button,
-  RadioButton,
 } from 'react-native-paper';
 // スライダーコンポーネントを利用する
 // スライダーを Paper のテーマに合わせたコンポーネント
@@ -86,6 +85,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [snackbar, setSnackbar] = useState('');
   // 薬剤選択メニューの表示状態
   const [menuVisible, setMenuVisible] = useState(false);
+  // 単位選択メニューの表示状態
+  const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 投与量範囲から流量範囲を計算する共通処理
   const updateRateRange = (w: number, conc: number, range: Range): void => {
@@ -191,6 +192,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const handleUnitChange = (value: string): void => {
     const unit = value as SoluteUnit;
     setSoluteUnit(unit);
+    setUnitMenuVisible(false);
     updateConcentration(soluteAmount, unit, solutionVolume);
   };
 
@@ -278,15 +280,19 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         keyboardType="numeric"
         onChangeText={handleAmountChange}
       />
-      {/* mg/µg 選択用ラジオボタン */}
-      <RadioButton.Group
-        onValueChange={handleUnitChange}
-        value={soluteUnit}
-        style={styles.radioGroup}
+      {/* mg/µg 選択用プルダウン */}
+      <Menu
+        visible={unitMenuVisible}
+        onDismiss={() => setUnitMenuVisible(false)}
+        anchor={
+          <Button mode="outlined" onPress={() => setUnitMenuVisible(true)}>
+            {soluteUnit}
+          </Button>
+        }
       >
-        <RadioButton.Item label="mg" value="mg" />
-        <RadioButton.Item label="µg" value="µg" />
-      </RadioButton.Group>
+        <Menu.Item onPress={() => handleUnitChange('mg')} title="mg" />
+        <Menu.Item onPress={() => handleUnitChange('µg')} title="µg" />
+      </Menu>
       {/* 溶液量入力欄 */}
       <Text style={styles.label}>溶液量: {solutionVolume} ml</Text>
       <TextInput
@@ -336,9 +342,6 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     marginVertical: 8,
-  },
-  radioGroup: {
-    flexDirection: "row",
   },
   label: {
     fontSize: 14,
