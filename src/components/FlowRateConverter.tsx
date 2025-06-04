@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
-  // スライダー用の共通スタイル
+  // PaperSlider のコンテナに適用する共通スタイル
   slider: {
     width: "80%",
     marginVertical: 8,

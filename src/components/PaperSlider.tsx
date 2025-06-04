@@ -13,6 +13,7 @@ export type PaperSliderProps = SliderProps & {
 
 // forwardRef を使うことで親コンポーネントからスライダーの値を
 // 強制的に更新できるようにしておく
+// Paper のテーマカラーに合わせたスライダーコンポーネント
 export default forwardRef(function PaperSlider(
   {
     style,
@@ -41,11 +42,12 @@ export default forwardRef(function PaperSlider(
       : 0;
 
   return (
-    <View style={styles.container} onLayout={handleLayout}>
+    // container の幅を onLayout で取得するため、ここにスタイルを適用
+    <View style={[styles.container, style]} onLayout={handleLayout}>
       <Slider
         ref={ref}
         {...rest}
-        style={[styles.slider, style]}
+        style={styles.slider}
         minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
         maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
         thumbTintColor={thumbTintColor ?? colors.primary}
@@ -79,5 +81,8 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   // デフォルトではスタイルを空にしておき、呼び出し側で拡張できるようにする
-  slider: {},
+  slider: {
+    // container の幅いっぱいに表示する
+    width: '100%',
+  },
 });
