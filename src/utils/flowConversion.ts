@@ -10,6 +10,22 @@ export const DEFAULT_SOLUTE_UNIT: SoluteUnit = 'mg';
 export const DEFAULT_SOLUTION_VOLUME = 50;
 
 /**
+ * 溶質量・単位・溶液量を一行の文字列にまとめる
+ * 例: 5 mg / 50 ml
+ * @param {number} amount - 溶質量
+ * @param {SoluteUnit} unit - 溶質量の単位
+ * @param {number} volume - 溶液量(ml)
+ * @returns {string} 組成を表す文字列
+ */
+export function formatComposition(
+  amount: number,
+  unit: SoluteUnit,
+  volume: number,
+): string {
+  return `${amount} ${unit} / ${volume} ml`;
+}
+
+/**
  * 溶質量と溶液量から濃度(µg/ml)を計算
  * @param {number} amount - 溶質量
  * @param {SoluteUnit} unit - 溶質量の単位
