@@ -44,8 +44,8 @@ function roundStep(value: number, step: number): number {
 }
 
 // 各ダイアルの設定値
-const WEIGHT_MIN = 2;
-const WEIGHT_MAX = 200;
+const WEIGHT_MIN = 20;
+const WEIGHT_MAX = 120;
 const DOSE_MIN = 0;
 const DOSE_MAX = 5;
 const RATE_MIN = 0;
@@ -75,7 +75,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const handleWeightChange = (w: number): void => {
     let value = roundStep(w, 1);
     if (value < WEIGHT_MIN || value > WEIGHT_MAX) {
-      showToast("体重は2\u2013200kgの範囲です");
+      showToast("体重は20\u2013120kgの範囲です");
       value = Math.max(WEIGHT_MIN, Math.min(WEIGHT_MAX, value));
     }
     setWeight(value);
