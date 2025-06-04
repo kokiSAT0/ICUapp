@@ -2,8 +2,8 @@
 // ノルアドレナリン(2mg/20ml)のみを対象とする簡易版です
 
 // 濃度: 2mg/20ml = 2000µg/20ml = 100µg/ml
-// 濃度を定数として定義。const にすることで変更不可とする
-const CONCENTRATION_UG_PER_ML = 100;
+// デフォルト値として利用するため定数化
+export const DEFAULT_CONCENTRATION = 100;
 
 /**
  * 投与量(µg/kg/min)から流量(ml/hr)を計算します
@@ -15,7 +15,11 @@ const CONCENTRATION_UG_PER_ML = 100;
  * 投与量(µg/kg/min)から流量(ml/hr)を計算
  * dose: 投与量, weight: 体重
  */
-export function convertDoseToRate(dose: number, weight: number): number {
+export function convertDoseToRate(
+  dose: number,
+  weight: number,
+  concentration: number,
+): number {
   // 体重が 0 以下なら計算できない
 
   if (weight <= 0) {
@@ -24,7 +28,7 @@ export function convertDoseToRate(dose: number, weight: number): number {
   const ugPerMin = dose * weight; // 体重を掛けて µg/min へ
   const ugPerHour = ugPerMin * 60; // 60分を掛けて µg/hr へ
   // 濃度(µg/ml)で割って ml/hr を算出
-  return ugPerHour / CONCENTRATION_UG_PER_ML;
+  return ugPerHour / concentration;
 }
 
 /**
@@ -37,13 +41,17 @@ export function convertDoseToRate(dose: number, weight: number): number {
  * 流量(ml/hr)から投与量(µg/kg/min)を計算
  * rate: 流量, weight: 体重
  */
-export function convertRateToDose(rate: number, weight: number): number {
+export function convertRateToDose(
+  rate: number,
+  weight: number,
+  concentration: number,
+): number {
   // 体重が 0 以下なら計算できない
   if (weight <= 0) {
     return NaN;
   }
 
-  const ugPerHour = rate * CONCENTRATION_UG_PER_ML; // ml/hr から µg/hr へ
+  const ugPerHour = rate * concentration; // ml/hr から µg/hr へ
   const ugPerMin = ugPerHour / 60; // 1時間60分で割る
   // 体重で割って µg/kg/min を算出
   return ugPerMin / weight;
