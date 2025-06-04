@@ -1,13 +1,13 @@
 // 流量換算に関する計算関数
-// ノルアドレナリン(2mg/20ml)のみを対象とする簡易版です
+// 複数の昇圧薬に対応するための計算関数
 
 // 濃度計算に利用する型定義
 export type SoluteUnit = 'mg' | 'µg';
 
 // デフォルトの溶質量と溶液量
-export const DEFAULT_SOLUTE_AMOUNT = 2;
+export const DEFAULT_SOLUTE_AMOUNT = 5;
 export const DEFAULT_SOLUTE_UNIT: SoluteUnit = 'mg';
-export const DEFAULT_SOLUTION_VOLUME = 20;
+export const DEFAULT_SOLUTION_VOLUME = 50;
 
 /**
  * 溶質量と溶液量から濃度(µg/ml)を計算
@@ -34,6 +34,39 @@ export const DEFAULT_CONCENTRATION = computeConcentration(
   DEFAULT_SOLUTE_UNIT,
   DEFAULT_SOLUTION_VOLUME,
 );
+
+// 薬剤ごとのデフォルト値をまとめた型
+export type DrugType = 'norepinephrine' | 'dopamine';
+
+export type DrugInfo = {
+  // 画面に表示する日本語名称
+  label: string;
+  soluteAmount: number;
+  soluteUnit: SoluteUnit;
+  solutionVolume: number;
+  doseMin: number;
+  doseMax: number;
+};
+
+// 対応する薬剤リスト
+export const DRUGS: Record<DrugType, DrugInfo> = {
+  norepinephrine: {
+    label: 'ノルアドレナリン',
+    soluteAmount: 5,
+    soluteUnit: 'mg',
+    solutionVolume: 50,
+    doseMin: 0,
+    doseMax: 0.3,
+  },
+  dopamine: {
+    label: 'ドパミン',
+    soluteAmount: 600,
+    soluteUnit: 'mg',
+    solutionVolume: 200,
+    doseMin: 0,
+    doseMax: 20,
+  },
+};
 
 /**
  * 投与量(µg/kg/min)から流量(ml/hr)を計算します
