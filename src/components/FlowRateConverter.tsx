@@ -269,6 +269,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         onValueChange={handleDoseChange}
         minimumValue={doseRange.min}
         maximumValue={doseRange.max}
+        dangerThreshold={DRUGS[drug].dangerDose}
         step={0.01}
       />
       {/* 溶質量入力欄 */}
