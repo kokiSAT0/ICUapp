@@ -232,7 +232,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   return (
     // Surface は Paper の View 相当コンポーネント
     <Surface style={styles.container}>
-      <Text style={styles.title}>{DRUGS[drug].label}換算ツール</Text>
+      {/* 画面上部のタイトルを固定の文言に変更 */}
+      <Text style={styles.title}>投与量・流量換算ツール</Text>
       {/* 薬剤選択 */}
       <Menu
         visible={menuVisible}
