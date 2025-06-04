@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const {
   convertDoseToRate,
   convertRateToDose,
-} = require('../utils/flowConversion.ts');
+} = require('../utils/flowConversion');
 
 // 投与量->流量の換算テスト
 // 例: 50kg の患者に 0.1µg/kg/min 投与する場合

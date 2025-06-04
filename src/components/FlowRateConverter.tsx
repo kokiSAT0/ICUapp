@@ -13,7 +13,7 @@ import PaperSlider from './PaperSlider';
 import {
   convertDoseToRate,
   convertRateToDose,
-} from '../utils/flowConversion.ts';
+} from '../utils/flowConversion';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
 // 簡易的なメッセージ表示

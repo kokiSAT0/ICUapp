@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const {
   convertDoseToRate,
   convertRateToDose,
-} = require('../src/utils/flowConversion.ts');
+} = require('../src/utils/flowConversion');
 
 test('dose-rate roundtrip', () => {
   const rate = convertDoseToRate(0.03, 50);
