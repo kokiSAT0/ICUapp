@@ -5,5 +5,10 @@
     "allowJs": true,
     "noEmit": true
   },
-  "include": ["src/**/*", "App.tsx", "index.js"]
+  "include": [
+    "src/**/*",
+    "App.tsx",
+    "index.js"
+  ],
+  "extends": "expo/tsconfig.base"
 }
