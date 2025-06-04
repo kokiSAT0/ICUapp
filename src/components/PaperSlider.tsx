@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { StyleSheet, StyleProp, ViewStyle, View, LayoutChangeEvent } from 'react-native';
 import Slider, { SliderProps } from '@react-native-community/slider';
 import { useTheme } from 'react-native-paper';
@@ -10,14 +10,20 @@ export type PaperSliderProps = SliderProps & {
   dangerThreshold?: number;
 };
 
-export default function PaperSlider({
-  style,
-  minimumTrackTintColor,
-  maximumTrackTintColor,
-  thumbTintColor,
-  dangerThreshold,
-  ...rest
-}: PaperSliderProps) {
+
+// forwardRef を使うことで親コンポーネントからスライダーの値を
+// 強制的に更新できるようにしておく
+export default forwardRef(function PaperSlider(
+  {
+    style,
+    minimumTrackTintColor,
+    maximumTrackTintColor,
+    thumbTintColor,
+    ...rest
+  }: PaperSliderProps,
+  ref: React.Ref<Slider>
+) {
+
   const { colors } = useTheme();
   // onLayout で取得した幅を保持
   const [width, setWidth] = useState(0);
@@ -34,23 +40,18 @@ export default function PaperSlider({
       : 0;
 
   return (
-    <View onLayout={handleLayout} style={[styles.container, style]}>
-      {dangerThreshold !== undefined && width > 0 && startX < width && (
-        <View
-          pointerEvents="none"
-          style={[styles.danger, { backgroundColor: colors.error, left: startX, width: width - startX }]}
-        />
-      )}
-      <Slider
-        {...rest}
-        style={styles.slider}
-        minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
-        maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
-        thumbTintColor={thumbTintColor ?? colors.primary}
-      />
-    </View>
+
+    <Slider
+      ref={ref}
+      {...rest}
+      style={[styles.slider, style]}
+      minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
+      maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
+      thumbTintColor={thumbTintColor ?? colors.primary}
+    />
+
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
