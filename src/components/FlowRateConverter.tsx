@@ -25,6 +25,8 @@ import {
   DEFAULT_SOLUTION_VOLUME,
   computeConcentration,
   SoluteUnit,
+  DRUGS,
+  DrugType,
 } from '../utils/flowConversion';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
@@ -46,18 +48,28 @@ function roundStep(value: number, step: number): number {
 // 各ダイアルの設定値
 const WEIGHT_MIN = 20;
 const WEIGHT_MAX = 120;
-const DOSE_MIN = 0;
-const DOSE_MAX = 5;
-const RATE_MIN = 0;
-const RATE_MAX = 100;
+export type Range = {
+  min: number;
+  max: number;
+};
 
 export type FlowRateConverterProps = {};
 
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、投与量0.03µg/kg/min
+  const [drug, setDrug] = useState<DrugType>('norepinephrine');
   const [weight, setWeight] = useState(50);
   const [dose, setDose] = useState(0.03);
+  // 投与量・流量の範囲を薬剤ごとに保持
+  const [doseRange, setDoseRange] = useState<Range>({
+    min: DRUGS.norepinephrine.doseMin,
+    max: DRUGS.norepinephrine.doseMax,
+  });
+  const [rateRange, setRateRange] = useState<Range>({
+    min: convertDoseToRate(DRUGS.norepinephrine.doseMin, 50, DEFAULT_CONCENTRATION),
+    max: convertDoseToRate(DRUGS.norepinephrine.doseMax, 50, DEFAULT_CONCENTRATION),
+  });
   // 濃度計算用のパラメータ
   const [soluteAmount, setSoluteAmount] = useState(DEFAULT_SOLUTE_AMOUNT);
   const [soluteUnit, setSoluteUnit] = useState<SoluteUnit>(DEFAULT_SOLUTE_UNIT);
@@ -71,6 +83,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   // Snackbar 用の状態管理
   const [snackbar, setSnackbar] = useState('');
 
+  // 投与量範囲から流量範囲を計算する共通処理
+  const updateRateRange = (w: number, conc: number, range: Range): void => {
+    setRateRange({
+      min: roundStep(convertDoseToRate(range.min, w, conc), 0.1),
+      max: roundStep(convertDoseToRate(range.max, w, conc), 0.1),
+    });
+  };
+
   // 体重変更時の処理
   const handleWeightChange = (w: number): void => {
     let value = roundStep(w, 1);
@@ -80,40 +100,47 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     }
     setWeight(value);
     const r = roundStep(convertDoseToRate(dose, value, concentration), 0.1);
-    if (r < RATE_MIN || r > RATE_MAX) {
-      showToast("流量は0\u2013100ml/hrの範囲です");
+    const min = rateRange.min;
+    const max = rateRange.max;
+    if (r < min || r > max) {
+      showToast(`流量は${min}\u2013${max}ml/hrの範囲です`);
     }
-    setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
+    setRate(Math.max(min, Math.min(max, r)));
+    updateRateRange(value, concentration, doseRange);
   };
 
   // 投与量変更時の処理
   const handleDoseChange = (d: number): void => {
     let value = roundStep(d, 0.01);
-    if (value < DOSE_MIN || value > DOSE_MAX) {
-      showToast("投与量は0\u20135\u00b5g/kg/minの範囲です");
-      value = Math.max(DOSE_MIN, Math.min(DOSE_MAX, value));
+    if (value < doseRange.min || value > doseRange.max) {
+      showToast(
+        `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
+      );
+      value = Math.max(doseRange.min, Math.min(doseRange.max, value));
     }
     setDose(value);
     const r = roundStep(convertDoseToRate(value, weight, concentration), 0.1);
-    if (r < RATE_MIN || r > RATE_MAX) {
-      showToast("流量は0\u2013100ml/hrの範囲です");
+    if (r < rateRange.min || r > rateRange.max) {
+      showToast(`流量は${rateRange.min}\u2013${rateRange.max}ml/hrの範囲です`);
     }
-    setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
+    setRate(Math.max(rateRange.min, Math.min(rateRange.max, r)));
   };
 
   // 流量変更時の処理
   const handleRateChange = (r: number): void => {
     let value = roundStep(r, 0.1);
-    if (value < RATE_MIN || value > RATE_MAX) {
-      showToast("流量は0\u2013100ml/hrの範囲です");
-      value = Math.max(RATE_MIN, Math.min(RATE_MAX, value));
+    if (value < rateRange.min || value > rateRange.max) {
+      showToast(`流量は${rateRange.min}\u2013${rateRange.max}ml/hrの範囲です`);
+      value = Math.max(rateRange.min, Math.min(rateRange.max, value));
     }
     setRate(value);
     const d = roundStep(convertRateToDose(value, weight, concentration), 0.01);
-    if (d < DOSE_MIN || d > DOSE_MAX) {
-      showToast("投与量は0\u20135\u00b5g/kg/minの範囲です");
+    if (d < doseRange.min || d > doseRange.max) {
+      showToast(
+        `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
+      );
     }
-    setDose(Math.max(DOSE_MIN, Math.min(DOSE_MAX, d)));
+    setDose(Math.max(doseRange.min, Math.min(doseRange.max, d)));
   };
 
   // 入力値から濃度を計算して更新する共通処理
@@ -130,7 +157,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     setConcentration(c);
     // 濃度変更時は流量も再計算する
     const r = roundStep(convertDoseToRate(dose, weight, c), 0.1);
-    setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
+    updateRateRange(weight, c, doseRange);
+    setRate(Math.max(rateRange.min, Math.min(rateRange.max, r)));
   };
 
   // 溶質量変更時の処理
@@ -162,10 +190,48 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     updateConcentration(soluteAmount, unit, solutionVolume);
   };
 
+  // 薬剤変更時の処理
+  const handleDrugChange = (value: string): void => {
+    const info = DRUGS[value as DrugType];
+    setDrug(value as DrugType);
+    setSoluteAmount(info.soluteAmount);
+    setSoluteUnit(info.soluteUnit);
+    setSolutionVolume(info.solutionVolume);
+    setDoseRange({ min: info.doseMin, max: info.doseMax });
+    const conc = computeConcentration(
+      info.soluteAmount,
+      info.soluteUnit,
+      info.solutionVolume,
+    );
+    setConcentration(conc);
+    const newRange = {
+      min: info.doseMin,
+      max: info.doseMax,
+    };
+    setDoseRange(newRange);
+    updateRateRange(weight, conc, newRange);
+    // 初期投与量と流量を範囲内に調整
+    const d = Math.max(newRange.min, Math.min(newRange.max, dose));
+    setDose(d);
+    const r = roundStep(convertDoseToRate(d, weight, conc), 0.1);
+    const minRate = convertDoseToRate(newRange.min, weight, conc);
+    const maxRate = convertDoseToRate(newRange.max, weight, conc);
+    setRate(Math.max(minRate, Math.min(maxRate, r)));
+  };
+
   return (
     // Surface は Paper の View 相当コンポーネント
     <Surface style={styles.container}>
-      <Text style={styles.title}>ノルアドレナリン換算ツール</Text>
+      <Text style={styles.title}>{DRUGS[drug].label}換算ツール</Text>
+      {/* 薬剤選択 */}
+      <RadioButton.Group
+        onValueChange={handleDrugChange}
+        value={drug}
+        style={styles.radioGroup}
+      >
+        <RadioButton.Item label="ノルアドレナリン" value="norepinephrine" />
+        <RadioButton.Item label="ドパミン" value="dopamine" />
+      </RadioButton.Group>
       {/* 体重調整用スライダー */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
       <PaperSlider
@@ -182,8 +248,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         style={styles.slider}
         value={dose}
         onValueChange={handleDoseChange}
-        minimumValue={DOSE_MIN}
-        maximumValue={DOSE_MAX}
+        minimumValue={doseRange.min}
+        maximumValue={doseRange.max}
         step={0.01}
       />
       {/* 溶質量入力欄 */}
@@ -221,8 +287,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         style={styles.slider}
         value={rate}
         onValueChange={handleRateChange}
-        minimumValue={RATE_MIN}
-        maximumValue={RATE_MAX}
+        minimumValue={rateRange.min}
+        maximumValue={rateRange.max}
         step={0.1}
       />
       {/* Snackbar でバリデーションメッセージを表示 */}
