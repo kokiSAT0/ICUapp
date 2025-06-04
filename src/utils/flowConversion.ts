@@ -1,9 +1,39 @@
 // 流量換算に関する計算関数
 // ノルアドレナリン(2mg/20ml)のみを対象とする簡易版です
 
-// 濃度: 2mg/20ml = 2000µg/20ml = 100µg/ml
-// デフォルト値として利用するため定数化
-export const DEFAULT_CONCENTRATION = 100;
+// 濃度計算に利用する型定義
+export type SoluteUnit = 'mg' | 'µg';
+
+// デフォルトの溶質量と溶液量
+export const DEFAULT_SOLUTE_AMOUNT = 2;
+export const DEFAULT_SOLUTE_UNIT: SoluteUnit = 'mg';
+export const DEFAULT_SOLUTION_VOLUME = 20;
+
+/**
+ * 溶質量と溶液量から濃度(µg/ml)を計算
+ * @param {number} amount - 溶質量
+ * @param {SoluteUnit} unit - 溶質量の単位
+ * @param {number} volume - 溶液量(ml)
+ * @returns {number} µg/ml
+ */
+export function computeConcentration(
+  amount: number,
+  unit: SoluteUnit,
+  volume: number,
+): number {
+  if (volume <= 0) {
+    return NaN;
+  }
+  const ug = unit === 'mg' ? amount * 1000 : amount;
+  return ug / volume;
+}
+
+// デフォルト濃度を計算して定数化
+export const DEFAULT_CONCENTRATION = computeConcentration(
+  DEFAULT_SOLUTE_AMOUNT,
+  DEFAULT_SOLUTE_UNIT,
+  DEFAULT_SOLUTION_VOLUME,
+);
 
 /**
  * 投与量(µg/kg/min)から流量(ml/hr)を計算します

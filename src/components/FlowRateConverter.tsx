@@ -6,7 +6,13 @@ import {
   Alert,
 } from 'react-native';
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
-import { Surface, Text, TextInput, Snackbar } from 'react-native-paper';
+import {
+  Surface,
+  Text,
+  TextInput,
+  Snackbar,
+  RadioButton,
+} from 'react-native-paper';
 // スライダーコンポーネントを利用する
 // スライダーを Paper のテーマに合わせたコンポーネント
 import PaperSlider from './PaperSlider';
@@ -14,6 +20,11 @@ import {
   convertDoseToRate,
   convertRateToDose,
   DEFAULT_CONCENTRATION,
+  DEFAULT_SOLUTE_AMOUNT,
+  DEFAULT_SOLUTE_UNIT,
+  DEFAULT_SOLUTION_VOLUME,
+  computeConcentration,
+  SoluteUnit,
 } from '../utils/flowConversion';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
@@ -47,6 +58,12 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、投与量0.03µg/kg/min
   const [weight, setWeight] = useState(50);
   const [dose, setDose] = useState(0.03);
+  // 濃度計算用のパラメータ
+  const [soluteAmount, setSoluteAmount] = useState(DEFAULT_SOLUTE_AMOUNT);
+  const [soluteUnit, setSoluteUnit] = useState<SoluteUnit>(DEFAULT_SOLUTE_UNIT);
+  const [solutionVolume, setSolutionVolume] = useState(
+    DEFAULT_SOLUTION_VOLUME,
+  );
   const [concentration, setConcentration] = useState(DEFAULT_CONCENTRATION);
   const [rate, setRate] = useState(
     roundStep(convertDoseToRate(0.03, 50, DEFAULT_CONCENTRATION), 0.1),
@@ -99,21 +116,50 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     setDose(Math.max(DOSE_MIN, Math.min(DOSE_MAX, d)));
   };
 
-  // 濃度入力時の処理。TextInput からは文字列が渡される
-  const handleConcentrationChange = (text: string): void => {
-    const num = Number(text);
-    if (Number.isNaN(num)) {
-      setSnackbar('濃度は数値で入力してください');
-      return;
-    }
-    if (num <= 0 || num > 1000) {
+  // 入力値から濃度を計算して更新する共通処理
+  const updateConcentration = (
+    amount: number,
+    unit: SoluteUnit,
+    volume: number,
+  ): void => {
+    const c = computeConcentration(amount, unit, volume);
+    if (Number.isNaN(c) || c <= 0 || c > 1000) {
       setSnackbar('濃度は1\u20131000µg/mlの範囲です');
       return;
     }
-    setConcentration(num);
-    // 濃度変更に伴い流量・投与量を再計算する
-    const r = roundStep(convertDoseToRate(dose, weight, num), 0.1);
+    setConcentration(c);
+    // 濃度変更時は流量も再計算する
+    const r = roundStep(convertDoseToRate(dose, weight, c), 0.1);
     setRate(Math.max(RATE_MIN, Math.min(RATE_MAX, r)));
+  };
+
+  // 溶質量変更時の処理
+  const handleAmountChange = (text: string): void => {
+    const num = Number(text);
+    if (Number.isNaN(num)) {
+      setSnackbar('溶質量は数値で入力してください');
+      return;
+    }
+    setSoluteAmount(num);
+    updateConcentration(num, soluteUnit, solutionVolume);
+  };
+
+  // 溶液量変更時の処理
+  const handleVolumeChange = (text: string): void => {
+    const num = Number(text);
+    if (Number.isNaN(num)) {
+      setSnackbar('溶液量は数値で入力してください');
+      return;
+    }
+    setSolutionVolume(num);
+    updateConcentration(soluteAmount, soluteUnit, num);
+  };
+
+  // 単位(mg/µg)変更時の処理
+  const handleUnitChange = (value: string): void => {
+    const unit = value as SoluteUnit;
+    setSoluteUnit(unit);
+    updateConcentration(soluteAmount, unit, solutionVolume);
   };
 
   return (
@@ -140,15 +186,35 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         maximumValue={DOSE_MAX}
         step={0.01}
       />
-      {/* 濃度入力欄 */}
-      <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
+      {/* 溶質量入力欄 */}
+      <Text style={styles.label}>溶質量: {soluteAmount} {soluteUnit}</Text>
       <TextInput
         mode="outlined"
         style={styles.input}
-        value={String(concentration)}
+        value={String(soluteAmount)}
         keyboardType="numeric"
-        onChangeText={handleConcentrationChange}
+        onChangeText={handleAmountChange}
       />
+      {/* mg/µg 選択用ラジオボタン */}
+      <RadioButton.Group
+        onValueChange={handleUnitChange}
+        value={soluteUnit}
+        style={styles.radioGroup}
+      >
+        <RadioButton.Item label="mg" value="mg" />
+        <RadioButton.Item label="µg" value="µg" />
+      </RadioButton.Group>
+      {/* 溶液量入力欄 */}
+      <Text style={styles.label}>溶液量: {solutionVolume} ml</Text>
+      <TextInput
+        mode="outlined"
+        style={styles.input}
+        value={String(solutionVolume)}
+        keyboardType="numeric"
+        onChangeText={handleVolumeChange}
+      />
+      {/* 濃度表示 */}
+      <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
       {/* 流量調整用スライダー */}
       <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
       <PaperSlider
@@ -187,6 +253,9 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     marginVertical: 8,
+  },
+  radioGroup: {
+    flexDirection: "row",
   },
   label: {
     fontSize: 14,
