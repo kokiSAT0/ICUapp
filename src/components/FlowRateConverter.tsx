@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
-  View,
   StyleSheet,
   Platform,
   ToastAndroid,
   Alert,
 } from 'react-native';
-// UI 表示には react-native-paper の Text コンポーネントを使用
-import { Text } from 'react-native-paper';
+// UI 表示には react-native-paper の Text と Surface コンポーネントを使用
+import { Surface, Text } from 'react-native-paper';
 // スライダーコンポーネントを利用する
 import Slider from '@react-native-community/slider';
 import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion';
@@ -91,7 +90,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   };
 
   return (
-    <View style={styles.container}>
+    // Surface は Paper の View 相当コンポーネント
+    <Surface style={styles.container}>
       <Text style={styles.title}>ノルアドレナリン換算ツール</Text>
       {/* 体重調整用スライダー */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
@@ -123,7 +123,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         maximumValue={RATE_MAX}
         step={0.1}
       />
-    </View>
+    </Surface>
   );
 }
 
