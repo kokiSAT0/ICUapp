@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { convertDoseToRate, convertRateToDose } from '../src/utils/flowConversion.js';
+// sucrase を使って TypeScript ファイルを読み込む設定
+import 'sucrase/register/ts.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const {
+  convertDoseToRate,
+  convertRateToDose,
+} = require('../src/utils/flowConversion.ts');
 
 test('dose-rate roundtrip', () => {
   const rate = convertDoseToRate(0.03, 50);

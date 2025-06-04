@@ -2,6 +2,7 @@
 // ノルアドレナリン(2mg/20ml)のみを対象とする簡易版です
 
 // 濃度: 2mg/20ml = 2000µg/20ml = 100µg/ml
+// 濃度を定数として定義。const にすることで変更不可とする
 const CONCENTRATION_UG_PER_ML = 100;
 
 /**
@@ -10,7 +11,11 @@ const CONCENTRATION_UG_PER_ML = 100;
  * @param {number} weight - 体重(kg)
  * @returns {number} ml/hr
  */
-export function convertDoseToRate(dose, weight) {
+/**
+ * 投与量(µg/kg/min)から流量(ml/hr)を計算
+ * dose: 投与量, weight: 体重
+ */
+export function convertDoseToRate(dose: number, weight: number): number {
   // 体重が 0 以下なら計算できない
 
   if (weight <= 0) {
@@ -28,7 +33,11 @@ export function convertDoseToRate(dose, weight) {
  * @param {number} weight - 体重(kg)
  * @returns {number} µg/kg/min
  */
-export function convertRateToDose(rate, weight) {
+/**
+ * 流量(ml/hr)から投与量(µg/kg/min)を計算
+ * rate: 流量, weight: 体重
+ */
+export function convertRateToDose(rate: number, weight: number): number {
   // 体重が 0 以下なら計算できない
   if (weight <= 0) {
     return NaN;

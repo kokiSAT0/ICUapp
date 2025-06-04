@@ -9,7 +9,10 @@ import {
 import { Surface, Text } from 'react-native-paper';
 // スライダーコンポーネントを利用する
 import Slider from '@react-native-community/slider';
-import { convertDoseToRate, convertRateToDose } from '../utils/flowConversion';
+import {
+  convertDoseToRate,
+  convertRateToDose,
+} from '../utils/flowConversion.ts';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
 // 簡易的なメッセージ表示
