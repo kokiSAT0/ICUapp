@@ -8,7 +8,8 @@ import {
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
 import { Surface, Text } from 'react-native-paper';
 // スライダーコンポーネントを利用する
-import Slider from '@react-native-community/slider';
+// スライダーを Paper のテーマに合わせたコンポーネント
+import PaperSlider from './PaperSlider';
 import {
   convertDoseToRate,
   convertRateToDose,
@@ -98,7 +99,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       <Text style={styles.title}>ノルアドレナリン換算ツール</Text>
       {/* 体重調整用スライダー */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
-      <Slider
+      <PaperSlider
         style={styles.slider}
         value={weight}
         onValueChange={handleWeightChange}
@@ -108,7 +109,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       />
       {/* 投与量調整用スライダー */}
       <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
-      <Slider
+      <PaperSlider
         style={styles.slider}
         value={dose}
         onValueChange={handleDoseChange}
@@ -118,7 +119,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       />
       {/* 流量調整用スライダー */}
       <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
-      <Slider
+      <PaperSlider
         style={styles.slider}
         value={rate}
         onValueChange={handleRateChange}
