@@ -19,6 +19,7 @@ export default forwardRef(function PaperSlider(
     minimumTrackTintColor,
     maximumTrackTintColor,
     thumbTintColor,
+    dangerThreshold,
     ...rest
   }: PaperSliderProps,
   ref: React.Ref<Slider>
@@ -40,16 +41,29 @@ export default forwardRef(function PaperSlider(
       : 0;
 
   return (
-
-    <Slider
-      ref={ref}
-      {...rest}
-      style={[styles.slider, style]}
-      minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
-      maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
-      thumbTintColor={thumbTintColor ?? colors.primary}
-    />
-
+    <View style={styles.container} onLayout={handleLayout}>
+      <Slider
+        ref={ref}
+        {...rest}
+        style={[styles.slider, style]}
+        minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
+        maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
+        thumbTintColor={thumbTintColor ?? colors.primary}
+      />
+      {dangerThreshold !== undefined && (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.danger,
+            {
+              left: startX,
+              width: width - startX,
+              backgroundColor: colors.error,
+            },
+          ]}
+        />
+      )}
+    </View>
   );
 });
 
