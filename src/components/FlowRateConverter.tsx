@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Platform,
@@ -17,6 +17,8 @@ import {
 // スライダーコンポーネントを利用する
 // スライダーを Paper のテーマに合わせたコンポーネント
 import PaperSlider from './PaperSlider';
+// ref 用に元の Slider コンポーネントも読み込む
+import Slider from '@react-native-community/slider';
 import {
   convertDoseToRate,
   convertRateToDose,
@@ -87,6 +89,18 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [menuVisible, setMenuVisible] = useState(false);
   // 単位選択メニューの表示状態
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
+
+  // 各スライダーを操作するための参照を保持
+  const weightRef = useRef<Slider>(null);
+  const doseRef = useRef<Slider>(null);
+  const rateRef = useRef<Slider>(null);
+
+  // 初期表示時に各スライダーの位置を状態に合わせる
+  useEffect(() => {
+    weightRef.current?.updateValue(weight);
+    doseRef.current?.updateValue(dose);
+    rateRef.current?.updateValue(rate);
+  }, []);
 
   // 投与量範囲から流量範囲を計算する共通処理
   const updateRateRange = (w: number, conc: number, range: Range): void => {
@@ -255,6 +269,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
       <PaperSlider
         style={styles.slider}
+        ref={weightRef}
         value={weight}
         onValueChange={handleWeightChange}
         minimumValue={WEIGHT_MIN}
@@ -265,6 +280,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
       <PaperSlider
         style={styles.slider}
+        ref={doseRef}
         value={dose}
         onValueChange={handleDoseChange}
         minimumValue={doseRange.min}
@@ -308,6 +324,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
       <PaperSlider
         style={styles.slider}
+        ref={rateRef}
         value={rate}
         onValueChange={handleRateChange}
         minimumValue={rateRange.min}
