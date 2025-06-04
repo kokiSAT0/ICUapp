@@ -7,11 +7,12 @@ const require = createRequire(import.meta.url);
 const {
   convertDoseToRate,
   convertRateToDose,
+  DEFAULT_CONCENTRATION,
 } = require('../src/utils/flowConversion');
 
 test('dose-rate roundtrip', () => {
-  const rate = convertDoseToRate(0.03, 50);
+  const rate = convertDoseToRate(0.03, 50, DEFAULT_CONCENTRATION);
   assert.ok(Math.abs(rate - 0.9) < 1e-6);
-  const dose = convertRateToDose(rate, 50);
+  const dose = convertRateToDose(rate, 50, DEFAULT_CONCENTRATION);
   assert.ok(Math.abs(dose - 0.03) < 1e-6);
 });
