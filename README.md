@@ -13,6 +13,9 @@
    `npm install --legacy-peer-deps` を実行します。
    Web 版を利用する場合は次のパッケージも追加でインストールしてください。
    `npx expo install react-dom react-native-web @expo/metro-runtime`
+   
+   **補足**: テストでは TypeScript を扱うため `sucrase` を使用します。
+   `npm install` を実行すると開発用依存関係として自動的にインストールされます。
 
 2. `npm run lint` でコードの静的解析 (エラー検出) を行います。
 3. `npm test` でテストを実行します。
