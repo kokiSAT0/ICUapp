@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Platform,
@@ -15,6 +15,8 @@ import {
   Menu,
   Button,
 } from 'react-native-paper';
+// 端末にデータを保存するため AsyncStorage を利用
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // スライダーコンポーネントを利用する
 // スライダーを Paper のテーマに合わせたコンポーネント
 import PaperSlider from './PaperSlider';
@@ -50,6 +52,8 @@ function roundStep(value: number, step: number): number {
 // 各ダイアルの設定値
 const WEIGHT_MIN = 20;
 const WEIGHT_MAX = 120;
+// 体重を保存する際のキー名
+const STORAGE_KEY_WEIGHT = 'weight';
 export type Range = {
   min: number;
   max: number;
@@ -62,6 +66,36 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
   const [drug, setDrug] = useState<DrugType>('norepinephrine');
   const [weight, setWeight] = useState(50);
+  // Snackbar 用の状態管理は最初に宣言
+  const [snackbar, setSnackbar] = useState('');
+  // 初回読み込み時に保存済み体重を取得
+  useEffect(() => {
+    const loadWeight = async (): Promise<void> => {
+      try {
+        const value = await AsyncStorage.getItem(STORAGE_KEY_WEIGHT);
+        if (value !== null) {
+          const num = Number(value);
+          if (!Number.isNaN(num)) {
+            setWeight(num);
+          }
+        }
+      } catch {
+        setSnackbar('体重の読み込みに失敗しました');
+      }
+    };
+    loadWeight();
+  }, []);
+  // 体重変更時に保存
+  useEffect(() => {
+    const saveWeight = async (): Promise<void> => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY_WEIGHT, String(weight));
+      } catch {
+        setSnackbar('体重の保存に失敗しました');
+      }
+    };
+    saveWeight();
+  }, [weight]);
   const [dose, setDose] = useState(DRUGS.norepinephrine.initialDose);
   // 投与量・流量の範囲を薬剤ごとに保持
   const [doseRange, setDoseRange] = useState<Range>({
@@ -97,8 +131,6 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       DRUGS.norepinephrine.rateStep,
     ),
   );
-  // Snackbar 用の状態管理
-  const [snackbar, setSnackbar] = useState('');
   // 薬剤選択メニューの表示状態
   const [menuVisible, setMenuVisible] = useState(false);
   // 単位選択メニューの表示状態
