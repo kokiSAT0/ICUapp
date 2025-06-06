@@ -9,6 +9,8 @@ export type DrugConfigContextType = {
   configs: Record<DrugType, DrugConfig>;
   setConfigs: (configs: Record<DrugType, DrugConfig>) => void;
   resetToDefault: () => Promise<void>;
+  // 指定した薬剤のみデフォルトに戻す
+  resetDrugToDefault: (drug: DrugType) => Promise<void>;
   loadConfigs: () => Promise<void>;
 };
 
@@ -47,12 +49,20 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     await setConfigs(DRUGS);
   };
 
+  // 特定の薬剤のみデフォルトに戻す処理
+  const resetDrugToDefault = async (drug: DrugType): Promise<void> => {
+    const updated = { ...configs, [drug]: DRUGS[drug] };
+    await setConfigs(updated);
+  };
+
   useEffect(() => {
     loadConfigs();
   }, []);
 
   return (
-    <DrugConfigContext.Provider value={{ configs, setConfigs, resetToDefault, loadConfigs }}>
+    <DrugConfigContext.Provider
+      value={{ configs, setConfigs, resetToDefault, resetDrugToDefault, loadConfigs }}
+    >
       {children}
     </DrugConfigContext.Provider>
   );
