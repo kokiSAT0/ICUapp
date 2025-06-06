@@ -375,234 +375,251 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   return (
     // ScrollView で画面からはみ出した場合に縦スクロールできるようにする
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {/* Surface は Paper の View 相当コンポーネント */}
-      <Surface style={styles.container}>
-      {/* 薬剤選択 */}
-      <Menu
-        visible={menuVisible}
-        onDismiss={() => setMenuVisible(false)}
-        anchor={
-          <Button mode="outlined" onPress={() => setMenuVisible(true)}>
-            {configs[drug].label}
-          </Button>
-        }
-      >
-        {enabledDrugs.map((d) => (
-          <Menu.Item
-            key={d}
-            onPress={() => handleDrugSelect(d)}
-            title={configs[d].label}
-          />
-        ))}
-      </Menu>
-      {/* 体重入力エリア */}
-      <View style={styles.inputRow}>
-        <Text style={styles.label}>体重:</Text>
-        <View style={styles.numberInputContainer}>
-          {/* 増量ボタンを横並びで表示 */}
-          <View style={styles.buttonRow}>
-            {/* 10kg 増加ボタン */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>++</Text>
-            )}
-            size={20}
-            onPress={() => handleWeightChange(weight + 10)}
-          />
-          <IconButton
-            icon="plus"
-            size={20}
-            onPress={() => handleWeightChange(weight + 1)}
-          />
-        </View>
-        <TextInput
-          mode="outlined"
-          style={styles.numberInput}
-          keyboardType="numeric"
-          value={String(weight)}
-          onChangeText={(v) => {
-            const n = Number(v);
-            if (!Number.isNaN(n)) {
-              handleWeightChange(n);
+      <View style={styles.container}>
+        {/* 薬剤選択をカードに配置 */}
+        <Surface style={[styles.card, styles.drugCard]}>
+          <Menu
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            anchor={
+              <Button mode="outlined" onPress={() => setMenuVisible(true)}>
+                {configs[drug].label}
+              </Button>
             }
-          }}
-        />
-        {/* 減量ボタンを横並びで表示 */}
-        <View style={styles.buttonRow}>
-          {/* 10kg 減少ボタンを左に配置 */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>--</Text>
-            )}
-            size={20}
-            onPress={() => handleWeightChange(weight - 10)}
-          />
-          <IconButton
-            icon="minus"
-            size={20}
-            onPress={() => handleWeightChange(weight - 1)}
-          />
-        </View>
-        </View>
-        <Text style={styles.inlineText}>kg</Text>
-      </View>
-      {/* 溶質量・単位・溶液量を横並びで入力する */}
-      <View style={styles.compositionRow}>
-        {/* ラベルと入力欄を一行に配置する */}
-        <Text style={styles.label}>組成:</Text>
-        <TextInput
-          mode="outlined"
-          style={styles.compInput}
-          value={String(soluteAmount)}
-          keyboardType="numeric"
-          onChangeText={handleAmountChange}
-        />
-        <Menu
-          visible={unitMenuVisible}
-          onDismiss={() => setUnitMenuVisible(false)}
-          anchor={
-            <Button
+          >
+            {enabledDrugs.map((d) => (
+              <Menu.Item
+                key={d}
+                onPress={() => handleDrugSelect(d)}
+                title={configs[d].label}
+              />
+            ))}
+          </Menu>
+        </Surface>
+
+        {/* 体重入力エリア */}
+        <Surface style={[styles.card, styles.weightCard]}>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>体重:</Text>
+            <View style={styles.numberInputContainer}>
+              {/* 増量ボタンを横並びで表示 */}
+              <View style={styles.buttonRow}>
+                {/* 10kg 増加ボタン */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>++</Text>
+                  )}
+                  size={20}
+                  onPress={() => handleWeightChange(weight + 10)}
+                />
+                <IconButton
+                  icon="plus"
+                  size={20}
+                  onPress={() => handleWeightChange(weight + 1)}
+                />
+              </View>
+              <TextInput
+                mode="outlined"
+                style={styles.numberInput}
+                keyboardType="numeric"
+                value={String(weight)}
+                onChangeText={(v) => {
+                  const n = Number(v);
+                  if (!Number.isNaN(n)) {
+                    handleWeightChange(n);
+                  }
+                }}
+              />
+              {/* 減量ボタンを横並びで表示 */}
+              <View style={styles.buttonRow}>
+                {/* 10kg 減少ボタンを左に配置 */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>--</Text>
+                  )}
+                  size={20}
+                  onPress={() => handleWeightChange(weight - 10)}
+                />
+                <IconButton
+                  icon="minus"
+                  size={20}
+                  onPress={() => handleWeightChange(weight - 1)}
+                />
+              </View>
+            </View>
+            <Text style={styles.inlineText}>kg</Text>
+          </View>
+        </Surface>
+
+        {/* 溶質量・単位・溶液量を横並びで入力する */}
+        <Surface style={[styles.card, styles.compositionCard]}>
+          <View style={styles.compositionRow}>
+            {/* ラベルと入力欄を一行に配置する */}
+            <Text style={styles.label}>組成:</Text>
+            <TextInput
               mode="outlined"
-              onPress={() => setUnitMenuVisible(true)}
               style={styles.compInput}
+              value={String(soluteAmount)}
+              keyboardType="numeric"
+              onChangeText={handleAmountChange}
+            />
+            <Menu
+              visible={unitMenuVisible}
+              onDismiss={() => setUnitMenuVisible(false)}
+              anchor={
+                <Button
+                  mode="outlined"
+                  onPress={() => setUnitMenuVisible(true)}
+                  style={styles.compInput}
+                >
+                  {soluteUnit}
+                </Button>
+              }
             >
-              {soluteUnit}
-            </Button>
-          }
-        >
-          <Menu.Item onPress={() => handleUnitChange('mg')} title="mg" />
-          <Menu.Item onPress={() => handleUnitChange('µg')} title="µg" />
-        </Menu>
-        <Text style={styles.inlineText}>/</Text>
-        <TextInput
-          mode="outlined"
-          style={styles.compInput}
-          value={String(solutionVolume)}
-          keyboardType="numeric"
-          onChangeText={handleVolumeChange}
-        />
-        <Text style={styles.inlineText}>ml</Text>
-      </View>
-      {/* 濃度表示 */}
-      <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
-      {/* 流量入力エリア */}
-      <View style={styles.rateRow}>
-        <Text style={styles.label}>流量:</Text>
-        <View style={styles.numberInputContainer}>
-          <View style={styles.buttonRow}>
-            {/* 流量を10倍刻みで増やすボタン */}
-            <IconButton
-              icon={({ color }) => (
-                <Text style={[styles.doubleIcon, { color }]}>++</Text>
-            )}
-            size={20}
-            onPress={() =>
-              handleRateChange(rate + configs[drug].rateStep * 10)
-            }
-          />
-          <IconButton
-            icon="plus"
-            size={20}
-            onPress={() => handleRateChange(rate + configs[drug].rateStep)}
-          />
-        </View>
-        <TextInput
-          mode="outlined"
-          style={styles.numberInput}
-          keyboardType="numeric"
-          value={String(rate)}
-          onChangeText={(v) => {
-            const n = Number(v);
-            if (!Number.isNaN(n)) {
-              handleRateChange(n);
-            }
-          }}
-        />
-        <Text style={styles.inlineText}>ml/hr</Text>
-        <View style={styles.buttonRow}>
-          {/* 流量を10倍刻みで減らすボタンを左に配置 */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>--</Text>
-            )}
-            size={20}
-            onPress={() =>
-              handleRateChange(rate - configs[drug].rateStep * 10)
-            }
-          />
-          <IconButton
-            icon="minus"
-            size={20}
-            onPress={() => handleRateChange(rate - configs[drug].rateStep)}
-          />
+              <Menu.Item onPress={() => handleUnitChange('mg')} title="mg" />
+              <Menu.Item onPress={() => handleUnitChange('µg')} title="µg" />
+            </Menu>
+            <Text style={styles.inlineText}>/</Text>
+            <TextInput
+              mode="outlined"
+              style={styles.compInput}
+              value={String(solutionVolume)}
+              keyboardType="numeric"
+              onChangeText={handleVolumeChange}
+            />
+            <Text style={styles.inlineText}>ml</Text>
           </View>
-        </View>
-      </View>
-      {/* 投与量入力エリア */}
-      <View style={styles.inputRow}>
-        <Text style={styles.inlineText}>投与量:</Text>
-        <View style={styles.numberInputContainer}>
-          <View style={styles.buttonRow}>
-            {/* 投与量を10倍刻みで増やすボタン */}
-            <IconButton
-              icon={({ color }) => (
-                <Text style={[styles.doubleIcon, { color }]}>++</Text>
-              )}
-              size={20}
-              onPress={() =>
-                handleDoseChange(dose + configs[drug].doseStep * 10)
-              }
-            />
-            <IconButton
-              icon="plus"
-              size={20}
-              onPress={() => handleDoseChange(dose + configs[drug].doseStep)}
-            />
+          {/* 濃度表示 */}
+          <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
+        </Surface>
+
+        {/* 流量入力エリア */}
+        <Surface style={[styles.card, styles.rateCard]}>
+          <View style={styles.rateRow}>
+            <Text style={styles.label}>流量:</Text>
+            <View style={styles.numberInputContainer}>
+              <View style={styles.buttonRow}>
+                {/* 流量を10倍刻みで増やすボタン */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>++</Text>
+                  )}
+                  size={20}
+                  onPress={() =>
+                    handleRateChange(rate + configs[drug].rateStep * 10)
+                  }
+                />
+                <IconButton
+                  icon="plus"
+                  size={20}
+                  onPress={() => handleRateChange(rate + configs[drug].rateStep)}
+                />
+              </View>
+              <TextInput
+                mode="outlined"
+                style={[styles.numberInput, styles.largeNumber]}
+                keyboardType="numeric"
+                value={String(rate)}
+                onChangeText={(v) => {
+                  const n = Number(v);
+                  if (!Number.isNaN(n)) {
+                    handleRateChange(n);
+                  }
+                }}
+              />
+              <Text style={styles.inlineText}>ml/hr</Text>
+              <View style={styles.buttonRow}>
+                {/* 流量を10倍刻みで減らすボタンを左に配置 */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>--</Text>
+                  )}
+                  size={20}
+                  onPress={() =>
+                    handleRateChange(rate - configs[drug].rateStep * 10)
+                  }
+                />
+                <IconButton
+                  icon="minus"
+                  size={20}
+                  onPress={() => handleRateChange(rate - configs[drug].rateStep)}
+                />
+              </View>
+            </View>
           </View>
-          <TextInput
-            mode="outlined"
-            style={styles.numberInput}
-            keyboardType="numeric"
-            value={String(dose)}
-            onChangeText={(v) => {
-              const n = Number(v);
-              if (!Number.isNaN(n)) {
-                handleDoseChange(n);
-              }
-            }}
+        </Surface>
+
+        {/* 投与量入力エリア */}
+        <Surface style={[styles.card, styles.doseCard]}>
+          <View style={styles.inputRow}>
+            <Text style={styles.inlineText}>投与量:</Text>
+            <View style={styles.numberInputContainer}>
+              <View style={styles.buttonRow}>
+                {/* 投与量を10倍刻みで増やすボタン */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>++</Text>
+                  )}
+                  size={20}
+                  onPress={() =>
+                    handleDoseChange(dose + configs[drug].doseStep * 10)
+                  }
+                />
+                <IconButton
+                  icon="plus"
+                  size={20}
+                  onPress={() => handleDoseChange(dose + configs[drug].doseStep)}
+                />
+              </View>
+              <TextInput
+                mode="outlined"
+                style={[styles.numberInput, styles.largeNumber]}
+                keyboardType="numeric"
+                value={String(dose)}
+                onChangeText={(v) => {
+                  const n = Number(v);
+                  if (!Number.isNaN(n)) {
+                    handleDoseChange(n);
+                  }
+                }}
+              />
+              <View style={styles.buttonRow}>
+                {/* 投与量を10倍刻みで減らすボタンを左に配置 */}
+                <IconButton
+                  icon={({ color }) => (
+                    <Text style={[styles.doubleIcon, { color }]}>--</Text>
+                  )}
+                  size={20}
+                  onPress={() =>
+                    handleDoseChange(dose - configs[drug].doseStep * 10)
+                  }
+                />
+                <IconButton
+                  icon="minus"
+                  size={20}
+                  onPress={() => handleDoseChange(dose - configs[drug].doseStep)}
+                />
+              </View>
+            </View>
+            <Text style={styles.inlineText}>{configs[drug].doseUnit}</Text>
+          </View>
+          <PaperSlider
+            style={styles.slider}
+            value={dose}
+            onValueChange={handleDoseChange}
+            minimumValue={doseRange.min}
+            maximumValue={doseRange.max}
+            dangerThreshold={configs[drug].dangerDose}
+            step={configs[drug].doseStep}
           />
-          <View style={styles.buttonRow}>
-            {/* 投与量を10倍刻みで減らすボタンを左に配置 */}
-            <IconButton
-              icon={({ color }) => (
-                <Text style={[styles.doubleIcon, { color }]}>--</Text>
-              )}
-              size={20}
-              onPress={() =>
-                handleDoseChange(dose - configs[drug].doseStep * 10)
-              }
-            />
-            <IconButton
-              icon="minus"
-              size={20}
-              onPress={() => handleDoseChange(dose - configs[drug].doseStep)}
-            />
-          </View>
-        </View>
-        <Text style={styles.inlineText}>{configs[drug].doseUnit}</Text>
-      </View>
-      <PaperSlider
-        style={styles.slider}
-        value={dose}
-        onValueChange={handleDoseChange}
-        minimumValue={doseRange.min}
-        maximumValue={doseRange.max}
-        dangerThreshold={configs[drug].dangerDose}
-        step={configs[drug].doseStep}
-      />
-      {/* 薬剤の説明を最下部に表示 */}
-      <Text style={styles.description}>{configs[drug].description}</Text>
-      {/* Snackbar でバリデーションメッセージを表示 */}
+        </Surface>
+
+        {/* 解説表示エリア */}
+        <Surface style={[styles.card, styles.descriptionCard]}>
+          <Text style={styles.description}>{configs[drug].description}</Text>
+        </Surface>
+
+        {/* Snackbar でバリデーションメッセージを表示 */}
         <Snackbar
           visible={snackbar.length > 0}
           onDismiss={() => setSnackbar('')}
@@ -610,7 +627,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         >
           {snackbar}
         </Snackbar>
-      </Surface>
+      </View>
     </ScrollView>
   );
 }
@@ -694,5 +711,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
+  },
+  // 各エリアをカード風に表示する共通スタイル
+  card: {
+    width: '90%',
+    marginVertical: 6,
+    padding: 8,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  drugCard: {
+    backgroundColor: '#e1f5fe',
+  },
+  weightCard: {
+    backgroundColor: '#fff3e0',
+  },
+  compositionCard: {
+    backgroundColor: '#f1f8e9',
+  },
+  rateCard: {
+    backgroundColor: '#fce4ec',
+  },
+  doseCard: {
+    backgroundColor: '#e8eaf6',
+  },
+  descriptionCard: {
+    backgroundColor: '#eeeeee',
+  },
+  // 流量・投与量の数値を大きく表示する
+  largeNumber: {
+    fontSize: 18,
   },
 });
