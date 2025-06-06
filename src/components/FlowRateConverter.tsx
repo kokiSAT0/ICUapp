@@ -387,13 +387,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         <Text style={styles.inlineText}>kg</Text>
       </View>
       {/* 投与量入力エリア */}
-      <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
-      <View style={styles.numberInputContainer}>
-        <View style={styles.buttonRow}>
-          {/* 投与量を10倍刻みで増やすボタン */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>++</Text>
+      <View style={styles.inputRow}>
+        <Text style={styles.inlineText}>投与量:</Text>
+        <View style={styles.numberInputContainer}>
+          <View style={styles.buttonRow}>
+            {/* 投与量を10倍刻みで増やすボタン */}
+            <IconButton
+              icon={({ color }) => (
+                <Text style={[styles.doubleIcon, { color }]}>++</Text>
             )}
             size={20}
             onPress={() =>
@@ -435,6 +436,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               onPress={() => handleDoseChange(dose - configs[drug].doseStep)}
             />
           </View>
+        </View>
+        <Text style={styles.inlineText}>µg/kg/min</Text>
       </View>
       <PaperSlider
         style={styles.slider}
@@ -625,5 +628,11 @@ const styles = StyleSheet.create({
   // 10倍増減ボタン用のテキストスタイル
   doubleIcon: {
     fontSize: 12,
+  },
+  // ラベルと入力欄を横並びに表示する行
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
   },
 });
