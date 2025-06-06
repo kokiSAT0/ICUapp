@@ -488,13 +488,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       {/* 濃度表示 */}
       <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
       {/* 流量入力エリア */}
-      <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
-      <View style={styles.numberInputContainer}>
-        <View style={styles.buttonRow}>
-          {/* 流量を10倍刻みで増やすボタン */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>++</Text>
+      <View style={styles.rateRow}>
+        <Text style={styles.label}>流量:</Text>
+        <View style={styles.numberInputContainer}>
+          <View style={styles.buttonRow}>
+            {/* 流量を10倍刻みで増やすボタン */}
+            <IconButton
+              icon={({ color }) => (
+                <Text style={[styles.doubleIcon, { color }]}>++</Text>
             )}
             size={20}
             onPress={() =>
@@ -519,6 +520,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             }
           }}
         />
+        <Text style={styles.inlineText}>ml/hr</Text>
         <View style={styles.buttonRow}>
           {/* 流量を10倍刻みで減らすボタンを左に配置 */}
           <IconButton
@@ -535,6 +537,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             size={20}
             onPress={() => handleRateChange(rate - configs[drug].rateStep)}
           />
+        </View>
         </View>
       </View>
       <PaperSlider
@@ -624,6 +627,11 @@ const styles = StyleSheet.create({
   numberInput: {
     width: 80,
     textAlign: 'center',
+  },
+  // 流量ラベルと入力欄を横並びに配置する行
+  rateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   // 10倍増減ボタン用のテキストスタイル
   doubleIcon: {
