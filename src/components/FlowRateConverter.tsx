@@ -5,6 +5,7 @@ import {
   ToastAndroid,
   Alert,
   View,
+  ScrollView,
 } from 'react-native';
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
 import {
@@ -296,8 +297,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   };
 
   return (
-    // Surface は Paper の View 相当コンポーネント
-    <Surface style={styles.container}>
+    // ScrollView で画面からはみ出した場合に縦スクロールできるようにする
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Surface は Paper の View 相当コンポーネント */}
+      <Surface style={styles.container}>
       {/* 薬剤選択 */}
       <Menu
         visible={menuVisible}
@@ -459,20 +462,27 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       {/* 薬剤の説明を最下部に表示 */}
       <Text style={styles.description}>{configs[drug].description}</Text>
       {/* Snackbar でバリデーションメッセージを表示 */}
-      <Snackbar
-        visible={snackbar.length > 0}
-        onDismiss={() => setSnackbar('')}
-        duration={2000}
-      >
-        {snackbar}
-      </Snackbar>
-    </Surface>
+        <Snackbar
+          visible={snackbar.length > 0}
+          onDismiss={() => setSnackbar('')}
+          duration={2000}
+        >
+          {snackbar}
+        </Snackbar>
+      </Surface>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  // スクロールコンテナでは flexGrow を指定して中央寄せにする
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
   container: {
-    alignItems: "center",
+    alignItems: 'center',
   },
   // PaperSlider のコンテナに適用する共通スタイル
   slider: {
