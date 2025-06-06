@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Surface, Text, TextInput, Button, Menu, Snackbar } from 'react-native-paper';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
-import { DrugType } from '../config/drugs';
+import { DrugType, DRUGS } from '../config/drugs';
 
 export type SettingsScreenProps = {
   onClose: () => void;
 };
 
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
-  const { configs, setConfigs, resetToDefault } = useDrugConfigs();
+  const { configs, setConfigs, resetDrugToDefault } = useDrugConfigs();
   const [localConfigs, setLocalConfigs] = useState(configs);
+  const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
-  const [menuVisible, setMenuVisible] = useState<DrugType | null>(null);
+  const [drugMenuVisible, setDrugMenuVisible] = useState(false);
+  const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 入力値更新用ヘルパー
   const updateValue = (
@@ -43,16 +45,44 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   };
 
   const handleReset = async () => {
-    await resetToDefault();
-    setLocalConfigs(configs);
+    await resetDrugToDefault(selectedDrug);
+    setLocalConfigs({
+      ...localConfigs,
+      [selectedDrug]: DRUGS[selectedDrug],
+    });
     setSnackbar('デフォルトに戻しました');
   };
 
   return (
     <Surface style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {Object.keys(localConfigs).map((drugKey) => {
-          const key = drugKey as DrugType;
+        {/* 薬剤選択用プルダウン */}
+        <Menu
+          visible={drugMenuVisible}
+          onDismiss={() => setDrugMenuVisible(false)}
+          anchor={
+            <Button mode="outlined" onPress={() => setDrugMenuVisible(true)}>
+              {localConfigs[selectedDrug].label}
+            </Button>
+          }
+        >
+          <Menu.Item
+            onPress={() => {
+              setSelectedDrug('norepinephrine');
+              setDrugMenuVisible(false);
+            }}
+            title="ノルアドレナリン"
+          />
+          <Menu.Item
+            onPress={() => {
+              setSelectedDrug('dopamine');
+              setDrugMenuVisible(false);
+            }}
+            title="ドパミン"
+          />
+        </Menu>
+        {(() => {
+          const key = selectedDrug;
           const cfg = localConfigs[key];
           return (
             <View key={key} style={styles.section}>
@@ -75,9 +105,11 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
                 />
                 <Menu
-                  visible={menuVisible === key}
-                  onDismiss={() => setMenuVisible(null)}
-                  anchor={<Button onPress={() => setMenuVisible(key)}>{cfg.soluteUnit}</Button>}
+                  visible={unitMenuVisible}
+                  onDismiss={() => setUnitMenuVisible(false)}
+                  anchor={
+                    <Button onPress={() => setUnitMenuVisible(true)}>{cfg.soluteUnit}</Button>
+                  }
                 >
                   <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'mg')} title="mg" />
                   <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'µg')} title="µg" />
@@ -94,7 +126,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
               </View>
             </View>
           );
-        })}
+        })()}
         <View style={styles.buttonRow}>
           <Button mode="contained" onPress={handleSave} style={styles.button}>
             保存
