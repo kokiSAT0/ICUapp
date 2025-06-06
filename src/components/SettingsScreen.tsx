@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import {
   Surface,
   Text,
@@ -9,6 +10,8 @@ import {
   Snackbar,
   Switch,
   RadioButton,
+  List,
+  IconButton,
 } from 'react-native-paper';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DrugConfig } from '../config/drugs';
@@ -47,6 +50,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     resetDrugToDefault,
     initialDrug,
     setInitialDrug,
+    drugOrder,
+    setDrugOrder,
   } = useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
   const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>({
@@ -57,7 +62,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const [startupDrug, setStartupDrug] = useState<DrugType>(initialDrug);
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
-  const [drugMenuVisible, setDrugMenuVisible] = useState(false);
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 外部設定の初期薬剤が変わったら同期する
@@ -125,27 +129,21 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   return (
     <Surface style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* 薬剤選択用プルダウン */}
-        <Menu
-          visible={drugMenuVisible}
-          onDismiss={() => setDrugMenuVisible(false)}
-          anchor={
-            <Button mode="outlined" onPress={() => setDrugMenuVisible(true)}>
-              {localConfigs[selectedDrug].label}
-            </Button>
-          }
-        >
-          {(Object.keys(localConfigs) as DrugType[]).map((k) => (
-            <Menu.Item
-              key={k}
-              onPress={() => {
-                setSelectedDrug(k);
-                setDrugMenuVisible(false);
-              }}
-              title={localConfigs[k].label}
+        {/* 並び順を変更するリスト */}
+        <DraggableFlatList
+          data={drugOrder}
+          keyExtractor={(item) => item}
+          onDragEnd={({ data }) => setDrugOrder(data as DrugType[])}
+          style={styles.list}
+          renderItem={({ item, drag }: RenderItemParams<DrugType>) => (
+            <List.Item
+              title={localConfigs[item].label}
+              onPress={() => setSelectedDrug(item)}
+              onLongPress={drag}
+              right={() => <IconButton icon="drag" />}
             />
-          ))}
-        </Menu>
+          )}
+        />
         {(() => {
           const key = selectedDrug;
           const cfg = localConfigs[key];
@@ -205,7 +203,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             onValueChange={(v) => setStartupDrug(v as DrugType)}
             value={startupDrug}
           >
-            {(Object.keys(localConfigs) as DrugType[]).map((k) => (
+            {drugOrder.map((k) => (
               <View key={k} style={styles.row}>
                 <RadioButton value={k} />
                 <Text style={styles.inlineText}>{localConfigs[k].label}</Text>
@@ -240,4 +238,5 @@ const styles = StyleSheet.create({
   buttonRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
   button: { marginHorizontal: 4 },
   closeButton: { marginTop: 16 },
+  list: { marginBottom: 16 },
 });

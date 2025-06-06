@@ -72,7 +72,7 @@ export type FlowRateConverterProps = {};
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
-  const { configs, initialDrug, setInitialDrug } = useDrugConfigs();
+  const { configs, initialDrug, setInitialDrug, drugOrder } = useDrugConfigs();
   const [drug, setDrug] = useState<DrugType>(initialDrug);
 
   // 設定から初期薬剤が変化した場合に state を同期する
@@ -162,9 +162,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 表示対象の薬剤一覧
-  const enabledDrugs = (Object.keys(configs) as DrugType[]).filter(
-    (k) => configs[k].enabled,
-  );
+  const enabledDrugs = drugOrder.filter((k) => configs[k].enabled);
 
   // 選択中の薬剤が非表示になった場合は先頭の薬剤を選ぶ
   useEffect(() => {
