@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import {
   Surface,
   Text,
@@ -129,99 +129,112 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
 
   return (
     <Surface style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* 薬剤の並び順を変更するリスト。長押しでドラッグ開始 */}
-        <DraggableFlatList
-          data={drugOrder}
-          keyExtractor={(item) => item}
-          onDragEnd={({ data }) => setDrugOrder(data)}
-          renderItem={({ item, drag }) => (
-            <List.Item
-              title={localConfigs[item].label}
-              // タップで編集対象を切り替える
-              onPress={() => setSelectedDrug(item)}
-              onLongPress={drag}
-              right={() => <IconButton icon="drag" />} />
-          )}
-          style={styles.list}
-        />
-        {(() => {
-          const key = selectedDrug;
-          const cfg = localConfigs[key];
-          return (
-            <View key={key} style={styles.section}>
-              <Text style={styles.heading}>{cfg.label}</Text>
-              <View style={styles.row}>
-                <Text style={styles.inlineText}>表示</Text>
-                <Switch
-                  value={cfg.enabled}
-                  onValueChange={(v) => updateValue(key, 'enabled', v)}
-                />
-              </View>
-              <TextInput
-                mode="outlined"
-                label={`初期投与量(${cfg.doseUnit})`}
-                style={styles.input}
-                keyboardType="numeric"
-                value={cfg.initialDose}
-                onChangeText={(v) => updateValue(key, 'initialDose', v)}
-              />
-              <View style={styles.row}>
-                <TextInput
-                  mode="outlined"
-                  label="溶質量"
-                  style={styles.smallInput}
-                  keyboardType="numeric"
-                  value={cfg.soluteAmount}
-                  onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
-                />
-                <Menu
-                  visible={unitMenuVisible}
-                  onDismiss={() => setUnitMenuVisible(false)}
-                  anchor={
-                    <Button onPress={() => setUnitMenuVisible(true)}>{cfg.soluteUnit}</Button>
-                  }
-                >
-                  <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'mg')} title="mg" />
-                  <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'µg')} title="µg" />
-                </Menu>
-                <Text style={styles.inlineText}>/</Text>
-                <TextInput
-                  mode="outlined"
-                  label="溶液量(ml)"
-                  style={styles.smallInput}
-                  keyboardType="numeric"
-                  value={cfg.solutionVolume}
-                  onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
-                />
-              </View>
+      <DraggableFlatList
+        data={drugOrder}
+        keyExtractor={(item) => item}
+        onDragEnd={({ data }) => setDrugOrder(data)}
+        renderItem={({ item, drag }) => (
+          <List.Item
+            title={localConfigs[item].label}
+            // タップで編集対象を切り替える
+            onPress={() => setSelectedDrug(item)}
+            onLongPress={drag}
+            right={() => <IconButton icon="drag" />}
+          />
+        )}
+        style={styles.list}
+        contentContainerStyle={styles.scrollContainer}
+        ListFooterComponent={
+          <>
+            {(() => {
+              const key = selectedDrug;
+              const cfg = localConfigs[key];
+              return (
+                <View key={key} style={styles.section}>
+                  <Text style={styles.heading}>{cfg.label}</Text>
+                  <View style={styles.row}>
+                    <Text style={styles.inlineText}>表示</Text>
+                    <Switch
+                      value={cfg.enabled}
+                      onValueChange={(v) => updateValue(key, 'enabled', v)}
+                    />
+                  </View>
+                  <TextInput
+                    mode="outlined"
+                    label={`初期投与量(${cfg.doseUnit})`}
+                    style={styles.input}
+                    keyboardType="numeric"
+                    value={cfg.initialDose}
+                    onChangeText={(v) => updateValue(key, 'initialDose', v)}
+                  />
+                  <View style={styles.row}>
+                    <TextInput
+                      mode="outlined"
+                      label="溶質量"
+                      style={styles.smallInput}
+                      keyboardType="numeric"
+                      value={cfg.soluteAmount}
+                      onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
+                    />
+                    <Menu
+                      visible={unitMenuVisible}
+                      onDismiss={() => setUnitMenuVisible(false)}
+                      anchor={
+                        <Button onPress={() => setUnitMenuVisible(true)}>
+                          {cfg.soluteUnit}
+                        </Button>
+                      }
+                    >
+                      <Menu.Item
+                        onPress={() => updateValue(key, 'soluteUnit', 'mg')}
+                        title="mg"
+                      />
+                      <Menu.Item
+                        onPress={() => updateValue(key, 'soluteUnit', 'µg')}
+                        title="µg"
+                      />
+                    </Menu>
+                    <Text style={styles.inlineText}>/</Text>
+                    <TextInput
+                      mode="outlined"
+                      label="溶液量(ml)"
+                      style={styles.smallInput}
+                      keyboardType="numeric"
+                      value={cfg.solutionVolume}
+                      onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
+                    />
+                  </View>
+                </View>
+              );
+            })()}
+            <View style={styles.section}>
+              <Text style={styles.heading}>起動時に表示する薬剤</Text>
+              <RadioButton.Group
+                onValueChange={(v) => setStartupDrug(v as DrugType)}
+                value={startupDrug}
+              >
+                {(Object.keys(localConfigs) as DrugType[]).map((k) => (
+                  <View key={k} style={styles.row}>
+                    <RadioButton value={k} />
+                    <Text style={styles.inlineText}>{localConfigs[k].label}</Text>
+                  </View>
+                ))}
+              </RadioButton.Group>
             </View>
-          );
-        })()}
-        <View style={styles.section}>
-          <Text style={styles.heading}>起動時に表示する薬剤</Text>
-          <RadioButton.Group
-            onValueChange={(v) => setStartupDrug(v as DrugType)}
-            value={startupDrug}
-          >
-            {(Object.keys(localConfigs) as DrugType[]).map((k) => (
-              <View key={k} style={styles.row}>
-                <RadioButton value={k} />
-                <Text style={styles.inlineText}>{localConfigs[k].label}</Text>
-              </View>
-            ))}
-          </RadioButton.Group>
-        </View>
-        <View style={styles.buttonRow}>
-          <Button mode="contained" onPress={handleSave} style={styles.button}>
-            保存
-          </Button>
-          <Button mode="outlined" onPress={handleReset} style={styles.button}>
-            デフォルトに戻す
-          </Button>
-        </View>
-        <Button onPress={onClose} style={styles.closeButton}>閉じる</Button>
-      </ScrollView>
+            <View style={styles.buttonRow}>
+              <Button mode="contained" onPress={handleSave} style={styles.button}>
+                保存
+              </Button>
+              <Button mode="outlined" onPress={handleReset} style={styles.button}>
+                デフォルトに戻す
+              </Button>
+            </View>
+            <Button onPress={onClose} style={styles.closeButton}>
+              閉じる
+            </Button>
+          </>
+        }
+      />
       <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>{snackbar}</Snackbar>
     </Surface>
   );
