@@ -10,6 +10,7 @@ const {
   DEFAULT_CONCENTRATION,
   formatComposition,
 } = require('../src/utils/flowConversion');
+const { DRUGS } = require('../src/config/drugs');
 
 test('dose-rate roundtrip', () => {
   const rate = convertDoseToRate(0.03, 50, DEFAULT_CONCENTRATION);
@@ -21,4 +22,9 @@ test('dose-rate roundtrip', () => {
 test('format composition string', () => {
   const result = formatComposition(5, 'mg', 50);
   assert.strictEqual(result, '5 mg / 50 ml');
+});
+
+test('dexmedetomidine config', () => {
+  assert.strictEqual(DRUGS.dexmedetomidine.doseUnit, 'µg/kg/hr');
+  assert.strictEqual(DRUGS.dexmedetomidine.initialDose, 0.2);
 });

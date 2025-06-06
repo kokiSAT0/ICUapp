@@ -47,6 +47,16 @@ function roundStep(value: number, step: number): number {
   return Math.round(value / step) * step;
 }
 
+// 投与量の単位が hr 指定の場合は分単位へ変換する
+function toMinuteDose(dose: number, unit: string): number {
+  return unit === 'µg/kg/hr' ? dose / 60 : dose;
+}
+
+// 分単位から表示単位へ戻す
+function fromMinuteDose(dose: number, unit: string): number {
+  return unit === 'µg/kg/hr' ? dose * 60 : dose;
+}
+
 // 各ダイアルの設定値
 const WEIGHT_MIN = 20;
 const WEIGHT_MAX = 120;
@@ -109,14 +119,22 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   });
   const [rateRange, setRateRange] = useState<Range>({
     min: convertDoseToRate(
-      defaultCfg.doseMin,
+      toMinuteDose(defaultCfg.doseMin, defaultCfg.doseUnit),
       50,
-      computeConcentration(defaultCfg.soluteAmount, defaultCfg.soluteUnit, defaultCfg.solutionVolume),
+      computeConcentration(
+        defaultCfg.soluteAmount,
+        defaultCfg.soluteUnit,
+        defaultCfg.solutionVolume,
+      ),
     ),
     max: convertDoseToRate(
-      defaultCfg.doseMax,
+      toMinuteDose(defaultCfg.doseMax, defaultCfg.doseUnit),
       50,
-      computeConcentration(defaultCfg.soluteAmount, defaultCfg.soluteUnit, defaultCfg.solutionVolume),
+      computeConcentration(
+        defaultCfg.soluteAmount,
+        defaultCfg.soluteUnit,
+        defaultCfg.solutionVolume,
+      ),
     ),
   });
   // 濃度計算用のパラメータ
@@ -131,7 +149,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [rate, setRate] = useState(
     roundStep(
       convertDoseToRate(
-        defaultCfg.initialDose,
+        toMinuteDose(defaultCfg.initialDose, defaultCfg.doseUnit),
         50,
         computeConcentration(defaultCfg.soluteAmount, defaultCfg.soluteUnit, defaultCfg.solutionVolume),
       ),
@@ -168,11 +186,23 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     const d = Math.max(info.doseMin, Math.min(info.doseMax, info.initialDose));
     setDose(d);
     const r = roundStep(
-      convertDoseToRate(d, weight, conc),
+      convertDoseToRate(
+        toMinuteDose(d, info.doseUnit),
+        weight,
+        conc,
+      ),
       info.rateStep,
     );
-    const minRate = convertDoseToRate(info.doseMin, weight, conc);
-    const maxRate = convertDoseToRate(info.doseMax, weight, conc);
+    const minRate = convertDoseToRate(
+      toMinuteDose(info.doseMin, info.doseUnit),
+      weight,
+      conc,
+    );
+    const maxRate = convertDoseToRate(
+      toMinuteDose(info.doseMax, info.doseUnit),
+      weight,
+      conc,
+    );
     setRate(Math.max(minRate, Math.min(maxRate, r)));
   }, [configs, drug, weight]);
 
@@ -184,8 +214,22 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     step: number = configs[drug].rateStep,
   ): void => {
     setRateRange({
-      min: roundStep(convertDoseToRate(range.min, w, conc), step),
-      max: roundStep(convertDoseToRate(range.max, w, conc), step),
+      min: roundStep(
+        convertDoseToRate(
+          toMinuteDose(range.min, configs[drug].doseUnit),
+          w,
+          conc,
+        ),
+        step,
+      ),
+      max: roundStep(
+        convertDoseToRate(
+          toMinuteDose(range.max, configs[drug].doseUnit),
+          w,
+          conc,
+        ),
+        step,
+      ),
     });
   };
 
@@ -198,7 +242,11 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     }
     setWeight(value);
     const r = roundStep(
-      convertDoseToRate(dose, value, concentration),
+      convertDoseToRate(
+        toMinuteDose(dose, configs[drug].doseUnit),
+        value,
+        concentration,
+      ),
       configs[drug].rateStep,
     );
     const min = rateRange.min;
@@ -215,13 +263,17 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     let value = roundStep(d, configs[drug].doseStep);
     if (value < doseRange.min || value > doseRange.max) {
       showToast(
-        `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
+        `投与量は${doseRange.min}\u2013${doseRange.max}${configs[drug].doseUnit}の範囲です`,
       );
       value = Math.max(doseRange.min, Math.min(doseRange.max, value));
     }
     setDose(value);
     const r = roundStep(
-      convertDoseToRate(value, weight, concentration),
+      convertDoseToRate(
+        toMinuteDose(value, configs[drug].doseUnit),
+        weight,
+        concentration,
+      ),
       configs[drug].rateStep,
     );
     if (r < rateRange.min || r > rateRange.max) {
@@ -239,12 +291,15 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     }
     setRate(value);
     const d = roundStep(
-      convertRateToDose(value, weight, concentration),
+      fromMinuteDose(
+        convertRateToDose(value, weight, concentration),
+        configs[drug].doseUnit,
+      ),
       configs[drug].doseStep,
     );
     if (d < doseRange.min || d > doseRange.max) {
       showToast(
-        `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
+        `投与量は${doseRange.min}\u2013${doseRange.max}${configs[drug].doseUnit}の範囲です`,
       );
     }
     setDose(Math.max(doseRange.min, Math.min(doseRange.max, d)));
@@ -264,7 +319,11 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     setConcentration(c);
     // 濃度変更時は流量も再計算する
     const r = roundStep(
-      convertDoseToRate(dose, weight, c),
+      convertDoseToRate(
+        toMinuteDose(dose, configs[drug].doseUnit),
+        weight,
+        c,
+      ),
       configs[drug].rateStep,
     );
     updateRateRange(weight, c, doseRange);
@@ -437,7 +496,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             />
           </View>
         </View>
-        <Text style={styles.inlineText}>µg/kg/min</Text>
+        <Text style={styles.inlineText}>{configs[drug].doseUnit}</Text>
       </View>
       <PaperSlider
         style={styles.slider}
