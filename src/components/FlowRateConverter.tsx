@@ -319,6 +319,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       {/* 体重入力エリア */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
       <View style={styles.numberInputContainer}>
+        {/* 10kg 増加ボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>++</Text>
+          )}
+          size={20}
+          onPress={() => handleWeightChange(weight + 10)}
+        />
         <IconButton
           icon="plus"
           size={20}
@@ -341,6 +349,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           size={20}
           onPress={() => handleWeightChange(weight - 1)}
         />
+        {/* 10kg 減少ボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>--</Text>
+          )}
+          size={20}
+          onPress={() => handleWeightChange(weight - 10)}
+        />
       </View>
       <PaperSlider
         style={styles.slider}
@@ -353,6 +369,16 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       {/* 投与量入力エリア */}
       <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
       <View style={styles.numberInputContainer}>
+        {/* 投与量を10倍刻みで増やすボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>++</Text>
+          )}
+          size={20}
+          onPress={() =>
+            handleDoseChange(dose + configs[drug].doseStep * 10)
+          }
+        />
         <IconButton
           icon="plus"
           size={20}
@@ -374,6 +400,16 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           icon="minus"
           size={20}
           onPress={() => handleDoseChange(dose - configs[drug].doseStep)}
+        />
+        {/* 投与量を10倍刻みで減らすボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>--</Text>
+          )}
+          size={20}
+          onPress={() =>
+            handleDoseChange(dose - configs[drug].doseStep * 10)
+          }
         />
       </View>
       <PaperSlider
@@ -428,6 +464,16 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       {/* 流量入力エリア */}
       <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
       <View style={styles.numberInputContainer}>
+        {/* 流量を10倍刻みで増やすボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>++</Text>
+          )}
+          size={20}
+          onPress={() =>
+            handleRateChange(rate + configs[drug].rateStep * 10)
+          }
+        />
         <IconButton
           icon="plus"
           size={20}
@@ -449,6 +495,16 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           icon="minus"
           size={20}
           onPress={() => handleRateChange(rate - configs[drug].rateStep)}
+        />
+        {/* 流量を10倍刻みで減らすボタン */}
+        <IconButton
+          icon={({ color }) => (
+            <Text style={[styles.doubleIcon, { color }]}>--</Text>
+          )}
+          size={20}
+          onPress={() =>
+            handleRateChange(rate - configs[drug].rateStep * 10)
+          }
         />
       </View>
       <PaperSlider
@@ -528,5 +584,9 @@ const styles = StyleSheet.create({
   numberInput: {
     width: 80,
     textAlign: 'center',
+  },
+  // 10倍増減ボタン用のテキストスタイル
+  doubleIcon: {
+    fontSize: 12,
   },
 });
