@@ -31,11 +31,24 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
       const json = await AsyncStorage.getItem(STORAGE_KEY);
       if (json) {
         const parsed = JSON.parse(json);
-        setConfigsState(parsed);
+        // 保存データが欠損していないか確認
+        if (
+          parsed.norepinephrine &&
+          parsed.dopamine &&
+          parsed.dexmedetomidine
+        ) {
+          setConfigsState(parsed);
+        }
       }
       const d = await AsyncStorage.getItem(INITIAL_DRUG_KEY);
-      if (d) {
-        setInitialDrugState(d as DrugType);
+      if (
+        d === 'norepinephrine' ||
+        d === 'dopamine' ||
+        d === 'dexmedetomidine'
+      ) {
+        setInitialDrugState(d);
+      } else {
+        setInitialDrugState('norepinephrine');
       }
     } catch {
       // 読み込みに失敗した場合はデフォルトを使用
