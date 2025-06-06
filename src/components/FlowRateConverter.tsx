@@ -72,13 +72,14 @@ export type FlowRateConverterProps = {};
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
-  const { configs, initialDrug, setInitialDrug } = useDrugConfigs();
-  const [drug, setDrug] = useState<DrugType>(initialDrug);
+  // 表示順の先頭薬剤をデフォルトとする
+  const { configs, drugOrder } = useDrugConfigs();
+  const [drug, setDrug] = useState<DrugType>(drugOrder[0]);
 
-  // 設定から初期薬剤が変化した場合に state を同期する
+  // 表示順が変更された場合に初期薬剤を合わせる
   useEffect(() => {
-    setDrug(initialDrug);
-  }, [initialDrug]);
+    setDrug(drugOrder[0]);
+  }, [drugOrder]);
   const [weight, setWeight] = useState(50);
   // Snackbar 用の状態管理は最初に宣言
   const [snackbar, setSnackbar] = useState('');
@@ -110,7 +111,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     };
     saveWeight();
   }, [weight]);
-  const defaultCfg = configs[initialDrug];
+  // drugOrder の先頭要素を基に初期設定を取得
+  const defaultCfg = configs[drugOrder[0]];
   const [dose, setDose] = useState(defaultCfg.initialDose);
   // 投与量・流量の範囲を薬剤ごとに保持
   const [doseRange, setDoseRange] = useState<Range>({
@@ -162,9 +164,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 表示対象の薬剤一覧
-  const enabledDrugs = (Object.keys(configs) as DrugType[]).filter(
-    (k) => configs[k].enabled,
-  );
+  // 並び順を保ったまま表示対象のみ抽出
+  const enabledDrugs = drugOrder.filter((k) => configs[k].enabled);
 
   // 選択中の薬剤が非表示になった場合は先頭の薬剤を選ぶ
   useEffect(() => {

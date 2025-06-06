@@ -52,28 +52,26 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
           setConfigsState(parsed);
         }
       }
-      const order = await AsyncStorage.getItem(STORAGE_KEY_ORDER);
-      if (order) {
-        const parsedOrder = JSON.parse(order);
+      const orderData = await AsyncStorage.getItem(STORAGE_KEY_ORDER);
+      let loadedOrder: DrugType[] = [
+        'norepinephrine',
+        'dopamine',
+        'dexmedetomidine',
+      ];
+      if (orderData) {
+        const parsedOrder = JSON.parse(orderData);
         if (
           Array.isArray(parsedOrder) &&
           parsedOrder.every((d) =>
             ['norepinephrine', 'dopamine', 'dexmedetomidine'].includes(d),
           )
         ) {
-          setDrugOrderState(parsedOrder as DrugType[]);
+          loadedOrder = parsedOrder as DrugType[];
         }
       }
-      const d = await AsyncStorage.getItem(INITIAL_DRUG_KEY);
-      if (
-        d === 'norepinephrine' ||
-        d === 'dopamine' ||
-        d === 'dexmedetomidine'
-      ) {
-        setInitialDrugState(d);
-      } else {
-        setInitialDrugState('norepinephrine');
-      }
+      setDrugOrderState(loadedOrder);
+      // 並び順の先頭を初期薬剤として保存
+      await setInitialDrug(loadedOrder[0]);
     } catch {
       // 読み込みに失敗した場合はデフォルトを使用
       setConfigsState(DRUGS);
