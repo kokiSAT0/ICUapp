@@ -22,15 +22,14 @@ import {
   convertDoseToRate,
   convertRateToDose,
   DEFAULT_CONCENTRATION,
+  formatComposition,
+  computeConcentration,
   DEFAULT_SOLUTE_AMOUNT,
   DEFAULT_SOLUTE_UNIT,
   DEFAULT_SOLUTION_VOLUME,
-  formatComposition,
-  computeConcentration,
-  SoluteUnit,
-  DRUGS,
-  DrugType,
 } from '../utils/flowConversion';
+import { SoluteUnit } from '../types';
+import { DRUGS, DrugType } from '../config/drugs';
 
 // Toast 表示をプラットフォーム別に行う簡易関数
 // 簡易的なメッセージ表示
@@ -60,18 +59,26 @@ export type FlowRateConverterProps = {};
 
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
-  // 初期値: 体重50kg、投与量0.03µg/kg/min
+  // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
   const [drug, setDrug] = useState<DrugType>('norepinephrine');
   const [weight, setWeight] = useState(50);
-  const [dose, setDose] = useState(0.03);
+  const [dose, setDose] = useState(DRUGS.norepinephrine.initialDose);
   // 投与量・流量の範囲を薬剤ごとに保持
   const [doseRange, setDoseRange] = useState<Range>({
     min: DRUGS.norepinephrine.doseMin,
     max: DRUGS.norepinephrine.doseMax,
   });
   const [rateRange, setRateRange] = useState<Range>({
-    min: convertDoseToRate(DRUGS.norepinephrine.doseMin, 50, DEFAULT_CONCENTRATION),
-    max: convertDoseToRate(DRUGS.norepinephrine.doseMax, 50, DEFAULT_CONCENTRATION),
+    min: convertDoseToRate(
+      DRUGS.norepinephrine.doseMin,
+      50,
+      DEFAULT_CONCENTRATION,
+    ),
+    max: convertDoseToRate(
+      DRUGS.norepinephrine.doseMax,
+      50,
+      DEFAULT_CONCENTRATION,
+    ),
   });
   // 濃度計算用のパラメータ
   const [soluteAmount, setSoluteAmount] = useState(DEFAULT_SOLUTE_AMOUNT);
@@ -81,7 +88,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   );
   const [concentration, setConcentration] = useState(DEFAULT_CONCENTRATION);
   const [rate, setRate] = useState(
-    roundStep(convertDoseToRate(0.03, 50, DEFAULT_CONCENTRATION), 0.1),
+    roundStep(
+      convertDoseToRate(
+        DRUGS.norepinephrine.initialDose,
+        50,
+        DEFAULT_CONCENTRATION,
+      ),
+      DRUGS.norepinephrine.rateStep,
+    ),
   );
   // Snackbar 用の状態管理
   const [snackbar, setSnackbar] = useState('');
@@ -91,10 +105,15 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 投与量範囲から流量範囲を計算する共通処理
-  const updateRateRange = (w: number, conc: number, range: Range): void => {
+  const updateRateRange = (
+    w: number,
+    conc: number,
+    range: Range,
+    step: number = DRUGS[drug].rateStep,
+  ): void => {
     setRateRange({
-      min: roundStep(convertDoseToRate(range.min, w, conc), 0.1),
-      max: roundStep(convertDoseToRate(range.max, w, conc), 0.1),
+      min: roundStep(convertDoseToRate(range.min, w, conc), step),
+      max: roundStep(convertDoseToRate(range.max, w, conc), step),
     });
   };
 
@@ -106,7 +125,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       value = Math.max(WEIGHT_MIN, Math.min(WEIGHT_MAX, value));
     }
     setWeight(value);
-    const r = roundStep(convertDoseToRate(dose, value, concentration), 0.1);
+    const r = roundStep(
+      convertDoseToRate(dose, value, concentration),
+      DRUGS[drug].rateStep,
+    );
     const min = rateRange.min;
     const max = rateRange.max;
     if (r < min || r > max) {
@@ -118,7 +140,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
 
   // 投与量変更時の処理
   const handleDoseChange = (d: number): void => {
-    let value = roundStep(d, 0.01);
+    let value = roundStep(d, DRUGS[drug].doseStep);
     if (value < doseRange.min || value > doseRange.max) {
       showToast(
         `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
@@ -126,7 +148,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       value = Math.max(doseRange.min, Math.min(doseRange.max, value));
     }
     setDose(value);
-    const r = roundStep(convertDoseToRate(value, weight, concentration), 0.1);
+    const r = roundStep(
+      convertDoseToRate(value, weight, concentration),
+      DRUGS[drug].rateStep,
+    );
     if (r < rateRange.min || r > rateRange.max) {
       showToast(`流量は${rateRange.min}\u2013${rateRange.max}ml/hrの範囲です`);
     }
@@ -135,13 +160,16 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
 
   // 流量変更時の処理
   const handleRateChange = (r: number): void => {
-    let value = roundStep(r, 0.1);
+    let value = roundStep(r, DRUGS[drug].rateStep);
     if (value < rateRange.min || value > rateRange.max) {
       showToast(`流量は${rateRange.min}\u2013${rateRange.max}ml/hrの範囲です`);
       value = Math.max(rateRange.min, Math.min(rateRange.max, value));
     }
     setRate(value);
-    const d = roundStep(convertRateToDose(value, weight, concentration), 0.01);
+    const d = roundStep(
+      convertRateToDose(value, weight, concentration),
+      DRUGS[drug].doseStep,
+    );
     if (d < doseRange.min || d > doseRange.max) {
       showToast(
         `投与量は${doseRange.min}\u2013${doseRange.max}\u00b5g/kg/minの範囲です`,
@@ -163,7 +191,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     }
     setConcentration(c);
     // 濃度変更時は流量も再計算する
-    const r = roundStep(convertDoseToRate(dose, weight, c), 0.1);
+    const r = roundStep(
+      convertDoseToRate(dose, weight, c),
+      DRUGS[drug].rateStep,
+    );
     updateRateRange(weight, c, doseRange);
     setRate(Math.max(rateRange.min, Math.min(rateRange.max, r)));
   };
@@ -217,11 +248,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       max: info.doseMax,
     };
     setDoseRange(newRange);
-    updateRateRange(weight, conc, newRange);
+    updateRateRange(weight, conc, newRange, info.rateStep);
     // 初期投与量と流量を範囲内に調整
-    const d = Math.max(newRange.min, Math.min(newRange.max, dose));
+    const d = Math.max(newRange.min, Math.min(newRange.max, info.initialDose));
     setDose(d);
-    const r = roundStep(convertDoseToRate(d, weight, conc), 0.1);
+    const r = roundStep(
+      convertDoseToRate(d, weight, conc),
+      info.rateStep,
+    );
     const minRate = convertDoseToRate(newRange.min, weight, conc);
     const maxRate = convertDoseToRate(newRange.max, weight, conc);
     setRate(Math.max(minRate, Math.min(maxRate, r)));
@@ -272,7 +306,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         minimumValue={doseRange.min}
         maximumValue={doseRange.max}
         dangerThreshold={DRUGS[drug].dangerDose}
-        step={0.01}
+        step={DRUGS[drug].doseStep}
       />
       {/* 溶質量・単位・溶液量を横並びで入力する */}
       <Text style={styles.label}>
@@ -322,7 +356,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         onValueChange={handleRateChange}
         minimumValue={rateRange.min}
         maximumValue={rateRange.max}
-        step={0.1}
+        step={DRUGS[drug].rateStep}
       />
       {/* Snackbar でバリデーションメッセージを表示 */}
       <Snackbar
