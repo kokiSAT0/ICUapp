@@ -25,6 +25,14 @@ export type DrugConfig = {
   enabled: boolean;
 };
 
+// 薬剤の並び順を定義
+// 配列の一番目が初期表示薬剤となる
+export const DRUG_ORDER_DEFAULT: DrugType[] = [
+  'norepinephrine',
+  'dopamine',
+  'dexmedetomidine',
+];
+
 export const DRUGS: Record<DrugType, DrugConfig> = {
   norepinephrine: {
     label: "ノルアドレナリン",
