@@ -6,6 +6,8 @@ import { DRUGS, DrugConfig, DrugType } from '../config/drugs';
 const STORAGE_KEY = 'drugConfigs';
 // 起動時に表示する薬剤を保存するキー名
 const INITIAL_DRUG_KEY = 'initialDrug';
+// 薬剤の並び順を保存するキー名
+const STORAGE_KEY_ORDER = 'drugOrder';
 
 export type DrugConfigContextType = {
   configs: Record<DrugType, DrugConfig>;
@@ -15,6 +17,10 @@ export type DrugConfigContextType = {
   resetToDefault: () => Promise<void>;
   // 指定した薬剤のみデフォルトに戻す
   resetDrugToDefault: (drug: DrugType) => Promise<void>;
+  // 薬剤の並び順
+  drugOrder: DrugType[];
+  // 並び順を保存する
+  setDrugOrder: (order: DrugType[]) => Promise<void>;
   loadConfigs: () => Promise<void>;
 };
 
@@ -24,6 +30,12 @@ const DrugConfigContext = createContext<DrugConfigContextType | undefined>(undef
 export function DrugConfigProvider({ children }: { children: React.ReactNode }) {
   const [configs, setConfigsState] = useState<Record<DrugType, DrugConfig>>(DRUGS);
   const [initialDrug, setInitialDrugState] = useState<DrugType>('norepinephrine');
+  // 薬剤の表示順。デフォルトは指定の順序
+  const [drugOrder, setDrugOrderState] = useState<DrugType[]>([
+    'norepinephrine',
+    'dopamine',
+    'dexmedetomidine',
+  ]);
 
   // 保存された設定を読み込む
   const loadConfigs = async (): Promise<void> => {
@@ -40,6 +52,18 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
           setConfigsState(parsed);
         }
       }
+      const order = await AsyncStorage.getItem(STORAGE_KEY_ORDER);
+      if (order) {
+        const parsedOrder = JSON.parse(order);
+        if (
+          Array.isArray(parsedOrder) &&
+          parsedOrder.every((d) =>
+            ['norepinephrine', 'dopamine', 'dexmedetomidine'].includes(d),
+          )
+        ) {
+          setDrugOrderState(parsedOrder as DrugType[]);
+        }
+      }
       const d = await AsyncStorage.getItem(INITIAL_DRUG_KEY);
       if (
         d === 'norepinephrine' ||
@@ -54,6 +78,7 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
       // 読み込みに失敗した場合はデフォルトを使用
       setConfigsState(DRUGS);
       setInitialDrugState('norepinephrine');
+      setDrugOrderState(['norepinephrine', 'dopamine', 'dexmedetomidine']);
     }
   };
 
@@ -77,10 +102,21 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     }
   };
 
+  // 並び順を保存する処理
+  const setDrugOrder = async (order: DrugType[]): Promise<void> => {
+    setDrugOrderState(order);
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
+    } catch {
+      // 保存失敗時はエラーを無視
+    }
+  };
+
   // デフォルトに戻す処理
   const resetToDefault = async (): Promise<void> => {
     await setConfigs(DRUGS);
     await setInitialDrug('norepinephrine');
+    await setDrugOrder(['norepinephrine', 'dopamine', 'dexmedetomidine']);
   };
 
   // 特定の薬剤のみデフォルトに戻す処理
@@ -100,6 +136,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
         setConfigs,
         initialDrug,
         setInitialDrug,
+        drugOrder,
+        setDrugOrder,
         resetToDefault,
         resetDrugToDefault,
         loadConfigs,
