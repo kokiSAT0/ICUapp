@@ -14,6 +14,7 @@ import {
   Snackbar,
   Menu,
   Button,
+  IconButton,
 } from 'react-native-paper';
 // 端末にデータを保存するため AsyncStorage を利用
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -312,8 +313,32 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           title="ドパミン"
         />
       </Menu>
-      {/* 体重調整用スライダー */}
+      {/* 体重入力エリア */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
+      <View style={styles.numberInputContainer}>
+        <IconButton
+          icon="plus"
+          size={20}
+          onPress={() => handleWeightChange(weight + 1)}
+        />
+        <TextInput
+          mode="outlined"
+          style={styles.numberInput}
+          keyboardType="numeric"
+          value={String(weight)}
+          onChangeText={(v) => {
+            const n = Number(v);
+            if (!Number.isNaN(n)) {
+              handleWeightChange(n);
+            }
+          }}
+        />
+        <IconButton
+          icon="minus"
+          size={20}
+          onPress={() => handleWeightChange(weight - 1)}
+        />
+      </View>
       <PaperSlider
         style={styles.slider}
         value={weight}
@@ -322,8 +347,32 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         maximumValue={WEIGHT_MAX}
         step={1}
       />
-      {/* 投与量調整用スライダー */}
+      {/* 投与量入力エリア */}
       <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
+      <View style={styles.numberInputContainer}>
+        <IconButton
+          icon="plus"
+          size={20}
+          onPress={() => handleDoseChange(dose + configs[drug].doseStep)}
+        />
+        <TextInput
+          mode="outlined"
+          style={styles.numberInput}
+          keyboardType="numeric"
+          value={String(dose)}
+          onChangeText={(v) => {
+            const n = Number(v);
+            if (!Number.isNaN(n)) {
+              handleDoseChange(n);
+            }
+          }}
+        />
+        <IconButton
+          icon="minus"
+          size={20}
+          onPress={() => handleDoseChange(dose - configs[drug].doseStep)}
+        />
+      </View>
       <PaperSlider
         style={styles.slider}
         value={dose}
@@ -373,8 +422,32 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       </View>
       {/* 濃度表示 */}
       <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
-      {/* 流量調整用スライダー */}
+      {/* 流量入力エリア */}
       <Text style={styles.label}>流量: {rate.toFixed(1)} ml/hr</Text>
+      <View style={styles.numberInputContainer}>
+        <IconButton
+          icon="plus"
+          size={20}
+          onPress={() => handleRateChange(rate + configs[drug].rateStep)}
+        />
+        <TextInput
+          mode="outlined"
+          style={styles.numberInput}
+          keyboardType="numeric"
+          value={String(rate)}
+          onChangeText={(v) => {
+            const n = Number(v);
+            if (!Number.isNaN(n)) {
+              handleRateChange(n);
+            }
+          }}
+        />
+        <IconButton
+          icon="minus"
+          size={20}
+          onPress={() => handleRateChange(rate - configs[drug].rateStep)}
+        />
+      </View>
       <PaperSlider
         style={styles.slider}
         value={rate}
@@ -435,5 +508,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 16,
     paddingHorizontal: 16,
+  },
+  // 数値入力と増減ボタン用の縦並びコンテナ
+  numberInputContainer: {
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  // 体重や投与量などを直接入力するテキストボックス
+  numberInput: {
+    width: 80,
+    textAlign: 'center',
   },
 });
