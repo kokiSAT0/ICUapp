@@ -49,12 +49,11 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     setInitialDrug,
   } = useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
-  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>(
-    {
-      norepinephrine: toInputConfig(configs.norepinephrine),
-      dopamine: toInputConfig(configs.dopamine),
-    },
-  );
+  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>({
+    norepinephrine: toInputConfig(configs.norepinephrine),
+    dopamine: toInputConfig(configs.dopamine),
+    dexmedetomidine: toInputConfig(configs.dexmedetomidine),
+  });
   const [startupDrug, setStartupDrug] = useState<DrugType>(initialDrug);
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
@@ -85,6 +84,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     const parsed: Record<DrugType, DrugConfig> = {
       norepinephrine: fromInputConfig(localConfigs.norepinephrine),
       dopamine: fromInputConfig(localConfigs.dopamine),
+      dexmedetomidine: fromInputConfig(localConfigs.dexmedetomidine),
     };
     // 数値変換に失敗した場合はエラーメッセージを表示
     if (
@@ -95,6 +95,9 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         parsed.dopamine.initialDose,
         parsed.dopamine.soluteAmount,
         parsed.dopamine.solutionVolume,
+        parsed.dexmedetomidine.initialDose,
+        parsed.dexmedetomidine.soluteAmount,
+        parsed.dexmedetomidine.solutionVolume,
       ].some((v) => Number.isNaN(v))
     ) {
       setSnackbar('数値を正しく入力してください');
@@ -158,7 +161,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
               </View>
               <TextInput
                 mode="outlined"
-                label="初期投与量(µg/kg/min)"
+                label={`初期投与量(${cfg.doseUnit})`}
                 style={styles.input}
                 keyboardType="numeric"
                 value={cfg.initialDose}

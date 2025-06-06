@@ -1,12 +1,14 @@
-export type DrugType = "norepinephrine" | "dopamine";
+export type DrugType = "norepinephrine" | "dopamine" | "dexmedetomidine";
 
 import { SoluteUnit } from "../types";
 
 export type DrugConfig = {
   // 画面表示用ラベル
   label: string;
-  // 初期投与量(µg/kg/min)
+  // 初期投与量
   initialDose: number;
+  // 投与量の単位
+  doseUnit: "µg/kg/min" | "µg/kg/hr";
   soluteAmount: number;
   soluteUnit: SoluteUnit;
   solutionVolume: number;
@@ -26,6 +28,7 @@ export type DrugConfig = {
 export const DRUGS: Record<DrugType, DrugConfig> = {
   norepinephrine: {
     label: "ノルアドレナリン",
+    doseUnit: "µg/kg/min",
     initialDose: 0.03,
     soluteAmount: 5,
     soluteUnit: "mg",
@@ -41,6 +44,7 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
   },
   dopamine: {
     label: "ドパミン",
+    doseUnit: "µg/kg/min",
     initialDose: 5,
     soluteAmount: 600,
     soluteUnit: "mg",
@@ -52,6 +56,22 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     rateStep: 1,
     description:
       "循環維持を目的とした一般的な初期投与量は3\uFF5E5µg/kg/minであり，患者の心拍出量，血圧，心拍数および尿量により適宜増減する．患者の病態に応じて，最大20µg/kg/minまで増量することができるが，8\uFF5E10µg/kg/min以上では血管抵抗の上昇が強くなるので，さらなる心収縮力の増強を期待する場合は他の薬剤との併用を考慮する．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  dexmedetomidine: {
+    label: "デクスメデトミジン",
+    doseUnit: "µg/kg/hr",
+    initialDose: 0.2,
+    soluteAmount: 200,
+    soluteUnit: "µg",
+    solutionVolume: 50,
+    doseMin: 0,
+    doseMax: 1.2,
+    dangerDose: 0.7,
+    doseStep: 0.01,
+    rateStep: 0.1,
+    description:
+      "初期負荷投与は通常行わないが，実施する場合は循環動態の変動に十分注意する．維持投与速度は，0.2\uFF5E0.7µg/kg/hrを目安とするが，目的とする鎮静度を得るために，より多量を必要とする症例もある．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
 };
