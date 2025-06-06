@@ -484,6 +484,59 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       </View>
       {/* 濃度表示 */}
       <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
+      {/* 流量入力エリア */}
+      <View style={styles.rateRow}>
+        <Text style={styles.label}>流量:</Text>
+        <View style={styles.numberInputContainer}>
+          <View style={styles.buttonRow}>
+            {/* 流量を10倍刻みで増やすボタン */}
+            <IconButton
+              icon={({ color }) => (
+                <Text style={[styles.doubleIcon, { color }]}>++</Text>
+            )}
+            size={20}
+            onPress={() =>
+              handleRateChange(rate + configs[drug].rateStep * 10)
+            }
+          />
+          <IconButton
+            icon="plus"
+            size={20}
+            onPress={() => handleRateChange(rate + configs[drug].rateStep)}
+          />
+        </View>
+        <TextInput
+          mode="outlined"
+          style={styles.numberInput}
+          keyboardType="numeric"
+          value={String(rate)}
+          onChangeText={(v) => {
+            const n = Number(v);
+            if (!Number.isNaN(n)) {
+              handleRateChange(n);
+            }
+          }}
+        />
+        <Text style={styles.inlineText}>ml/hr</Text>
+        <View style={styles.buttonRow}>
+          {/* 流量を10倍刻みで減らすボタンを左に配置 */}
+          <IconButton
+            icon={({ color }) => (
+              <Text style={[styles.doubleIcon, { color }]}>--</Text>
+            )}
+            size={20}
+            onPress={() =>
+              handleRateChange(rate - configs[drug].rateStep * 10)
+            }
+          />
+          <IconButton
+            icon="minus"
+            size={20}
+            onPress={() => handleRateChange(rate - configs[drug].rateStep)}
+          />
+          </View>
+        </View>
+      </View>
       {/* 投与量入力エリア */}
       <View style={styles.inputRow}>
         <Text style={styles.inlineText}>投与量:</Text>
@@ -545,67 +598,6 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         maximumValue={doseRange.max}
         dangerThreshold={configs[drug].dangerDose}
         step={configs[drug].doseStep}
-      />
-      {/* 流量入力エリア */}
-      <View style={styles.rateRow}>
-        <Text style={styles.label}>流量:</Text>
-        <View style={styles.numberInputContainer}>
-          <View style={styles.buttonRow}>
-            {/* 流量を10倍刻みで増やすボタン */}
-            <IconButton
-              icon={({ color }) => (
-                <Text style={[styles.doubleIcon, { color }]}>++</Text>
-            )}
-            size={20}
-            onPress={() =>
-              handleRateChange(rate + configs[drug].rateStep * 10)
-            }
-          />
-          <IconButton
-            icon="plus"
-            size={20}
-            onPress={() => handleRateChange(rate + configs[drug].rateStep)}
-          />
-        </View>
-        <TextInput
-          mode="outlined"
-          style={styles.numberInput}
-          keyboardType="numeric"
-          value={String(rate)}
-          onChangeText={(v) => {
-            const n = Number(v);
-            if (!Number.isNaN(n)) {
-              handleRateChange(n);
-            }
-          }}
-        />
-        <Text style={styles.inlineText}>ml/hr</Text>
-        <View style={styles.buttonRow}>
-          {/* 流量を10倍刻みで減らすボタンを左に配置 */}
-          <IconButton
-            icon={({ color }) => (
-              <Text style={[styles.doubleIcon, { color }]}>--</Text>
-            )}
-            size={20}
-            onPress={() =>
-              handleRateChange(rate - configs[drug].rateStep * 10)
-            }
-          />
-          <IconButton
-            icon="minus"
-            size={20}
-            onPress={() => handleRateChange(rate - configs[drug].rateStep)}
-          />
-        </View>
-        </View>
-      </View>
-      <PaperSlider
-        style={styles.slider}
-        value={rate}
-        onValueChange={handleRateChange}
-        minimumValue={rateRange.min}
-        maximumValue={rateRange.max}
-        step={configs[drug].rateStep}
       />
       {/* 薬剤の説明を最下部に表示 */}
       <Text style={styles.description}>{configs[drug].description}</Text>
