@@ -2,12 +2,18 @@
 // 複数の昇圧薬に対応するための計算関数
 
 // 濃度計算に利用する型定義
-export type SoluteUnit = 'mg' | 'µg';
+import { SoluteUnit } from '../types';
 
 // デフォルトの溶質量と溶液量
-export const DEFAULT_SOLUTE_AMOUNT = 5;
-export const DEFAULT_SOLUTE_UNIT: SoluteUnit = 'mg';
-export const DEFAULT_SOLUTION_VOLUME = 50;
+import { DRUGS, DrugType } from '../config/drugs';
+
+// デフォルト薬剤(初期画面に表示する薬剤)のキー
+const DEFAULT_DRUG: DrugType = 'norepinephrine';
+
+// 設定ファイルからデフォルト値を取得
+export const DEFAULT_SOLUTE_AMOUNT = DRUGS[DEFAULT_DRUG].soluteAmount;
+export const DEFAULT_SOLUTE_UNIT: SoluteUnit = DRUGS[DEFAULT_DRUG].soluteUnit;
+export const DEFAULT_SOLUTION_VOLUME = DRUGS[DEFAULT_DRUG].solutionVolume;
 
 /**
  * 溶質量・単位・溶液量を一行の文字列にまとめる
@@ -51,42 +57,9 @@ export const DEFAULT_CONCENTRATION = computeConcentration(
   DEFAULT_SOLUTION_VOLUME,
 );
 
-// 薬剤ごとのデフォルト値をまとめた型
-export type DrugType = 'norepinephrine' | 'dopamine';
-
-export type DrugInfo = {
-  // 画面に表示する日本語名称
-  label: string;
-  soluteAmount: number;
-  soluteUnit: SoluteUnit;
-  solutionVolume: number;
-  doseMin: number;
-  doseMax: number;
-  // 危険域とみなす投与量(µg/kg/min)。未設定なら表示しない
-  dangerDose?: number;
-};
-
-// 対応する薬剤リスト
-export const DRUGS: Record<DrugType, DrugInfo> = {
-  norepinephrine: {
-    label: 'ノルアドレナリン',
-    soluteAmount: 5,
-    soluteUnit: 'mg',
-    solutionVolume: 50,
-    doseMin: 0,
-    doseMax: 0.3,
-    dangerDose: 0.2,
-  },
-  dopamine: {
-    label: 'ドパミン',
-    soluteAmount: 600,
-    soluteUnit: 'mg',
-    solutionVolume: 200,
-    doseMin: 0,
-    doseMax: 20,
-    dangerDose: 15,
-  },
-};
+// DrugType と DRUGS は設定ファイルから再エクスポート
+export type { DrugType } from '../config/drugs';
+export { DRUGS } from '../config/drugs';
 
 /**
  * 投与量(µg/kg/min)から流量(ml/hr)を計算します
