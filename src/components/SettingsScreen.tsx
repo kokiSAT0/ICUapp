@@ -2,7 +2,30 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Surface, Text, TextInput, Button, Menu, Snackbar } from 'react-native-paper';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
-import { DrugType, DRUGS } from '../config/drugs';
+import { DrugType, DRUGS, DrugConfig } from '../config/drugs';
+
+// 数値項目のキー名
+type NumericKey = 'initialDose' | 'soluteAmount' | 'solutionVolume';
+// 入力用設定データ。数値項目を文字列で保持する
+type DrugConfigInput = Omit<DrugConfig, NumericKey> & {
+  [K in NumericKey]: string;
+};
+
+// DrugConfig から DrugConfigInput へ変換
+const toInputConfig = (cfg: DrugConfig): DrugConfigInput => ({
+  ...cfg,
+  initialDose: String(cfg.initialDose),
+  soluteAmount: String(cfg.soluteAmount),
+  solutionVolume: String(cfg.solutionVolume),
+});
+
+// DrugConfigInput から DrugConfig へ変換
+const fromInputConfig = (cfg: DrugConfigInput): DrugConfig => ({
+  ...cfg,
+  initialDose: parseFloat(cfg.initialDose),
+  soluteAmount: parseFloat(cfg.soluteAmount),
+  solutionVolume: parseFloat(cfg.solutionVolume),
+});
 
 export type SettingsScreenProps = {
   onClose: () => void;
@@ -10,7 +33,13 @@ export type SettingsScreenProps = {
 
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const { configs, setConfigs, resetDrugToDefault } = useDrugConfigs();
-  const [localConfigs, setLocalConfigs] = useState(configs);
+  // 設定値を文字列に変換したローカルステート
+  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>(
+    {
+      norepinephrine: toInputConfig(configs.norepinephrine),
+      dopamine: toInputConfig(configs.dopamine),
+    },
+  );
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
   const [drugMenuVisible, setDrugMenuVisible] = useState(false);
@@ -19,36 +48,51 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   // 入力値更新用ヘルパー
   const updateValue = (
     drug: DrugType,
-    key: keyof typeof configs[DrugType extends never ? never : DrugType],
+    key: keyof DrugConfigInput,
     value: string,
   ) => {
-    const numKeys: Array<keyof typeof configs[DrugType extends never ? never : DrugType]> = [
-      'initialDose',
-      'soluteAmount',
-      'solutionVolume',
-    ];
     setLocalConfigs({
       ...localConfigs,
       [drug]: {
         ...localConfigs[drug],
-        [key]: numKeys.includes(key)
-          ? Number(value)
-          : value,
+        [key]: value,
       },
     });
   };
 
   const handleSave = async () => {
-    await setConfigs(localConfigs);
-    setSnackbar('保存しました');
-    onClose();
+    const parsed: Record<DrugType, DrugConfig> = {
+      norepinephrine: fromInputConfig(localConfigs.norepinephrine),
+      dopamine: fromInputConfig(localConfigs.dopamine),
+    };
+    // 数値変換に失敗した場合はエラーメッセージを表示
+    if (
+      [
+        parsed.norepinephrine.initialDose,
+        parsed.norepinephrine.soluteAmount,
+        parsed.norepinephrine.solutionVolume,
+        parsed.dopamine.initialDose,
+        parsed.dopamine.soluteAmount,
+        parsed.dopamine.solutionVolume,
+      ].some((v) => Number.isNaN(v))
+    ) {
+      setSnackbar('数値を正しく入力してください');
+      return;
+    }
+    try {
+      await setConfigs(parsed);
+      setSnackbar('保存しました');
+      onClose();
+    } catch {
+      setSnackbar('保存に失敗しました');
+    }
   };
 
   const handleReset = async () => {
     await resetDrugToDefault(selectedDrug);
     setLocalConfigs({
       ...localConfigs,
-      [selectedDrug]: DRUGS[selectedDrug],
+      [selectedDrug]: toInputConfig(DRUGS[selectedDrug]),
     });
     setSnackbar('デフォルトに戻しました');
   };
@@ -92,7 +136,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                 label="初期投与量(µg/kg/min)"
                 style={styles.input}
                 keyboardType="numeric"
-                value={String(cfg.initialDose)}
+                value={cfg.initialDose}
                 onChangeText={(v) => updateValue(key, 'initialDose', v)}
               />
               <View style={styles.row}>
@@ -101,7 +145,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   label="溶質量"
                   style={styles.smallInput}
                   keyboardType="numeric"
-                  value={String(cfg.soluteAmount)}
+                  value={cfg.soluteAmount}
                   onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
                 />
                 <Menu
@@ -120,7 +164,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   label="溶液量(ml)"
                   style={styles.smallInput}
                   keyboardType="numeric"
-                  value={String(cfg.solutionVolume)}
+                  value={cfg.solutionVolume}
                   onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
                 />
               </View>
