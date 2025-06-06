@@ -1,3 +1,5 @@
+// react-native-gesture-handler の初期化を必ず最初に行う
+import 'react-native-gesture-handler';
 import { registerRootComponent } from 'expo';
 
 import App from './App';
