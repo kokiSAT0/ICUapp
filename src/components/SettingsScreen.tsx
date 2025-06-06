@@ -9,7 +9,11 @@ import {
   Snackbar,
   Switch,
   RadioButton,
+  List,
+  IconButton,
 } from 'react-native-paper';
+// リストをドラッグ操作で並び替えるためのコンポーネント
+import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DrugConfig } from '../config/drugs';
 
@@ -47,6 +51,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     resetDrugToDefault,
     initialDrug,
     setInitialDrug,
+    drugOrder,
+    setDrugOrder,
   } = useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
   const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>({
@@ -57,7 +63,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const [startupDrug, setStartupDrug] = useState<DrugType>(initialDrug);
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
-  const [drugMenuVisible, setDrugMenuVisible] = useState(false);
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 外部設定の初期薬剤が変わったら同期する
@@ -125,27 +130,21 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   return (
     <Surface style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* 薬剤選択用プルダウン */}
-        <Menu
-          visible={drugMenuVisible}
-          onDismiss={() => setDrugMenuVisible(false)}
-          anchor={
-            <Button mode="outlined" onPress={() => setDrugMenuVisible(true)}>
-              {localConfigs[selectedDrug].label}
-            </Button>
-          }
-        >
-          {(Object.keys(localConfigs) as DrugType[]).map((k) => (
-            <Menu.Item
-              key={k}
-              onPress={() => {
-                setSelectedDrug(k);
-                setDrugMenuVisible(false);
-              }}
-              title={localConfigs[k].label}
-            />
-          ))}
-        </Menu>
+        {/* 薬剤の並び順を変更するリスト。長押しでドラッグ開始 */}
+        <DraggableFlatList
+          data={drugOrder}
+          keyExtractor={(item) => item}
+          onDragEnd={({ data }) => setDrugOrder(data)}
+          renderItem={({ item, drag }) => (
+            <List.Item
+              title={localConfigs[item].label}
+              // タップで編集対象を切り替える
+              onPress={() => setSelectedDrug(item)}
+              onLongPress={drag}
+              right={() => <IconButton icon="drag" />} />
+          )}
+          style={styles.list}
+        />
         {(() => {
           const key = selectedDrug;
           const cfg = localConfigs[key];
@@ -239,5 +238,6 @@ const styles = StyleSheet.create({
   inlineText: { marginHorizontal: 4, fontSize: 14 },
   buttonRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
   button: { marginHorizontal: 4 },
+  list: { marginBottom: 16 },
   closeButton: { marginTop: 16 },
 });
