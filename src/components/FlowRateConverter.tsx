@@ -376,8 +376,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     // ScrollView で画面からはみ出した場合に縦スクロールできるようにする
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {/* 薬剤選択をカードに配置 */}
-        <Surface style={[styles.card, styles.drugCard]}>
+        {/* 薬剤選択と体重入力を横並びに配置 */}
+        <View style={styles.drugWeightRow}>
+          {/* 薬剤選択をカードに配置 */}
+          <Surface style={[styles.card, styles.drugCard, styles.drugArea]}>
           <Menu
             visible={menuVisible}
             onDismiss={() => setMenuVisible(false)}
@@ -395,10 +397,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               />
             ))}
           </Menu>
-        </Surface>
+          </Surface>
 
-        {/* 体重入力エリア */}
-        <Surface style={[styles.card, styles.weightCard]}>
+          {/* 体重入力エリア */}
+          <Surface style={[styles.card, styles.weightCard, styles.weightArea]}>
           <View style={styles.inputRow}>
             <Text style={styles.label}>体重:</Text>
             <View style={styles.numberInputContainer}>
@@ -449,7 +451,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             </View>
             <Text style={styles.inlineText}>kg</Text>
           </View>
-        </Surface>
+          </Surface>
+        </View>
 
         {/* 溶質量・単位・溶液量を横並びで入力する */}
         <Surface style={[styles.card, styles.compositionCard]}>
@@ -641,6 +644,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
+    width: '100%',
   },
   // PaperSlider のコンテナに適用する共通スタイル
   slider: {
@@ -714,7 +718,8 @@ const styles = StyleSheet.create({
   },
   // 各エリアをカード風に表示する共通スタイル
   card: {
-    width: '90%',
+    // 画面いっぱいに広げる
+    width: '100%',
     marginVertical: 6,
     padding: 8,
     borderRadius: 4,
@@ -737,6 +742,21 @@ const styles = StyleSheet.create({
   },
   descriptionCard: {
     backgroundColor: '#eeeeee',
+  },
+  // 薬剤選択と体重入力を横並びにする行
+  drugWeightRow: {
+    flexDirection: 'row',
+    width: '100%',
+  },
+  // 薬剤選択エリアは幅6割
+  drugArea: {
+    flex: 6,
+    marginRight: 4,
+  },
+  // 体重入力エリアは幅4割
+  weightArea: {
+    flex: 4,
+    marginLeft: 4,
   },
   // 流量・投与量の数値を大きく表示する
   largeNumber: {
