@@ -336,11 +336,12 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         ))}
       </Menu>
       {/* 体重入力エリア */}
-      <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
-      <View style={styles.numberInputContainer}>
-        {/* 増量ボタンを横並びで表示 */}
-        <View style={styles.buttonRow}>
-          {/* 10kg 増加ボタン */}
+      <View style={styles.inputRow}>
+        <Text style={styles.label}>体重:</Text>
+        <View style={styles.numberInputContainer}>
+          {/* 増量ボタンを横並びで表示 */}
+          <View style={styles.buttonRow}>
+            {/* 10kg 増加ボタン */}
           <IconButton
             icon={({ color }) => (
               <Text style={[styles.doubleIcon, { color }]}>++</Text>
@@ -382,6 +383,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             onPress={() => handleWeightChange(weight - 1)}
           />
         </View>
+        </View>
+        <Text style={styles.inlineText}>kg</Text>
       </View>
       {/* 投与量入力エリア */}
       <Text style={styles.label}>投与量: {dose.toFixed(2)} µg/kg/min</Text>
@@ -588,6 +591,12 @@ const styles = StyleSheet.create({
   inlineText: {
     fontSize: 14,
     marginHorizontal: 4,
+  },
+  // ラベルと入力エリアを横並びに配置する
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
   },
   label: {
     fontSize: 14,
