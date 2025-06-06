@@ -25,7 +25,6 @@ import PaperSlider from './PaperSlider';
 import {
   convertDoseToRate,
   convertRateToDose,
-  formatComposition,
   computeConcentration,
 } from '../utils/flowConversion';
 import { SoluteUnit } from '../types';
@@ -444,10 +443,9 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         step={configs[drug].doseStep}
       />
       {/* 溶質量・単位・溶液量を横並びで入力する */}
-      <Text style={styles.label}>
-        組成: {formatComposition(soluteAmount, soluteUnit, solutionVolume)}
-      </Text>
       <View style={styles.compositionRow}>
+        {/* ラベルと入力欄を一行に配置する */}
+        <Text style={styles.label}>組成:</Text>
         <TextInput
           mode="outlined"
           style={styles.compInput}
