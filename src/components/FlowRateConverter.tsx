@@ -63,8 +63,13 @@ export type FlowRateConverterProps = {};
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
-  const { configs } = useDrugConfigs();
-  const [drug, setDrug] = useState<DrugType>('norepinephrine');
+  const { configs, initialDrug, setInitialDrug } = useDrugConfigs();
+  const [drug, setDrug] = useState<DrugType>(initialDrug);
+
+  // 設定から初期薬剤が変化した場合に state を同期する
+  useEffect(() => {
+    setDrug(initialDrug);
+  }, [initialDrug]);
   const [weight, setWeight] = useState(50);
   // Snackbar 用の状態管理は最初に宣言
   const [snackbar, setSnackbar] = useState('');
@@ -96,7 +101,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
     };
     saveWeight();
   }, [weight]);
-  const defaultCfg = configs.norepinephrine;
+  const defaultCfg = configs[initialDrug];
   const [dose, setDose] = useState(defaultCfg.initialDose);
   // 投与量・流量の範囲を薬剤ごとに保持
   const [doseRange, setDoseRange] = useState<Range>({
@@ -138,6 +143,18 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   const [menuVisible, setMenuVisible] = useState(false);
   // 単位選択メニューの表示状態
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
+
+  // 表示対象の薬剤一覧
+  const enabledDrugs = (Object.keys(configs) as DrugType[]).filter(
+    (k) => configs[k].enabled,
+  );
+
+  // 選択中の薬剤が非表示になった場合は先頭の薬剤を選ぶ
+  useEffect(() => {
+    if (!configs[drug]?.enabled && enabledDrugs.length > 0) {
+      setDrug(enabledDrugs[0]);
+    }
+  }, [configs, drug, enabledDrugs]);
 
   // 設定値または薬剤選択が変わった際に状態を同期する
   useEffect(() => {
@@ -305,16 +322,19 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
       <Menu
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
-        anchor={<Button mode="outlined" onPress={() => setMenuVisible(true)}>{configs[drug].label}</Button>}
+        anchor={
+          <Button mode="outlined" onPress={() => setMenuVisible(true)}>
+            {configs[drug].label}
+          </Button>
+        }
       >
-        <Menu.Item
-          onPress={() => handleDrugSelect('norepinephrine')}
-          title="ノルアドレナリン"
-        />
-        <Menu.Item
-          onPress={() => handleDrugSelect('dopamine')}
-          title="ドパミン"
-        />
+        {enabledDrugs.map((d) => (
+          <Menu.Item
+            key={d}
+            onPress={() => handleDrugSelect(d)}
+            title={configs[d].label}
+          />
+        ))}
       </Menu>
       {/* 体重入力エリア */}
       <Text style={styles.label}>体重: {weight.toFixed(0)} kg</Text>
