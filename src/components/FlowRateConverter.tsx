@@ -358,6 +358,8 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         maximumValue={rateRange.max}
         step={DRUGS[drug].rateStep}
       />
+      {/* 薬剤の説明を最下部に表示 */}
+      <Text style={styles.description}>{DRUGS[drug].description}</Text>
       {/* Snackbar でバリデーションメッセージを表示 */}
       <Snackbar
         visible={snackbar.length > 0}
@@ -406,5 +408,11 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     marginTop: 12,
+  },
+  // 薬剤説明用テキストのスタイル
+  description: {
+    fontSize: 12,
+    marginTop: 16,
+    paddingHorizontal: 16,
   },
 });
