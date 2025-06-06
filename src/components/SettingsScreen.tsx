@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Surface, Text, TextInput, Button, Menu, Snackbar } from 'react-native-paper';
+import {
+  Surface,
+  Text,
+  TextInput,
+  Button,
+  Menu,
+  Snackbar,
+  Switch,
+  RadioButton,
+} from 'react-native-paper';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DrugConfig } from '../config/drugs';
 
@@ -32,7 +41,13 @@ export type SettingsScreenProps = {
 };
 
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
-  const { configs, setConfigs, resetDrugToDefault } = useDrugConfigs();
+  const {
+    configs,
+    setConfigs,
+    resetDrugToDefault,
+    initialDrug,
+    setInitialDrug,
+  } = useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
   const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>(
     {
@@ -40,16 +55,22 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       dopamine: toInputConfig(configs.dopamine),
     },
   );
+  const [startupDrug, setStartupDrug] = useState<DrugType>(initialDrug);
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
   const [drugMenuVisible, setDrugMenuVisible] = useState(false);
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
+  // 外部設定の初期薬剤が変わったら同期する
+  React.useEffect(() => {
+    setStartupDrug(initialDrug);
+  }, [initialDrug]);
+
   // 入力値更新用ヘルパー
   const updateValue = (
     drug: DrugType,
     key: keyof DrugConfigInput,
-    value: string,
+    value: string | boolean,
   ) => {
     setLocalConfigs({
       ...localConfigs,
@@ -81,6 +102,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     }
     try {
       await setConfigs(parsed);
+      await setInitialDrug(startupDrug);
       setSnackbar('保存しました');
       onClose();
     } catch {
@@ -110,20 +132,16 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             </Button>
           }
         >
-          <Menu.Item
-            onPress={() => {
-              setSelectedDrug('norepinephrine');
-              setDrugMenuVisible(false);
-            }}
-            title="ノルアドレナリン"
-          />
-          <Menu.Item
-            onPress={() => {
-              setSelectedDrug('dopamine');
-              setDrugMenuVisible(false);
-            }}
-            title="ドパミン"
-          />
+          {(Object.keys(localConfigs) as DrugType[]).map((k) => (
+            <Menu.Item
+              key={k}
+              onPress={() => {
+                setSelectedDrug(k);
+                setDrugMenuVisible(false);
+              }}
+              title={localConfigs[k].label}
+            />
+          ))}
         </Menu>
         {(() => {
           const key = selectedDrug;
@@ -131,6 +149,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
           return (
             <View key={key} style={styles.section}>
               <Text style={styles.heading}>{cfg.label}</Text>
+              <View style={styles.row}>
+                <Text style={styles.inlineText}>表示</Text>
+                <Switch
+                  value={cfg.enabled}
+                  onValueChange={(v) => updateValue(key, 'enabled', v)}
+                />
+              </View>
               <TextInput
                 mode="outlined"
                 label="初期投与量(µg/kg/min)"
@@ -171,6 +196,20 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             </View>
           );
         })()}
+        <View style={styles.section}>
+          <Text style={styles.heading}>起動時に表示する薬剤</Text>
+          <RadioButton.Group
+            onValueChange={(v) => setStartupDrug(v as DrugType)}
+            value={startupDrug}
+          >
+            {(Object.keys(localConfigs) as DrugType[]).map((k) => (
+              <View key={k} style={styles.row}>
+                <RadioButton value={k} />
+                <Text style={styles.inlineText}>{localConfigs[k].label}</Text>
+              </View>
+            ))}
+          </RadioButton.Group>
+        </View>
         <View style={styles.buttonRow}>
           <Button mode="contained" onPress={handleSave} style={styles.button}>
             保存
