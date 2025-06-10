@@ -103,6 +103,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
   // 並び順を保存する処理
   const setDrugOrder = async (order: DrugType[]): Promise<void> => {
     setDrugOrderState(order);
+    // 並び順が変わったら先頭を初期表示薬剤として保存する
+    await setInitialDrug(order[0]);
     try {
       await AsyncStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
     } catch {

@@ -8,9 +8,10 @@ import {
   Menu,
   Snackbar,
   Switch,
-  RadioButton,
   List,
   IconButton,
+  Portal,
+  Modal,
 } from 'react-native-paper';
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -49,8 +50,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     configs,
     setConfigs,
     resetDrugToDefault,
-    initialDrug,
-    setInitialDrug,
     drugOrder,
     setDrugOrder,
   } = useDrugConfigs();
@@ -60,15 +59,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     dopamine: toInputConfig(configs.dopamine),
     dexmedetomidine: toInputConfig(configs.dexmedetomidine),
   });
-  const [startupDrug, setStartupDrug] = useState<DrugType>(initialDrug);
   const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
   const [snackbar, setSnackbar] = useState('');
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
-  // 外部設定の初期薬剤が変わったら同期する
-  React.useEffect(() => {
-    setStartupDrug(initialDrug);
-  }, [initialDrug]);
+  // 編集ダイアログの表示状態
+  const [editVisible, setEditVisible] = useState(false);
 
   // 入力値更新用ヘルパー
   const updateValue = (
@@ -110,7 +106,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     }
     try {
       await setConfigs(parsed);
-      await setInitialDrug(startupDrug);
       setSnackbar('保存しました');
       onClose();
     } catch {
@@ -136,106 +131,95 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         renderItem={({ item, drag }) => (
           <List.Item
             title={localConfigs[item].label}
-            // タップで編集対象を切り替える
-            onPress={() => setSelectedDrug(item)}
+            onPress={() => {
+              setSelectedDrug(item);
+              setEditVisible(true);
+            }}
             onLongPress={drag}
             right={() => <IconButton icon="drag" />}
           />
         )}
         style={styles.list}
         contentContainerStyle={styles.scrollContainer}
-        ListFooterComponent={
-          <>
-            {(() => {
-              const key = selectedDrug;
-              const cfg = localConfigs[key];
-              return (
-                <View key={key} style={styles.section}>
-                  <Text style={styles.heading}>{cfg.label}</Text>
-                  <View style={styles.row}>
-                    <Text style={styles.inlineText}>表示</Text>
-                    <Switch
-                      value={cfg.enabled}
-                      onValueChange={(v) => updateValue(key, 'enabled', v)}
-                    />
-                  </View>
+      />
+      <View style={styles.buttonRow}>
+        <Button mode="contained" onPress={handleSave} style={styles.button}>
+          保存
+        </Button>
+        <Button onPress={onClose} style={styles.button}>
+          閉じる
+        </Button>
+      </View>
+      <Portal>
+        <Modal
+          visible={editVisible}
+          onDismiss={() => setEditVisible(false)}
+          contentContainerStyle={styles.modal}
+        >
+          {(() => {
+            const key = selectedDrug;
+            const cfg = localConfigs[key];
+            return (
+              <View key={key} style={styles.section}>
+                <Text style={styles.heading}>{cfg.label}</Text>
+                <View style={styles.row}>
+                  <Text style={styles.inlineText}>表示</Text>
+                  <Switch
+                    value={cfg.enabled}
+                    onValueChange={(v) => updateValue(key, 'enabled', v)}
+                  />
+                </View>
+                <TextInput
+                  mode="outlined"
+                  label={`初期投与量(${cfg.doseUnit})`}
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={cfg.initialDose}
+                  onChangeText={(v) => updateValue(key, 'initialDose', v)}
+                />
+                <View style={styles.row}>
                   <TextInput
                     mode="outlined"
-                    label={`初期投与量(${cfg.doseUnit})`}
-                    style={styles.input}
+                    label="溶質量"
+                    style={styles.smallInput}
                     keyboardType="numeric"
-                    value={cfg.initialDose}
-                    onChangeText={(v) => updateValue(key, 'initialDose', v)}
+                    value={cfg.soluteAmount}
+                    onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
                   />
-                  <View style={styles.row}>
-                    <TextInput
-                      mode="outlined"
-                      label="溶質量"
-                      style={styles.smallInput}
-                      keyboardType="numeric"
-                      value={cfg.soluteAmount}
-                      onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
-                    />
-                    <Menu
-                      visible={unitMenuVisible}
-                      onDismiss={() => setUnitMenuVisible(false)}
-                      anchor={
-                        <Button onPress={() => setUnitMenuVisible(true)}>
-                          {cfg.soluteUnit}
-                        </Button>
-                      }
-                    >
-                      <Menu.Item
-                        onPress={() => updateValue(key, 'soluteUnit', 'mg')}
-                        title="mg"
-                      />
-                      <Menu.Item
-                        onPress={() => updateValue(key, 'soluteUnit', 'µg')}
-                        title="µg"
-                      />
-                    </Menu>
-                    <Text style={styles.inlineText}>/</Text>
-                    <TextInput
-                      mode="outlined"
-                      label="溶液量(ml)"
-                      style={styles.smallInput}
-                      keyboardType="numeric"
-                      value={cfg.solutionVolume}
-                      onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
-                    />
-                  </View>
+                  <Menu
+                    visible={unitMenuVisible}
+                    onDismiss={() => setUnitMenuVisible(false)}
+                    anchor={<Button onPress={() => setUnitMenuVisible(true)}>{cfg.soluteUnit}</Button>}
+                  >
+                    <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'mg')} title="mg" />
+                    <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'µg')} title="µg" />
+                  </Menu>
+                  <Text style={styles.inlineText}>/</Text>
+                  <TextInput
+                    mode="outlined"
+                    label="溶液量(ml)"
+                    style={styles.smallInput}
+                    keyboardType="numeric"
+                    value={cfg.solutionVolume}
+                    onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
+                  />
                 </View>
-              );
-            })()}
-            <View style={styles.section}>
-              <Text style={styles.heading}>起動時に表示する薬剤</Text>
-              <RadioButton.Group
-                onValueChange={(v) => setStartupDrug(v as DrugType)}
-                value={startupDrug}
-              >
-                {(Object.keys(localConfigs) as DrugType[]).map((k) => (
-                  <View key={k} style={styles.row}>
-                    <RadioButton value={k} />
-                    <Text style={styles.inlineText}>{localConfigs[k].label}</Text>
-                  </View>
-                ))}
-              </RadioButton.Group>
-            </View>
-            <View style={styles.buttonRow}>
-              <Button mode="contained" onPress={handleSave} style={styles.button}>
-                保存
-              </Button>
-              <Button mode="outlined" onPress={handleReset} style={styles.button}>
-                デフォルトに戻す
-              </Button>
-            </View>
-            <Button onPress={onClose} style={styles.closeButton}>
-              閉じる
-            </Button>
-          </>
-        }
-      />
-      <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>{snackbar}</Snackbar>
+                <View style={styles.buttonRow}>
+                  <Button mode="outlined" onPress={handleReset} style={styles.button}>
+                    デフォルトに戻す
+                  </Button>
+                  <Button mode="contained" onPress={() => setEditVisible(false)} style={styles.button}>
+                    閉じる
+                  </Button>
+                </View>
+              </View>
+            );
+          })()}
+        </Modal>
+      </Portal>
+      <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>
+        {snackbar}
+      </Snackbar>
     </Surface>
   );
 }
@@ -253,4 +237,5 @@ const styles = StyleSheet.create({
   button: { marginHorizontal: 4 },
   list: { marginBottom: 16 },
   closeButton: { marginTop: 16 },
+  modal: { backgroundColor: 'white', margin: 16, padding: 16 },
 });
