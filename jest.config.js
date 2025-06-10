@@ -1,13 +1,13 @@
-/**
- * Jest の設定ファイル
- * Node.js を ES モジュールとして扱うため `export default` を使用する
- */
+
+/** @type {import('jest').Config} */
 export default {
   testEnvironment: 'node',
-  // tests フォルダのみを対象にする
-  testMatch: ['<rootDir>/tests/**/*.test.js'],
-  // TypeScript ファイルを Babel で変換する設定
+  // テストファイルは tests ディレクトリにまとめる
+  // 拡張子は js と ts の両方を対象にする
+  testMatch: ['<rootDir>/tests/**/*.test.{js,ts}'],
+  // TypeScript ファイルを Sucrase で変換する
   transform: {
-    '^.+\\.tsx?$': ['babel-jest']
+    '^.+\\.(ts|tsx)$': ['<rootDir>/scripts/jestTransformer.cjs']
+
   }
 };
