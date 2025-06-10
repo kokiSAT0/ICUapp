@@ -6,6 +6,7 @@ import {
   Alert,
   View,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -65,6 +66,8 @@ const WEIGHT_MIN = 20;
 const WEIGHT_MAX = 120;
 // 体重を保存する際のキー名
 const STORAGE_KEY_WEIGHT = 'weight';
+// 画面高さを取得して説明カードの高さに利用
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 export type Range = {
   min: number;
   max: number;
@@ -642,11 +645,24 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
             dangerThreshold={configs[drug].dangerDose}
             step={configs[drug].doseStep}
           />
+          <View style={styles.sliderLabelRow}>
+            <Text>0</Text>
+            <Text>
+              {doseRange.max}
+              {configs[drug].doseUnit === 'µg/kg/min'
+                ? 'γ'
+                : configs[drug].doseUnit === 'µg/kg/hr'
+                ? 'γ/hr'
+                : configs[drug].doseUnit}
+            </Text>
+          </View>
         </Surface>
 
-        {/* 解説表示エリア */}
+        {/* 解説表示エリア: 高さ固定でスクロール可能にする */}
         <Surface style={[styles.card, styles.descriptionCard]}>
-          <Text style={styles.description}>{configs[drug].description}</Text>
+          <ScrollView contentContainerStyle={styles.descriptionScroll}>
+            <Text style={styles.description}>{configs[drug].description}</Text>
+          </ScrollView>
         </Surface>
 
         {/* Snackbar でバリデーションメッセージを表示 */}
@@ -752,12 +768,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#D0D0D0',
     elevation: 2,
   },
-  drugCard: {},
-  weightCard: {},
-  compositionCard: {},
-  rateCard: {},
-  doseCard: {},
-  descriptionCard: {},
+
+  drugCard: {
+    backgroundColor: '#e1f5fe',
+  },
+  weightCard: {
+    backgroundColor: '#fff3e0',
+  },
+  compositionCard: {
+    backgroundColor: '#f1f8e9',
+  },
+  rateCard: {
+    backgroundColor: '#fce4ec',
+  },
+  doseCard: {
+    backgroundColor: '#e8eaf6',
+  },
+  descriptionCard: {
+    backgroundColor: '#eeeeee',
+    height: SCREEN_HEIGHT * 0.2,
+  },
+  // 説明文スクロール用コンテナ
+  descriptionScroll: {
+    paddingHorizontal: 8,
+  },
+  // スライダーのラベル行
+  sliderLabelRow: {
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
   // 薬剤選択と体重入力を横並びにする行
   drugWeightRow: {
     flexDirection: 'row',

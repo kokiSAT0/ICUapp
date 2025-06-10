@@ -1,5 +1,11 @@
 import React, { useState, forwardRef } from 'react';
-import { StyleSheet, StyleProp, ViewStyle, View, LayoutChangeEvent } from 'react-native';
+import {
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  View,
+  LayoutChangeEvent,
+} from 'react-native';
 import Slider, { SliderProps } from '@react-native-community/slider';
 import { useTheme } from 'react-native-paper';
 
@@ -41,15 +47,27 @@ export default forwardRef(function PaperSlider(
       ? ((dangerThreshold - min) / (max - min)) * width
       : 0;
 
+  const progress =
+    rest.value !== undefined && max > min
+      ? ((rest.value as number) - min) / (max - min)
+      : 0;
+
   return (
     // container の幅を onLayout で取得するため、ここにスタイルを適用
     <View style={[styles.container, style]} onLayout={handleLayout}>
+      {/* 背景のベーストラック */}
+      <View pointerEvents="none" style={styles.trackBase} />
+      {/* 緑色で現在値まで塗りつぶす */}
+      <View
+        pointerEvents="none"
+        style={[styles.trackProgress, { width: width * progress }]}
+      />
       <Slider
         ref={ref}
         {...rest}
         style={styles.slider}
-        minimumTrackTintColor={minimumTrackTintColor ?? colors.primary}
-        maximumTrackTintColor={maximumTrackTintColor ?? colors.outline}
+        minimumTrackTintColor="transparent"
+        maximumTrackTintColor="transparent"
         thumbTintColor={thumbTintColor ?? colors.primary}
       />
       {dangerThreshold !== undefined && (
@@ -72,6 +90,23 @@ export default forwardRef(function PaperSlider(
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+  },
+  // トラック全体の背景色
+  trackBase: {
+    position: 'absolute',
+    top: '50%',
+    height: 4,
+    marginTop: -2,
+    width: '100%',
+    backgroundColor: '#d3d3d3', // 薄灰色
+  },
+  // 現在値を示す緑色部分
+  trackProgress: {
+    position: 'absolute',
+    top: '50%',
+    height: 4,
+    marginTop: -2,
+    backgroundColor: '#4caf50',
   },
   // danger 表示用バー
   danger: {
