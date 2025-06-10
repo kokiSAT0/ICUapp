@@ -10,7 +10,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import FlowRateConverter from './src/components/FlowRateConverter';
 import SettingsScreen from './src/components/SettingsScreen';
 import GammaCalculatorScreen, {
   type GammaCalculatorScreenProps,
@@ -48,8 +47,6 @@ export default function App(_: AppProps) {
                     GammaCalculatorScreen as React.ComponentType<GammaCalculatorScreenProps>
                   }
                 />
-                {/* 旧換算画面は Converter として残す */}
-                <Stack.Screen name="Converter" component={FlowRateConverter} />
                 <Stack.Screen name="WebView" component={WebViewScreen} />
                 <Stack.Screen
                   name="Settings"

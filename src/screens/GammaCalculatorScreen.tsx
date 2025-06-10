@@ -98,13 +98,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       >
       {/* ===== Header ===== */}
       <View style={styles.header}>
-        {/* 旧換算画面への遷移ボタン */}
-        <IconButton
-          icon="swap-horizontal"
-          size={24}
-          style={styles.navBtn}
-          onPress={() => navigation.navigate('Converter')}
-        />
         <Pressable style={styles.centerButton}>
           <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
             ノルアドレナリン
@@ -274,8 +267,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  // 旧画面へ遷移するボタン
-  navBtn: { paddingHorizontal: 8 },
   settingBtn: { paddingHorizontal: 8 },
   infoCard: {
     margin: 8,
