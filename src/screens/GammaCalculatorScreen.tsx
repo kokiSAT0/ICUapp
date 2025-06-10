@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import DigitalNumber from '@/components/DigitalNumber';
 import { IconButton } from 'react-native-paper';
+import CompositionDialog from '@/components/CompositionDialog';
 
 import { DIGIT_SPACING } from '@/components/DigitalNumber';   // ← 追加
 
@@ -25,6 +26,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const [doseMg, setDoseMg] = useState(2);
   const [volumeMl, setVolumeMl] = useState(20);
   const [weightKg, setWeightKg] = useState(60);
+  // 値編集ダイアログの表示状態
+  const [dialogVisible, setDialogVisible] = useState(false);
   const [flowMlH, setFlowMlH] = useState(33.8);
   const [gamma, setGamma] = useState(0.88);
   const gammaMax = 0.7;
@@ -39,6 +42,16 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const decFlow  = (idx: number) => setFlowMlH(v => Math.max(0, +(v - flowSteps[idx]).toFixed(1)));
   const incGamma = (idx: number) => setGamma   (v => +(v + gammaSteps[idx]).toFixed(2));
   const decGamma = (idx: number) => setGamma   (v => Math.max(0, +(v - gammaSteps[idx]).toFixed(2)));
+
+  // ダイアログで保存された値を反映
+  const handleSubmitValues = useCallback(
+    (dose: number, volume: number, weight: number) => {
+      setDoseMg(dose);
+      setVolumeMl(volume);
+      setWeightKg(weight);
+    },
+    [],
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -65,11 +78,11 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       {/* ===== ① 組成 / 体重 ===== */}
       <Surface elevation={1} style={styles.infoCard}>
         <Text>組成：</Text>
-        <EditableBox value={doseMg} onPress={() => { /* ダイアログ */ }} />
+        <EditableBox value={doseMg} onPress={() => setDialogVisible(true)} />
         <Text> mg / </Text>
-        <EditableBox value={volumeMl} onPress={() => {}} />
+        <EditableBox value={volumeMl} onPress={() => setDialogVisible(true)} />
         <Text> ml　体重 </Text>
-        <EditableBox value={weightKg} onPress={() => {}} />
+        <EditableBox value={weightKg} onPress={() => setDialogVisible(true)} />
         <Text> kg</Text>
 
         <Text style={{ width: '100%', marginTop: 4 }}>
@@ -172,6 +185,14 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         </Text>
       </Surface>
       </ScrollView>
+      <CompositionDialog
+        visible={dialogVisible}
+        onDismiss={() => setDialogVisible(false)}
+        doseMg={doseMg}
+        volumeMl={volumeMl}
+        weightKg={weightKg}
+        onSubmit={handleSubmitValues}
+      />
     </SafeAreaView>
   );
 }
