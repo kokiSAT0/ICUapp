@@ -179,11 +179,19 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       </Surface>
 
       {/* ===== ④ 添付文書 ===== */}
-      <Surface elevation={1} style={styles.brochure}>
-        <Text variant="bodyMedium" style={{ color: '#666' }}>
-          添付文書（後日 WebView などで表示）
-        </Text>
-      </Surface>
+      <Pressable
+        onPress={() =>
+          navigation.navigate('WebView', {
+            uri: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          })
+        }
+      >
+        <Surface elevation={1} style={styles.brochure}>
+          <Text variant="bodyMedium" style={{ color: '#666' }}>
+            添付文書を表示
+          </Text>
+        </Surface>
+      </Pressable>
       </ScrollView>
       <CompositionDialog
         visible={dialogVisible}
