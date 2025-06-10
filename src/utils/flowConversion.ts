@@ -3,6 +3,8 @@
 
 // 濃度計算に利用する型定義
 import { SoluteUnit } from '../types';
+// .env を読み込んで環境変数を利用できるようにする
+import 'dotenv/config';
 
 // デフォルトの溶質量と溶液量
 import { DRUGS, DrugType } from '../config/drugs';
@@ -51,11 +53,15 @@ export function computeConcentration(
 }
 
 // デフォルト濃度を計算して定数化
-export const DEFAULT_CONCENTRATION = computeConcentration(
-  DEFAULT_SOLUTE_AMOUNT,
-  DEFAULT_SOLUTE_UNIT,
-  DEFAULT_SOLUTION_VOLUME,
-);
+// .env から DRUG_CONCENTRATION が設定されていればそれを利用する
+const envConc = Number(process.env.DRUG_CONCENTRATION);
+export const DEFAULT_CONCENTRATION = Number.isFinite(envConc)
+  ? envConc
+  : computeConcentration(
+      DEFAULT_SOLUTE_AMOUNT,
+      DEFAULT_SOLUTE_UNIT,
+      DEFAULT_SOLUTION_VOLUME,
+    );
 
 // DrugType と DRUGS は設定ファイルから再エクスポート
 export type { DrugType } from '../config/drugs';
