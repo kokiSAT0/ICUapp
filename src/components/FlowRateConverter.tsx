@@ -8,6 +8,8 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
 import {
   Surface,
@@ -18,6 +20,7 @@ import {
   Button,
   IconButton,
 } from 'react-native-paper';
+import Header from './Header';
 // 端末にデータを保存するため AsyncStorage を利用
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // スライダーコンポーネントを利用する
@@ -74,6 +77,7 @@ export type FlowRateConverterProps = {};
 
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
+  const navigation = useNavigation<any>();
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
   // 表示順の先頭薬剤をデフォルトとする
   const { configs, drugOrder } = useDrugConfigs();
@@ -376,13 +380,15 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   };
 
   return (
-    // ScrollView で画面からはみ出した場合に縦スクロールできるようにする
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <SafeAreaView style={styles.safeArea}>
+      <Header onPressSettings={() => navigation.navigate('Settings')} />
+      {/* ScrollView で画面からはみ出した場合に縦スクロールできるようにする */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         {/* 薬剤選択と体重入力を横並びに配置 */}
         <View style={styles.drugWeightRow}>
           {/* 薬剤選択をカードに配置 */}
-          <Surface style={[styles.card, styles.drugCard, styles.drugArea]}>
+          <Surface style={[styles.card, styles.drugArea]}>
           <Menu
             visible={menuVisible}
             onDismiss={() => setMenuVisible(false)}
@@ -402,8 +408,9 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           </Menu>
           </Surface>
 
+          {/* 体重入力と組成入力を同じカードにまとめる */}
+          <Surface style={[styles.card, styles.weightArea]}>
           {/* 体重入力エリア */}
-          <Surface style={[styles.card, styles.weightCard, styles.weightArea]}>
           <View style={styles.inputRow}>
             <Text style={styles.label}>体重:</Text>
             <View style={styles.numberInputContainer}>
@@ -453,14 +460,20 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               </View>
             </View>
             <Text style={styles.inlineText}>kg</Text>
+            {/* デフォルト値 60kg 設定ボタン */}
+            <Button
+              mode="contained"
+              compact
+              buttonColor="#9A9A9A"
+              onPress={() => handleWeightChange(60)}
+              style={styles.defaultButton}
+            >
+              60kg
+            </Button>
           </View>
-          </Surface>
-        </View>
 
-        {/* 溶質量・単位・溶液量を横並びで入力する */}
-        <Surface style={[styles.card, styles.compositionCard]}>
+          {/* 溶質量・単位・溶液量を横並びで入力する */}
           <View style={styles.compositionRow}>
-            {/* ラベルと入力欄を一行に配置する */}
             <Text style={styles.label}>組成:</Text>
             <TextInput
               mode="outlined"
@@ -494,10 +507,24 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               onChangeText={handleVolumeChange}
             />
             <Text style={styles.inlineText}>ml</Text>
+            {/* デフォルト値 2mg / 20ml ボタン */}
+            <Button
+              mode="contained"
+              compact
+              buttonColor="#9A9A9A"
+              onPress={() => {
+                handleAmountChange('2');
+                handleVolumeChange('20');
+              }}
+              style={styles.defaultButton}
+            >
+              2mg/20ml
+            </Button>
           </View>
           {/* 濃度表示 */}
           <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
-        </Surface>
+          </Surface>
+        </View>
 
         {/* 流量入力エリア */}
         <Surface style={[styles.card, styles.rateCard]}>
@@ -648,10 +675,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         </Snackbar>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   // スクロールコンテナでは flexGrow を指定して中央寄せにする
   scrollContainer: {
     flexGrow: 1,
@@ -731,10 +762,13 @@ const styles = StyleSheet.create({
     // 画面いっぱいに広げる
     width: '100%',
     marginVertical: 6,
+    marginHorizontal: 15,
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 10,
+    backgroundColor: '#D0D0D0',
     elevation: 2,
   },
+
   drugCard: {
     backgroundColor: '#e1f5fe',
   },
@@ -764,6 +798,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+
   // 薬剤選択と体重入力を横並びにする行
   drugWeightRow: {
     flexDirection: 'row',
@@ -782,5 +817,9 @@ const styles = StyleSheet.create({
   // 流量・投与量の数値を大きく表示する
   largeNumber: {
     fontSize: 18,
+  },
+  // デフォルト設定ボタンのスタイル
+  defaultButton: {
+    marginLeft: 8,
   },
 });

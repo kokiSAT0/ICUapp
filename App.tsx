@@ -2,7 +2,7 @@ import React from 'react';
 // StyleSheet はコンポーネントの見た目を整えるためのオブジェクトを生成する
 import { StyleSheet } from 'react-native';
 // PaperProvider はテーマ設定を提供する
-import { Provider as PaperProvider, IconButton } from 'react-native-paper';
+import { Provider as PaperProvider } from 'react-native-paper';
 // ジェスチャー操作を有効にするラッパービュー
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -24,26 +24,14 @@ export default function App(_: AppProps) {
       <DrugConfigProvider>
         <PaperProvider>
           <NavigationContainer>
-            <Stack.Navigator>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Home" component={FlowRateConverter} />
               <Stack.Screen
-                name="Home"
-                component={FlowRateConverter}
-              options={({ navigation }) => ({
-                title: '投与量・流量換算ツール',
-                headerRight: () => (
-                  <IconButton
-                    icon="cog"
-                    onPress={() => navigation.navigate('Settings')}
-                  />
-                ),
-              })}
-            />
-            <Stack.Screen
-              name="Settings"
-              component={SettingsScreenWrapper}
-              options={{ title: '設定' }}
-            />
-          </Stack.Navigator>
+                name="Settings"
+                component={SettingsScreenWrapper}
+                options={{ title: '設定' }}
+              />
+            </Stack.Navigator>
           </NavigationContainer>
         </PaperProvider>
       </DrugConfigProvider>
