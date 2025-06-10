@@ -41,14 +41,15 @@ export default function App(_: AppProps) {
           <PaperProvider>
             <NavigationContainer>
               <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Home" component={FlowRateConverter} />
-                {/* GammaCalculatorScreen 用の型を指定して読み込む */}
+                {/* ホーム画面を GammaCalculatorScreen に変更 */}
                 <Stack.Screen
-                  name="Gamma"
+                  name="Home"
                   component={
                     GammaCalculatorScreen as React.ComponentType<GammaCalculatorScreenProps>
                   }
                 />
+                {/* 旧換算画面は Converter として残す */}
+                <Stack.Screen name="Converter" component={FlowRateConverter} />
                 <Stack.Screen name="WebView" component={WebViewScreen} />
                 <Stack.Screen
                   name="Settings"
