@@ -10,7 +10,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "node scripts/lint.js",
-    "test": "node --test"
+    "test": "jest"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
@@ -35,6 +35,9 @@
     "eslint": "^8.56.0",
     "sucrase": "^3.35.0",
     "typescript": "~5.8.3",
-    "@types/react": "~19.0.10"
+    "@types/react": "~19.0.10",
+    "jest": "^29.7.0",
+    "@testing-library/react-native": "^12.1.5",
+    "@types/jest": "^29.5.5"
   }
 }
