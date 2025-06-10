@@ -5,7 +5,7 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import { Surface, Text, Divider } from 'react-native-paper';
+import { Surface, Text, Divider, Menu } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -28,7 +28,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   // useNavigation を用いて設定画面へ遷移する
   const navigation = useNavigation<any>();
   // DrugConfigContext から設定値を取得
-  const { configs, initialDrug } = useDrugConfigs();
+  const { configs, initialDrug, setInitialDrug, drugOrder } = useDrugConfigs();
   const drug = configs[initialDrug];
   // 溶質量の単位に依存するためコメントでは doseMg としているが実際は mg とは限らない
   const [doseMg, setDoseMg] = useState(drug.soluteAmount);
@@ -38,6 +38,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const [weightKg, setWeightKg] = useState(60);
   // 値編集ダイアログの表示状態
   const [dialogVisible, setDialogVisible] = useState(false);
+  // 薬剤選択メニューの表示状態
+  const [drugMenuVisible, setDrugMenuVisible] = useState(false);
   // 初期濃度から流量を計算
   const initialConc = computeConcentration(doseMg, drug.soluteUnit, volumeMl);
   const [flowMlH, setFlowMlH] = useState(
@@ -80,6 +82,12 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const incGamma = (idx: number) => updateFromGamma(gamma + gammaSteps[idx]);
   const decGamma = (idx: number) => updateFromGamma(gamma - gammaSteps[idx]);
 
+  // メニューから薬剤を選択したときの処理
+  const handleSelectDrug = async (drugId: keyof typeof configs) => {
+    await setInitialDrug(drugId);
+    setDrugMenuVisible(false);
+  };
+
   // ダイアログで保存された値を反映
   const handleSubmitValues = useCallback(
     (dose: number, volume: number, weight: number) => {
@@ -93,6 +101,21 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     },
     [flowMlH],
   );
+
+  // 選択薬剤が変わったら各値を初期設定に更新
+  useEffect(() => {
+    const next = configs[initialDrug];
+    setDoseMg(next.soluteAmount);
+    setVolumeMl(next.solutionVolume);
+    setGamma(next.initialDose);
+    const conc = computeConcentration(
+      next.soluteAmount,
+      next.soluteUnit,
+      next.solutionVolume,
+    );
+    const flow = convertDoseToRate(next.initialDose, weightKg, conc);
+    setFlowMlH(+flow.toFixed(1));
+  }, [initialDrug, configs, weightKg]);
 
   // 組成や体重が変化したときは現在の流量からγを再計算する
   useEffect(() => {
@@ -108,12 +131,32 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       >
       {/* ===== Header ===== */}
       <View style={styles.header}>
-        <Pressable style={styles.centerButton}>
-          {/* 薬剤名を設定ファイルから表示 */}
-          <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-            {drug.label}
-          </Text>
-        </Pressable>
+        <Menu
+          visible={drugMenuVisible}
+          onDismiss={() => setDrugMenuVisible(false)}
+          anchor=
+            {(
+              <Pressable
+                style={styles.centerButton}
+                onPress={() => setDrugMenuVisible(true)}
+              >
+                {/* 薬剤名を設定ファイルから表示 */}
+                <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                  {drug.label}
+                </Text>
+              </Pressable>
+            )}
+        >
+          {drugOrder
+            .filter((d) => configs[d].enabled)
+            .map((d) => (
+              <Menu.Item
+                key={d}
+                onPress={() => handleSelectDrug(d)}
+                title={configs[d].label}
+              />
+            ))}
+        </Menu>
         <Pressable
           style={styles.settingBtn}
           onPress={() => navigation.navigate('Settings')}
