@@ -379,7 +379,7 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         {/* 薬剤選択と体重入力を横並びに配置 */}
         <View style={styles.drugWeightRow}>
           {/* 薬剤選択をカードに配置 */}
-          <Surface style={[styles.card, styles.drugCard, styles.drugArea]}>
+          <Surface style={[styles.card, styles.drugArea]}>
           <Menu
             visible={menuVisible}
             onDismiss={() => setMenuVisible(false)}
@@ -399,8 +399,9 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
           </Menu>
           </Surface>
 
+          {/* 体重入力と組成入力を同じカードにまとめる */}
+          <Surface style={[styles.card, styles.weightArea]}>
           {/* 体重入力エリア */}
-          <Surface style={[styles.card, styles.weightCard, styles.weightArea]}>
           <View style={styles.inputRow}>
             <Text style={styles.label}>体重:</Text>
             <View style={styles.numberInputContainer}>
@@ -450,14 +451,20 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               </View>
             </View>
             <Text style={styles.inlineText}>kg</Text>
+            {/* デフォルト値 60kg 設定ボタン */}
+            <Button
+              mode="contained"
+              compact
+              buttonColor="#9A9A9A"
+              onPress={() => handleWeightChange(60)}
+              style={styles.defaultButton}
+            >
+              60kg
+            </Button>
           </View>
-          </Surface>
-        </View>
 
-        {/* 溶質量・単位・溶液量を横並びで入力する */}
-        <Surface style={[styles.card, styles.compositionCard]}>
+          {/* 溶質量・単位・溶液量を横並びで入力する */}
           <View style={styles.compositionRow}>
-            {/* ラベルと入力欄を一行に配置する */}
             <Text style={styles.label}>組成:</Text>
             <TextInput
               mode="outlined"
@@ -491,10 +498,24 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
               onChangeText={handleVolumeChange}
             />
             <Text style={styles.inlineText}>ml</Text>
+            {/* デフォルト値 2mg / 20ml ボタン */}
+            <Button
+              mode="contained"
+              compact
+              buttonColor="#9A9A9A"
+              onPress={() => {
+                handleAmountChange('2');
+                handleVolumeChange('20');
+              }}
+              style={styles.defaultButton}
+            >
+              2mg/20ml
+            </Button>
           </View>
           {/* 濃度表示 */}
           <Text style={styles.label}>濃度: {concentration.toFixed(0)} µg/ml</Text>
-        </Surface>
+          </Surface>
+        </View>
 
         {/* 流量入力エリア */}
         <Surface style={[styles.card, styles.rateCard]}>
@@ -715,28 +736,18 @@ const styles = StyleSheet.create({
     // 画面いっぱいに広げる
     width: '100%',
     marginVertical: 6,
+    marginHorizontal: 15,
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 10,
+    backgroundColor: '#D0D0D0',
     elevation: 2,
   },
-  drugCard: {
-    backgroundColor: '#e1f5fe',
-  },
-  weightCard: {
-    backgroundColor: '#fff3e0',
-  },
-  compositionCard: {
-    backgroundColor: '#f1f8e9',
-  },
-  rateCard: {
-    backgroundColor: '#fce4ec',
-  },
-  doseCard: {
-    backgroundColor: '#e8eaf6',
-  },
-  descriptionCard: {
-    backgroundColor: '#eeeeee',
-  },
+  drugCard: {},
+  weightCard: {},
+  compositionCard: {},
+  rateCard: {},
+  doseCard: {},
+  descriptionCard: {},
   // 薬剤選択と体重入力を横並びにする行
   drugWeightRow: {
     flexDirection: 'row',
@@ -755,5 +766,9 @@ const styles = StyleSheet.create({
   // 流量・投与量の数値を大きく表示する
   largeNumber: {
     fontSize: 18,
+  },
+  // デフォルト設定ボタンのスタイル
+  defaultButton: {
+    marginLeft: 8,
   },
 });
