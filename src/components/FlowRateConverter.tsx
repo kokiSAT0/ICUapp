@@ -20,6 +20,7 @@ import {
   Button,
   IconButton,
 } from 'react-native-paper';
+import { DIGIT_SPACING } from './DigitalNumber';
 import Header from './Header';
 // 端末にデータを保存するため AsyncStorage を利用
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -816,7 +817,9 @@ const styles = StyleSheet.create({
   },
   // 流量・投与量の数値を大きく表示する
   largeNumber: {
-    fontSize: 18,
+    fontSize: 32,
+    fontFamily: 'DSEG7Classic',
+    letterSpacing: DIGIT_SPACING,
   },
   // デフォルト設定ボタンのスタイル
   defaultButton: {
