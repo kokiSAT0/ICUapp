@@ -7,6 +7,8 @@ import {
   View,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 // UI 表示には react-native-paper の Text と Surface コンポーネントを使用
 import {
   Surface,
@@ -17,6 +19,7 @@ import {
   Button,
   IconButton,
 } from 'react-native-paper';
+import Header from './Header';
 // 端末にデータを保存するため AsyncStorage を利用
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // スライダーコンポーネントを利用する
@@ -71,6 +74,7 @@ export type FlowRateConverterProps = {};
 
 // メインコンポーネント
 export default function FlowRateConverter(_: FlowRateConverterProps) {
+  const navigation = useNavigation<any>();
   // 初期値: 体重50kg、薬剤ごとの設定に基づく投与量
   // 表示順の先頭薬剤をデフォルトとする
   const { configs, drugOrder } = useDrugConfigs();
@@ -373,8 +377,10 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
   };
 
   return (
-    // ScrollView で画面からはみ出した場合に縦スクロールできるようにする
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <SafeAreaView style={styles.safeArea}>
+      <Header onPressSettings={() => navigation.navigate('Settings')} />
+      {/* ScrollView で画面からはみ出した場合に縦スクロールできるようにする */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         {/* 薬剤選択と体重入力を横並びに配置 */}
         <View style={styles.drugWeightRow}>
@@ -632,10 +638,14 @@ export default function FlowRateConverter(_: FlowRateConverterProps) {
         </Snackbar>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   // スクロールコンテナでは flexGrow を指定して中央寄せにする
   scrollContainer: {
     flexGrow: 1,
