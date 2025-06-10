@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import FlowRateConverter from './src/components/FlowRateConverter';
 import SettingsScreen from './src/components/SettingsScreen';
+import GammaCalculatorScreen from './src/screens/GammaCalculatorScreen';
 import { DrugConfigProvider } from './src/contexts/DrugConfigContext';
 
 // アプリのエントリーポイント
@@ -38,6 +39,7 @@ export default function App(_: AppProps) {
             <NavigationContainer>
               <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Home" component={FlowRateConverter} />
+                <Stack.Screen name="Gamma" component={GammaCalculatorScreen} />
                 <Stack.Screen
                   name="Settings"
                   component={SettingsScreenWrapper}
