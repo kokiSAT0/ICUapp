@@ -226,20 +226,13 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         </View>
       </Surface>
 
-      {/* ===== ④ 添付文書 ===== */}
-      <Pressable
-        onPress={() =>
-          navigation.navigate('WebView', {
-            uri: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-          })
-        }
-      >
-        <Surface elevation={1} style={styles.brochure}>
-          <Text variant="bodyMedium" style={{ color: '#666' }}>
-            添付文書を表示
-          </Text>
-        </Surface>
-      </Pressable>
+      {/* ===== ④ 添付文書 / 補足説明 ===== */}
+      <Surface elevation={1} style={styles.brochure}>
+        {/* 設定ファイルから薬剤の説明文を表示 */}
+        <Text variant="bodyMedium" style={{ color: '#666' }}>
+          {drug.description}
+        </Text>
+      </Surface>
       </ScrollView>
       <CompositionDialog
         visible={dialogVisible}
@@ -381,10 +374,8 @@ const styles = StyleSheet.create({
   },
   brochure: {
     margin: 8,
-    height: 220,
     borderRadius: 12,
     backgroundColor: '#d7d7d7',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 12,
   },
 });
