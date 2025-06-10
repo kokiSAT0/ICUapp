@@ -2,7 +2,7 @@ import React from 'react';
 // StyleSheet はコンポーネントの見た目を整えるためのオブジェクトを生成する
 import { StyleSheet } from 'react-native';
 // PaperProvider はテーマ設定を提供する
-import { Provider as PaperProvider, IconButton } from 'react-native-paper';
+import { Provider as PaperProvider } from 'react-native-paper';
 // ジェスチャー操作を有効にするラッパービュー
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -28,16 +28,12 @@ export default function App(_: AppProps) {
               <Stack.Screen
                 name="Home"
                 component={FlowRateConverter}
-              options={({ navigation }) => ({
-                title: '投与量・流量換算ツール',
-                headerRight: () => (
-                  <IconButton
-                    icon="cog"
-                    onPress={() => navigation.navigate('Settings')}
-                  />
-                ),
-              })}
-            />
+                options={{
+                  headerTransparent: true,
+                  headerTitle: '',
+                  headerTitleAlign: 'center',
+                }}
+              />
             <Stack.Screen
               name="Settings"
               component={SettingsScreenWrapper}
