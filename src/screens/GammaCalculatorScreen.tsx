@@ -267,6 +267,11 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             />
           )}
           <Slider
+            /*
+             * key に初期薬剤IDを指定することで、薬剤が変わった際に
+             * スライダーを再マウントし、初期値を正しく反映させる
+             */
+            key={initialDrug}
             minimumValue={0}
             maximumValue={gammaMax}
             step={drug.doseStep}
