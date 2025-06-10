@@ -12,7 +12,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import FlowRateConverter from './src/components/FlowRateConverter';
 import SettingsScreen from './src/components/SettingsScreen';
-import GammaCalculatorScreen from './src/screens/GammaCalculatorScreen';
+import GammaCalculatorScreen, {
+  type GammaCalculatorScreenProps,
+} from './src/screens/GammaCalculatorScreen';
 import WebViewScreen from './src/screens/WebViewScreen';
 import { DrugConfigProvider } from './src/contexts/DrugConfigContext';
 
@@ -40,7 +42,13 @@ export default function App(_: AppProps) {
             <NavigationContainer>
               <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Home" component={FlowRateConverter} />
-                <Stack.Screen name="Gamma" component={GammaCalculatorScreen} />
+                {/* GammaCalculatorScreen 用の型を指定して読み込む */}
+                <Stack.Screen
+                  name="Gamma"
+                  component={
+                    GammaCalculatorScreen as React.ComponentType<GammaCalculatorScreenProps>
+                  }
+                />
                 <Stack.Screen name="WebView" component={WebViewScreen} />
                 <Stack.Screen
                   name="Settings"
