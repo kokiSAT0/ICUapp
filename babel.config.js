@@ -3,6 +3,18 @@
 export default function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo']
+    presets: ['babel-preset-expo'],
+    // モジュール解決を簡単にするためのプラグイン設定
+    plugins: [
+      [
+        'module-resolver',
+        {
+          root: ['./'],
+          alias: {
+            '@': './src'
+          }
+        }
+      ]
+    ]
   };
 }
