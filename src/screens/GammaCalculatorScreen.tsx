@@ -20,22 +20,32 @@ import {
   convertRateToDose,
   computeConcentration,
 } from '@/utils/flowConversion';
+import { useDrugConfigs } from '../contexts/DrugConfigContext';
 
 export type GammaCalculatorScreenProps = {};
 export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const insets = useSafeAreaInsets();
   // useNavigation を用いて設定画面へ遷移する
   const navigation = useNavigation<any>();
+  // DrugConfigContext から設定値を取得
+  const { configs, initialDrug } = useDrugConfigs();
+  const drug = configs[initialDrug];
+  // 溶質量の単位に依存するためコメントでは doseMg としているが実際は mg とは限らない
+  const [doseMg, setDoseMg] = useState(drug.soluteAmount);
+  const [volumeMl, setVolumeMl] = useState(drug.solutionVolume);
 
   /* ===== 画面状態 ===== */
-  const [doseMg, setDoseMg] = useState(2);
-  const [volumeMl, setVolumeMl] = useState(20);
   const [weightKg, setWeightKg] = useState(60);
   // 値編集ダイアログの表示状態
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [flowMlH, setFlowMlH] = useState(33.8);
-  const [gamma, setGamma] = useState(0.88);
-  const gammaMax = 0.7;
+  // 初期濃度から流量を計算
+  const initialConc = computeConcentration(doseMg, drug.soluteUnit, volumeMl);
+  const [flowMlH, setFlowMlH] = useState(
+    convertDoseToRate(drug.initialDose, weightKg, initialConc),
+  );
+  const [gamma, setGamma] = useState(drug.initialDose);
+  // スライダーの上限
+  const gammaMax = drug.doseMax;
 
   /* === 各桁ごとのインクリメント / デクリメント === */
   // ml/h : 3 桁（10, 1, 0.1）
@@ -45,8 +55,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
   // 濃度(µg/ml)を都度計算する。useMemo で不要な再計算を避ける
   const concentration = useMemo(
-    () => computeConcentration(doseMg, 'mg', volumeMl),
-    [doseMg, volumeMl],
+    () => computeConcentration(doseMg, drug.soluteUnit, volumeMl),
+    [doseMg, volumeMl, drug.soluteUnit],
   );
 
   /** ml/h 変更時に γ を自動更新する */
@@ -77,7 +87,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       setVolumeMl(volume);
       setWeightKg(weight);
       // 組成や体重が変わったら流量を基準に γ を計算し直す
-      const conc = computeConcentration(dose, 'mg', volume);
+      const conc = computeConcentration(dose, drug.soluteUnit, volume);
       const g = convertRateToDose(flowMlH, weight, conc);
       setGamma(+g.toFixed(2));
     },
@@ -99,8 +109,9 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       {/* ===== Header ===== */}
       <View style={styles.header}>
         <Pressable style={styles.centerButton}>
+          {/* 薬剤名を設定ファイルから表示 */}
           <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-            ノルアドレナリン
+            {drug.label}
           </Text>
         </Pressable>
         <Pressable
@@ -116,14 +127,14 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       <Surface elevation={1} style={styles.infoCard}>
         <Text>組成：</Text>
         <EditableBox value={doseMg} onPress={() => setDialogVisible(true)} />
-        <Text> mg / </Text>
+        <Text> {drug.soluteUnit} / </Text>
         <EditableBox value={volumeMl} onPress={() => setDialogVisible(true)} />
         <Text> ml　体重 </Text>
         <EditableBox value={weightKg} onPress={() => setDialogVisible(true)} />
         <Text> kg</Text>
 
         <Text style={{ width: '100%', marginTop: 4 }}>
-          濃度：{(doseMg * 1000 / volumeMl).toFixed(0)} µg/ml
+          濃度：{concentration.toFixed(0)} µg/ml
         </Text>
       </Surface>
 
@@ -202,7 +213,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
           <Slider
             minimumValue={0}
             maximumValue={gammaMax}
-            step={0.01}
+            step={drug.doseStep}
             value={gamma}
             onValueChange={updateFromGamma}
             minimumTrackTintColor="green"
