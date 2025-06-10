@@ -210,6 +210,19 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
         {/* スライダー */}
         <View style={{ width: '100%', paddingHorizontal: 8, marginTop: 4 }}>
+          {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
+          {drug.dangerDose !== undefined && (
+            <View
+              pointerEvents="none"
+              style={[
+                styles.dangerTrack,
+                {
+                  left: `${(drug.dangerDose / gammaMax) * 100}%`,
+                  width: `${((gammaMax - drug.dangerDose) / gammaMax) * 100}%`,
+                },
+              ]}
+            />
+          )}
           <Slider
             minimumValue={0}
             maximumValue={gammaMax}
@@ -224,6 +237,12 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             <Text>{gammaMax}γ</Text>
           </View>
         </View>
+        {/* 危険域に入ったら警告メッセージを表示 */}
+        {drug.dangerDose !== undefined && gamma >= drug.dangerDose && (
+          <Text style={styles.dangerMessage}>
+            高用量です。注意して投与して下さい。
+          </Text>
+        )}
       </Surface>
 
       {/* ===== ④ 添付文書 / 補足説明 ===== */}
@@ -367,6 +386,20 @@ const styles = StyleSheet.create({
     bottom: 6,
     fontSize: 26,
     fontWeight: '500',
+  },
+  // 危険域バーのスタイル
+  dangerTrack: {
+    position: 'absolute',
+    height: 4,
+    backgroundColor: 'red',
+    top: 20, // スライダーのトラック位置に合わせて調整
+    borderRadius: 2,
+  },
+  // 危険域メッセージのスタイル
+  dangerMessage: {
+    color: 'red',
+    marginTop: 4,
+    alignSelf: 'center',
   },
   gammaScale: {
     flexDirection: 'row',
