@@ -7,7 +7,8 @@ import { Provider as PaperProvider, IconButton } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import FlowRateConverter from './src/components/FlowRateConverter';
+// 新しい UI 案の画面を追加
+import GammaCalculatorScreen from './src/components/GammaCalculatorScreen';
 import SettingsScreen from './src/components/SettingsScreen';
 import { DrugConfigProvider } from './src/contexts/DrugConfigContext';
 
@@ -27,7 +28,7 @@ export default function App(_: AppProps) {
             <Stack.Navigator>
               <Stack.Screen
                 name="Home"
-                component={FlowRateConverter}
+                component={GammaCalculatorScreen}
               options={({ navigation }) => ({
                 title: '投与量・流量換算ツール',
                 headerRight: () => (
