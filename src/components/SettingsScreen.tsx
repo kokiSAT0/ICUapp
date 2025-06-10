@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Surface,
   Text,
@@ -123,6 +124,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   };
 
   return (
+    // SafeAreaView でステータスバーと重ならないようにする
+    <SafeAreaView style={styles.safeArea}>
     <Surface style={styles.container}>
       <DraggableFlatList
         data={drugOrder}
@@ -221,10 +224,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         {snackbar}
       </Snackbar>
     </Surface>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  // SafeAreaView 用のスタイル
+  safeArea: { flex: 1 },
   container: { flex: 1 },
   scrollContainer: { padding: 16 },
   section: { marginBottom: 24 },
