@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,6 +15,11 @@ import { IconButton } from 'react-native-paper';
 import CompositionDialog from '@/components/CompositionDialog';
 
 import { DIGIT_SPACING } from '@/components/DigitalNumber';   // ← 追加
+import {
+  convertDoseToRate,
+  convertRateToDose,
+  computeConcentration,
+} from '@/utils/flowConversion';
 
 export type GammaCalculatorScreenProps = {};
 export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
@@ -38,10 +43,32 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   // γ    : 4 桁（10, 1, 0.1, 0.01）
   const gammaSteps = [10, 1, 0.1, 0.01];
 
-  const incFlow  = (idx: number) => setFlowMlH(v => +(v + flowSteps[idx]).toFixed(1));
-  const decFlow  = (idx: number) => setFlowMlH(v => Math.max(0, +(v - flowSteps[idx]).toFixed(1)));
-  const incGamma = (idx: number) => setGamma   (v => +(v + gammaSteps[idx]).toFixed(2));
-  const decGamma = (idx: number) => setGamma   (v => Math.max(0, +(v - gammaSteps[idx]).toFixed(2)));
+  // 濃度(µg/ml)を都度計算する。useMemo で不要な再計算を避ける
+  const concentration = useMemo(
+    () => computeConcentration(doseMg, 'mg', volumeMl),
+    [doseMg, volumeMl],
+  );
+
+  /** ml/h 変更時に γ を自動更新する */
+  const updateFromFlow = (value: number): void => {
+    const flow = Math.max(0, +value.toFixed(1));
+    setFlowMlH(flow);
+    const g = convertRateToDose(flow, weightKg, concentration);
+    setGamma(+g.toFixed(2));
+  };
+
+  /** γ 変更時に ml/h を自動更新する */
+  const updateFromGamma = (value: number): void => {
+    const g = Math.max(0, +value.toFixed(2));
+    setGamma(g);
+    const flow = convertDoseToRate(g, weightKg, concentration);
+    setFlowMlH(+flow.toFixed(1));
+  };
+
+  const incFlow = (idx: number) => updateFromFlow(flowMlH + flowSteps[idx]);
+  const decFlow = (idx: number) => updateFromFlow(flowMlH - flowSteps[idx]);
+  const incGamma = (idx: number) => updateFromGamma(gamma + gammaSteps[idx]);
+  const decGamma = (idx: number) => updateFromGamma(gamma - gammaSteps[idx]);
 
   // ダイアログで保存された値を反映
   const handleSubmitValues = useCallback(
@@ -49,9 +76,19 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       setDoseMg(dose);
       setVolumeMl(volume);
       setWeightKg(weight);
+      // 組成や体重が変わったら流量を基準に γ を計算し直す
+      const conc = computeConcentration(dose, 'mg', volume);
+      const g = convertRateToDose(flowMlH, weight, conc);
+      setGamma(+g.toFixed(2));
     },
-    [],
+    [flowMlH],
   );
+
+  // 組成や体重が変化したときは現在の流量からγを再計算する
+  useEffect(() => {
+    const g = convertRateToDose(flowMlH, weightKg, concentration);
+    setGamma(+g.toFixed(2));
+  }, [concentration, weightKg]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -174,7 +211,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             maximumValue={gammaMax}
             step={0.01}
             value={gamma}
-            onValueChange={setGamma}
+            onValueChange={updateFromGamma}
             minimumTrackTintColor="green"
             thumbTintColor="black"
           />
