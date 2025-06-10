@@ -8,14 +8,18 @@ import {
 import { Surface, Text, Divider } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
 import DigitalNumber from '@/components/DigitalNumber';
 import { IconButton } from 'react-native-paper';
 
 import { DIGIT_SPACING } from '@/components/DigitalNumber';   // ← 追加
 
-export default function GammaCalculatorScreen() {
+export type GammaCalculatorScreenProps = {};
+export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const insets = useSafeAreaInsets();
+  // useNavigation を用いて設定画面へ遷移する
+  const navigation = useNavigation<any>();
 
   /* ===== 画面状態 ===== */
   const [doseMg, setDoseMg] = useState(2);
@@ -49,7 +53,10 @@ export default function GammaCalculatorScreen() {
             ノルアドレナリン
           </Text>
         </Pressable>
-        <Pressable style={styles.settingBtn} onPress={() => { /* 設定画面へ */ }}>
+        <Pressable
+          style={styles.settingBtn}
+          onPress={() => navigation.navigate('Settings')}
+        >
           <Text variant="titleLarge">⚙️</Text>
         </Pressable>
       </View>
