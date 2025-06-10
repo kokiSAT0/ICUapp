@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+// Text は React Native Paper 版を利用する
+import { Text } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
 
 /**
  * 7-セグ風のデジタル数字を「固定桁数」で表示するコンポーネント
@@ -9,18 +11,20 @@ import { Text, StyleSheet } from 'react-native';
  * - 未使用桁には “8” を淡いグレー (#bbb) で表示
  * - 少数部はフォントサイズを 60% に縮小
  */
-export default function DigitalNumber(props: {
+// このコンポーネントで受け取るプロパティの型を定義
+export type DigitalNumberProps = {
   value: number;
   intDigits: number;
   fracDigits?: number;
   fontSize?: number;
-}) {
-  const {
-    value,
-    intDigits,
-    fracDigits = 0,
-    fontSize = 72,
-  } = props;
+};
+
+export default function DigitalNumber({
+  value,
+  intDigits,
+  fracDigits = 0,
+  fontSize = 72,
+}: DigitalNumberProps) {
 
   // 例: intDigits=2, fracDigits=2 なら "12.34"
   const formatted = value.toFixed(fracDigits);
@@ -79,12 +83,16 @@ export default function DigitalNumber(props: {
     }
   }
 
-  return <Text style={{ flexDirection: 'row' }}>{[...intElems, ...fracElems]}</Text>;
+  return <Text style={styles.row}>{[...intElems, ...fracElems]}</Text>;
 }
 
 export const DIGIT_SPACING = 7;  // ← 追加：外部で再利用するため定数化
 
 const styles = StyleSheet.create({
+  // 数字全体を横並びに表示
+  row: {
+    flexDirection: 'row',
+  },
   digit: {
     fontFamily: 'DSEG7Classic',
     letterSpacing: DIGIT_SPACING,
