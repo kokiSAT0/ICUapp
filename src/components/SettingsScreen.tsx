@@ -123,6 +123,30 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     setSnackbar('デフォルトに戻しました');
   };
 
+  // 薬剤を表示対象とするかどうかを切り替える
+  const toggleEnabled = async (drug: DrugType) => {
+    // 新しい状態を計算
+    const newEnabled = !localConfigs[drug].enabled;
+    setLocalConfigs({
+      ...localConfigs,
+      [drug]: { ...localConfigs[drug], enabled: newEnabled },
+    });
+
+    // 並び順を更新。表示しない薬剤は末尾へ移動
+    const orderWithoutDrug = drugOrder.filter((d) => d !== drug);
+    if (newEnabled) {
+      // 先頭から非表示の薬剤を探し、その直前に挿入
+      const firstDisabled = orderWithoutDrug.findIndex(
+        (d) => !localConfigs[d].enabled,
+      );
+      const insertIndex = firstDisabled === -1 ? orderWithoutDrug.length : firstDisabled;
+      orderWithoutDrug.splice(insertIndex, 0, drug);
+    } else {
+      orderWithoutDrug.push(drug);
+    }
+    await setDrugOrder(orderWithoutDrug);
+  };
+
   return (
     // SafeAreaView でステータスバーと重ならないようにする
     <SafeAreaView style={styles.safeArea}>
@@ -134,11 +158,18 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         renderItem={({ item, drag }) => (
           <List.Item
             title={localConfigs[item].label}
+            titleStyle={{ color: localConfigs[item].enabled ? undefined : '#888' }}
             onPress={() => {
               setSelectedDrug(item);
               setEditVisible(true);
             }}
             onLongPress={drag}
+            left={() => (
+              <Switch
+                value={localConfigs[item].enabled}
+                onValueChange={() => toggleEnabled(item)}
+              />
+            )}
             right={() => <IconButton icon="drag" />}
           />
         )}
@@ -165,13 +196,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             return (
               <View key={key} style={styles.section}>
                 <Text style={styles.heading}>{cfg.label}</Text>
-                <View style={styles.row}>
-                  <Text style={styles.inlineText}>表示</Text>
-                  <Switch
-                    value={cfg.enabled}
-                    onValueChange={(v) => updateValue(key, 'enabled', v)}
-                  />
-                </View>
                 <TextInput
                   mode="outlined"
                   label={`初期投与量(${cfg.doseUnit})`}
