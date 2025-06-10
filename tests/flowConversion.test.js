@@ -1,4 +1,8 @@
 // Jest でテストを実行する
+import { createRequire } from 'module';
+
+// ES モジュール内で CommonJS の require を使うためのユーティリティ
+const require = createRequire(import.meta.url);
 require('sucrase/register/ts.js');
 const {
   convertDoseToRate,

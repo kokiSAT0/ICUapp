@@ -3,8 +3,9 @@
 
 // 濃度計算に利用する型定義
 import { SoluteUnit } from '../types';
-// .env を読み込んで環境変数を利用できるようにする
-import 'dotenv/config';
+// Expo 環境の設定値を取得するためのモジュール
+// Constants.expoConfig?.extra に app.config.js で定義した値が入る
+import Constants from 'expo-constants';
 
 // デフォルトの溶質量と溶液量
 import { DRUGS, DrugType } from '../config/drugs';
@@ -53,8 +54,9 @@ export function computeConcentration(
 }
 
 // デフォルト濃度を計算して定数化
-// .env から DRUG_CONCENTRATION が設定されていればそれを利用する
-const envConc = Number(process.env.DRUG_CONCENTRATION);
+// Expo の設定 (app.config.js の extra) から濃度を取得する
+// Constants.expoConfig?.extra?.DRUG_CONCENTRATION に値があればそれを利用する
+const envConc = Number(Constants.expoConfig?.extra?.DRUG_CONCENTRATION);
 export const DEFAULT_CONCENTRATION = Number.isFinite(envConc)
   ? envConc
   : computeConcentration(

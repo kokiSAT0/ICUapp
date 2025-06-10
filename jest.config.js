@@ -1,3 +1,4 @@
+
 /** @type {import('jest').Config} */
 export default {
   testEnvironment: 'node',
@@ -7,5 +8,6 @@ export default {
   // TypeScript ファイルを Sucrase で変換する
   transform: {
     '^.+\\.(ts|tsx)$': ['<rootDir>/scripts/jestTransformer.cjs']
+
   }
 };
