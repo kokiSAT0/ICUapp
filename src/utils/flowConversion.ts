@@ -5,7 +5,16 @@
 import { SoluteUnit } from '../types';
 // Expo 環境の設定値を取得するためのモジュール
 // Constants.expoConfig?.extra に app.config.js で定義した値が入る
-import Constants from 'expo-constants';
+// Expo 環境では expo-constants を利用するが、Jest 実行時は ESModules が
+// 読み込めずエラーになるため try/catch で読み込みを試みる
+let Constants: { expoConfig?: any } = { expoConfig: {} };
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  Constants = require('expo-constants').default;
+} catch {
+  // テスト環境では空オブジェクトを利用する
+  Constants = { expoConfig: {} };
+}
 
 // デフォルトの溶質量と溶液量
 import { DRUGS, DrugType } from '../config/drugs';
