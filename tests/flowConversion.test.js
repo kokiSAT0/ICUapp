@@ -9,7 +9,7 @@ const {
   convertRateToDose,
   DEFAULT_CONCENTRATION,
   formatComposition,
-} = require('../src/utils/flowConversion');
+} = require('../src/utils/flowConversion.ts');
 const { DRUGS } = require('../src/config/drugs');
 
 test('dose-rate roundtrip', () => {
