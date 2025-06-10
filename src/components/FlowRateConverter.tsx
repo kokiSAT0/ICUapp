@@ -710,12 +710,6 @@ const styles = StyleSheet.create({
   doubleIcon: {
     fontSize: 12,
   },
-  // ラベルと入力欄を横並びに表示する行
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-  },
   // 各エリアをカード風に表示する共通スタイル
   card: {
     // 画面いっぱいに広げる
