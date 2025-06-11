@@ -23,7 +23,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // 流量・投与量表示を “中央基準から” 左にずらすオフセット(px)
 //   -80 はスマホ〜小型タブで程良い位置。端末幅に応じ調整可
 // ────────────────────────────────────────────────
-const DISPLAY_SHIFT = -50;
+const DISPLAY_SHIFT = -30;
 
 import {
   convertDoseToRate,
