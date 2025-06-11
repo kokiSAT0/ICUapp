@@ -94,7 +94,7 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     initialDose: 1,          // 推奨初期設定：1 µg/kg/hr
     soluteAmount: 1000,      // 1 mg（=1000 µg）を
     soluteUnit: "µg",        // 
-    solutionVolume: 50,      // 50 mL シリンジで調製（20 µg/mL）
+    solutionVolume: 100,      // 100 mL で調製
     doseMin: 0,
     doseMax: 6,              // ガイドライン上の上限 5 µg/kg/hr を少し余裕を見て
     dangerDose: 4,           // 4 µg/kg/hr 超で警告表示
