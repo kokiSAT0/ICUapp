@@ -17,7 +17,7 @@ import {
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
-import { DrugType, DRUGS, DrugConfig } from '../config/drugs';
+import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from '../config/drugs';
 
 // 数値項目のキー名
 type NumericKey = 'initialDose' | 'soluteAmount' | 'solutionVolume';
@@ -55,12 +55,19 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     setDrugOrder,
   } = useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
-  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>({
-    norepinephrine: toInputConfig(configs.norepinephrine),
-    dopamine: toInputConfig(configs.dopamine),
-    dexmedetomidine: toInputConfig(configs.dexmedetomidine),
-  });
-  const [selectedDrug, setSelectedDrug] = useState<DrugType>('norepinephrine');
+  // DrugList を走査して初期設定を作る
+  // こうしておくと薬剤を追加しても自動で画面に反映される
+  const createLocalConfigs = (): Record<DrugType, DrugConfigInput> =>
+    DRUG_LIST.reduce((acc, key) => {
+      acc[key] = toInputConfig(configs[key]);
+      return acc;
+    }, {} as Record<DrugType, DrugConfigInput>);
+
+  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>(
+    createLocalConfigs(),
+  );
+  // 現在編集対象の薬剤。配列の先頭を初期値とする
+  const [selectedDrug, setSelectedDrug] = useState<DrugType>(DRUG_LIST[0]);
   const [snackbar, setSnackbar] = useState('');
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
@@ -83,25 +90,21 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   };
 
   const handleSave = async () => {
-    const parsed: Record<DrugType, DrugConfig> = {
-      norepinephrine: fromInputConfig(localConfigs.norepinephrine),
-      dopamine: fromInputConfig(localConfigs.dopamine),
-      dexmedetomidine: fromInputConfig(localConfigs.dexmedetomidine),
-    };
-    // 数値変換に失敗した場合はエラーメッセージを表示
-    if (
-      [
-        parsed.norepinephrine.initialDose,
-        parsed.norepinephrine.soluteAmount,
-        parsed.norepinephrine.solutionVolume,
-        parsed.dopamine.initialDose,
-        parsed.dopamine.soluteAmount,
-        parsed.dopamine.solutionVolume,
-        parsed.dexmedetomidine.initialDose,
-        parsed.dexmedetomidine.soluteAmount,
-        parsed.dexmedetomidine.solutionVolume,
-      ].some((v) => Number.isNaN(v))
-    ) {
+    // すべての薬剤設定をオブジェクトへ変換
+    // reduce は配列をまとめる処理。ここでは {id: config} の形を作る
+    const parsed = DRUG_LIST.reduce((acc, key) => {
+      acc[key] = fromInputConfig(localConfigs[key]);
+      return acc;
+    }, {} as Record<DrugType, DrugConfig>);
+
+    // 入力された数値に NaN がないか確認
+    // flatMap は配列を展開して一つにまとめる関数
+    const numbers = DRUG_LIST.flatMap((d) => [
+      parsed[d].initialDose,
+      parsed[d].soluteAmount,
+      parsed[d].solutionVolume,
+    ]);
+    if (numbers.some((v) => Number.isNaN(v))) {
       setSnackbar('数値を正しく入力してください');
       return;
     }

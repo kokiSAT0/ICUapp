@@ -17,11 +17,12 @@ try {
 }
 
 // デフォルトの溶質量と溶液量
-import { DRUGS, DrugType } from '../config/drugs';
+import { DRUGS, DRUG_LIST, DrugType } from '../config/drugs';
 import type { DoseUnit } from '../types';
 
 // デフォルト薬剤(初期画面に表示する薬剤)のキー
-const DEFAULT_DRUG: DrugType = 'norepinephrine';
+// DRUG_LIST[0] を参照することで、薬剤を追加しても自動で先頭が選ばれる
+const DEFAULT_DRUG: DrugType = DRUG_LIST[0];
 
 // 設定ファイルからデフォルト値を取得
 export const DEFAULT_SOLUTE_AMOUNT = DRUGS[DEFAULT_DRUG].soluteAmount;

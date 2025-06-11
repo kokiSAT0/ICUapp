@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DRUGS, DrugConfig, DrugType } from '../config/drugs';
+import { DRUGS, DRUG_LIST, DrugConfig, DrugType } from '../config/drugs';
 
 // 設定データを保存するキー名
 const STORAGE_KEY = 'drugConfigs';
@@ -29,13 +29,10 @@ const DrugConfigContext = createContext<DrugConfigContextType | undefined>(undef
 
 export function DrugConfigProvider({ children }: { children: React.ReactNode }) {
   const [configs, setConfigsState] = useState<Record<DrugType, DrugConfig>>(DRUGS);
-  const [initialDrug, setInitialDrugState] = useState<DrugType>('norepinephrine');
-  // 薬剤の表示順。デフォルトは指定の順序
-  const [drugOrder, setDrugOrderState] = useState<DrugType[]>([
-    'norepinephrine',
-    'dopamine',
-    'dexmedetomidine',
-  ]);
+  // 初期表示薬剤は DRUG_LIST の先頭を利用
+  const [initialDrug, setInitialDrugState] = useState<DrugType>(DRUG_LIST[0]);
+  // 薬剤の表示順。デフォルトは設定ファイルと同じ順序
+  const [drugOrder, setDrugOrderState] = useState<DrugType[]>([...DRUG_LIST]);
 
   // 保存された設定を読み込む
   const loadConfigs = async (): Promise<void> => {
@@ -43,30 +40,22 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
       const json = await AsyncStorage.getItem(STORAGE_KEY);
       if (json) {
         const parsed = JSON.parse(json);
-        // 保存データが欠損していないか確認
-        if (
-          parsed.norepinephrine &&
-          parsed.dopamine &&
-          parsed.dexmedetomidine
-        ) {
+        // すべての薬剤設定が存在するか確認
+        if (DRUG_LIST.every((key) => parsed[key])) {
           setConfigsState(parsed);
         }
       }
+
       const orderData = await AsyncStorage.getItem(STORAGE_KEY_ORDER);
-      let loadedOrder: DrugType[] = [
-        'norepinephrine',
-        'dopamine',
-        'dexmedetomidine',
-      ];
+      let loadedOrder: DrugType[] = [...DRUG_LIST];
       if (orderData) {
         const parsedOrder = JSON.parse(orderData);
-        if (
-          Array.isArray(parsedOrder) &&
-          parsedOrder.every((d) =>
-            ['norepinephrine', 'dopamine', 'dexmedetomidine'].includes(d),
-          )
-        ) {
-          loadedOrder = parsedOrder as DrugType[];
+        if (Array.isArray(parsedOrder) && parsedOrder.every((d: any) => DRUG_LIST.includes(d))) {
+          loadedOrder = [...parsedOrder];
+          // 新しく追加された薬剤があれば末尾に追加
+          DRUG_LIST.forEach((id) => {
+            if (!loadedOrder.includes(id)) loadedOrder.push(id);
+          });
         }
       }
       setDrugOrderState(loadedOrder);
@@ -75,8 +64,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     } catch {
       // 読み込みに失敗した場合はデフォルトを使用
       setConfigsState(DRUGS);
-      setInitialDrugState('norepinephrine');
-      setDrugOrderState(['norepinephrine', 'dopamine', 'dexmedetomidine']);
+      setInitialDrugState(DRUG_LIST[0]);
+      setDrugOrderState([...DRUG_LIST]);
     }
   };
 
@@ -115,8 +104,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
   // デフォルトに戻す処理
   const resetToDefault = async (): Promise<void> => {
     await setConfigs(DRUGS);
-    await setInitialDrug('norepinephrine');
-    await setDrugOrder(['norepinephrine', 'dopamine', 'dexmedetomidine']);
+    await setInitialDrug(DRUG_LIST[0]);
+    await setDrugOrder([...DRUG_LIST]);
   };
 
   // 特定の薬剤のみデフォルトに戻す処理
