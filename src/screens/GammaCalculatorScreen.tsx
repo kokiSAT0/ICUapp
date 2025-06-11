@@ -145,7 +145,9 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   }, [concentration, weightKg]);
 
   // γ の値が変わったらスライダーにも反映させる
-  useEffect(() => {}, [gamma]);
+  useEffect(() => {
+    sliderRef.current?.setNativeProps({ value: gamma });
+  }, [gamma]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
