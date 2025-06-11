@@ -6,6 +6,8 @@ export const DRUG_LIST = [
   "norepinephrine",
   "dopamine",
   "dexmedetomidine",
+  "fentanyl",
+  "remifentanil",
 ] as const;
 
 // DRUG_LIST の要素を使って型を生成
@@ -83,6 +85,41 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     rateStep: 0.1,
     description:
       "初期負荷投与は通常行わないが，実施する場合は循環動態の変動に十分注意する．維持投与速度は，0.2\uFF5E0.7µg/kg/hrを目安とするが，目的とする鎮静度を得るために，より多量を必要とする症例もある．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  fentanyl: {
+    label: "フェンタニル",
+    // ICU・術後鎮痛で一般的に用いられる体重当たり投与速度
+    doseUnit: "µg/kg/hr",
+    initialDose: 1,          // 推奨初期設定：1 µg/kg/hr
+    soluteAmount: 1000,      // 1 mg（=1000 µg）を
+    soluteUnit: "µg",        // 
+    solutionVolume: 50,      // 50 mL シリンジで調製（20 µg/mL）
+    doseMin: 0,
+    doseMax: 6,              // ガイドライン上の上限 5 µg/kg/hr を少し余裕を見て
+    dangerDose: 4,           // 4 µg/kg/hr 超で警告表示
+    doseStep: 0.1,
+    rateStep: 0.1,
+    description:
+      "術後鎮痛では通常1〜2 µg/kg/hrで開始し、呼吸抑制・徐脈に注意しながら0.5〜5 µg/kg/hrで調節する。大量投与では胸壁筋硬直が起こり得る。日本麻酔科学会医薬品ガイドライン第3版4訂より。", // :contentReference[oaicite:0]{index=0}
+    enabled: true,
+  },
+
+  remifentanil: {
+    label: "レミフェンタニル",
+    // 全身麻酔維持で用いる投与速度
+    doseUnit: "µg/kg/min",
+    initialDose: 0.25,       // 推奨初期設定：0.25 µg/kg/min
+    soluteAmount: 2,         // 2 mg を（添付製剤 2 mg/バイアルを）
+    soluteUnit: "mg",
+    solutionVolume: 20,      // 20 mL シリンジで調製（100 µg/mL）
+    doseMin: 0,
+    doseMax: 1,              // 実臨床では 0.05〜1 µg/kg/min が多い
+    dangerDose: 0.8,
+    doseStep: 0.01,
+    rateStep: 0.1,
+    description:
+      "全身麻酔維持には0.25〜0.5 µg/kg/minで開始し、循環動態に応じて0.05〜1 µg/kg/minの範囲で調節する。投与中止後は速やかに効果が消失するため、終了前に術後鎮痛薬を準備する。日本麻酔科学会医薬品ガイドライン第3版4訂より。", // :contentReference[oaicite:1]{index=1}
     enabled: true,
   },
 };
