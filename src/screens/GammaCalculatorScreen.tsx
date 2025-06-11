@@ -19,6 +19,12 @@ import { IconButton } from "react-native-paper";
 import CompositionDialog from "@/components/CompositionDialog";
 
 import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
+// ────────────────────────────────────────────────
+// 流量・投与量表示を “中央基準から” 左にずらすオフセット(px)
+//   -80 はスマホ〜小型タブで程良い位置。端末幅に応じ調整可
+// ────────────────────────────────────────────────
+const DISPLAY_SHIFT = -80;
+
 import {
   convertDoseToRate,
   convertRateToDose,
@@ -56,8 +62,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const doseMax = drug.doseMax;
 
   /* === 各桁ごとのインクリメント / デクリメント === */
-  // ml/h : 3 桁（10, 1, 0.1）
-  const flowSteps = [10, 1, 0.1];
+  // ml/h : 4 桁（100, 10, 1, 0.1）
+  const flowSteps = [100, 10, 1, 0.1];
   // 投与量 : 4 桁（10, 1, 0.1, 0.01）
   const doseSteps = [10, 1, 0.1, 0.01];
 
@@ -211,11 +217,12 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             onPress={() => setDialogVisible(true)}
           />
           <Text> ml　体重 </Text>
-          <EditableBox
+          <WeightBox
             value={weightKg}
             onPress={() => setDialogVisible(true)}
           />
-          <Text> kg</Text>
+          {/* kg ラベルを infoCard の右下に固定 */}
+          <Text style={styles.kgLabel}>kg</Text>
 
           <Text style={{ width: "100%", marginTop: 4 }}>
             濃度：{concentration.toFixed(0)} µg/ml
@@ -239,8 +246,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* デジタル数字＋単位を灰色ボックス内に表示 */}
           <View style={styles.displayBox}>
-            {/* ml/h は「2 整数桁 + 1 小数桁」= 3 桁固定 */}
-            <DigitalNumber value={flowMlH} intDigits={2} fracDigits={1} />
+            {/* ml/h は「3 整数桁 + 1 小数桁」= 4 桁固定 */}
+            <DigitalNumber value={flowMlH} intDigits={3} fracDigits={1} />
             <Text style={styles.unitInside}>ml/h</Text>
           </View>
 
@@ -366,6 +373,15 @@ function EditableBox(props: { value: number; onPress: () => void }) {
   );
 }
 
+/* ===== 体重専用：値を大きくし、kg を右下に配置 ===== */
+function WeightBox(props: { value: number; onPress: () => void }) {
+  return (
+    <Pressable onPress={props.onPress} style={styles.weightBox}>
+      <Text style={styles.weightValue}>{props.value}</Text>
+    </Pressable>
+  );
+}
+
 /* ===== StyleSheet ===== */
 const styles = StyleSheet.create({
   header: {
@@ -380,9 +396,12 @@ const styles = StyleSheet.create({
     marginLeft: 50,
     marginRight: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
   },
-  settingBtn: { paddingHorizontal: 8 },
+  settingBtn: {
+    paddingHorizontal: 8,
+  },
   infoCard: {
     margin: 8,
     padding: 12,
@@ -391,6 +410,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     alignItems: "center",
+    position: "relative",
   },
   editableBox: {
     backgroundColor: "#9ea29e",
@@ -398,6 +418,26 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     fontWeight: "bold",
   },
+  /* ---- 体重表示用 ---- */
+  weightBox: {
+    backgroundColor: "#9ea29e",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 6,
+    position: "relative",
+  },
+  weightValue: {
+    fontWeight: "bold",
+    fontSize: 26,
+  },
+  kgLabel: {
+    position: "absolute",
+    right: 12,
+    bottom: 8,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+
   flowCardBlue: {
     marginHorizontal: 8,
     marginTop: 8,
@@ -413,19 +453,18 @@ const styles = StyleSheet.create({
     margin: 8,
     paddingHorizontal: 12,
     paddingTop: 48,
-    paddingBottom: 48,
+    paddingBottom: 24,
     borderRadius: 12,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
-    position: "relative",
   },
   /* ── ▲▼ を数字の上・下に均等配置 ── */
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
   arrowRowTop: {
     position: "absolute",
     top: 10,
-    width: "95%", // 灰色ボックスと同じ幅
-    alignSelf: "center",
+    left: "50%",
+    transform: [{ translateX: DISPLAY_SHIFT * 2 }],
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -433,9 +472,9 @@ const styles = StyleSheet.create({
   /* ▼ を桁の真下に配置 (ml/h 用) */
   arrowRowBottom: {
     position: "absolute",
-    bottom: 12,
-    width: "95%",
-    alignSelf: "center",
+    bottom: 4,
+    left: "50%",
+    transform: [{ translateX: DISPLAY_SHIFT * 2}],
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -451,21 +490,27 @@ const styles = StyleSheet.create({
 
   /* ▼ 投与量用：灰色ボックス直下に配置 */
   arrowRowBelow: {
+    position: "absolute",
     flexDirection: "row",
-    width: "100%",
-    alignSelf: "center",
     justifyContent: "center",
-    marginTop: 8,
+    bottom: 16,
+    left: "50%",
+    transform: [{ translateX: DISPLAY_SHIFT * 2}],
+    zIndex: 10,
   },
   /* ==== new ==== */
   /* ── 灰色ボックス ── */
   displayBox: {
     width: "95%",
+    /* 桁数に合わせて自動サイズ。
+       端末幅が広い場合でも “中央から DISPLAY_SHIFT だけ左” へ配置 */
+    minWidth: 220,           // 必要に応じて調整
+    maxWidth: "90%",
     backgroundColor: "#c0c0c0",
-    borderRadius: 20,
+    borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    alignItems: "center", // ⬅ 数字を中央に
+    alignItems: "flex-start", // ⬅ 数字を左寄せ
     justifyContent: "center",
     position: "relative", // ⬅ 単位ラベルを絶対配置するため
     alignSelf: "center",
@@ -473,9 +518,9 @@ const styles = StyleSheet.create({
   /* ── 単位: 右下に固定 ── */
   unitInside: {
     position: "absolute",
-    right: 12,
-    bottom: 6,
-    fontSize: 26,
+    right: 4,
+    bottom: 1,
+    fontSize: 20,
     fontWeight: "500",
   },
   // 危険域バーのスタイル
@@ -483,7 +528,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: 4,
     backgroundColor: "red",
-    top: 20, // スライダーのトラック位置に合わせて調整
+    top: 12, // スライダーのトラック位置に合わせて調整
     borderRadius: 2,
   },
   // 危険域メッセージのスタイル
