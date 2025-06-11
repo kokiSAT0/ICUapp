@@ -82,8 +82,23 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const incGamma = (idx: number) => updateFromGamma(gamma + gammaSteps[idx]);
   const decGamma = (idx: number) => updateFromGamma(gamma - gammaSteps[idx]);
 
-  // メニューから薬剤を選択したときの処理
+  // メニューで薬剤を選択したときの処理
   const handleSelectDrug = async (drugId: keyof typeof configs) => {
+    // 選択された薬剤の設定を取得
+    const next = configs[drugId];
+    // 数値表示とスライダーがずれないよう先に各値を更新
+    setDoseMg(next.soluteAmount);
+    setVolumeMl(next.solutionVolume);
+    setGamma(next.initialDose);
+    const conc = computeConcentration(
+      next.soluteAmount,
+      next.soluteUnit,
+      next.solutionVolume,
+    );
+    const flow = convertDoseToRate(next.initialDose, weightKg, conc);
+    setFlowMlH(+flow.toFixed(1));
+
+    // 表示薬剤を切り替えたあとでメニューを閉じる
     await setInitialDrug(drugId);
     setDrugMenuVisible(false);
   };
