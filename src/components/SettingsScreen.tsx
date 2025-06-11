@@ -9,10 +9,10 @@ import {
   Menu,
   Snackbar,
   Switch,
-  List,
   IconButton,
   Portal,
   Modal,
+  TouchableRipple,
 } from 'react-native-paper';
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -156,22 +156,29 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         keyExtractor={(item) => item}
         onDragEnd={({ data }) => setDrugOrder(data)}
         renderItem={({ item, drag }) => (
-          <List.Item
-            title={localConfigs[item].label}
-            titleStyle={{ color: localConfigs[item].enabled ? undefined : '#888' }}
-            onPress={() => {
-              setSelectedDrug(item);
-              setEditVisible(true);
-            }}
-            onLongPress={drag}
-            left={() => (
-              <Switch
-                value={localConfigs[item].enabled}
-                onValueChange={() => toggleEnabled(item)}
-              />
-            )}
-            right={() => <IconButton icon="drag" />}
-          />
+          <View style={styles.itemRow}>
+            <Switch
+              value={localConfigs[item].enabled}
+              onValueChange={() => toggleEnabled(item)}
+            />
+            <TouchableRipple
+              onPress={() => {
+                setSelectedDrug(item);
+                setEditVisible(true);
+              }}
+              style={styles.titleArea}
+            >
+              <Text
+                style={[
+                  styles.itemTitle,
+                  { color: localConfigs[item].enabled ? undefined : '#888' },
+                ]}
+              >
+                {localConfigs[item].label}
+              </Text>
+            </TouchableRipple>
+            <IconButton icon="drag" onPressIn={drag} />
+          </View>
         )}
         style={styles.list}
         contentContainerStyle={styles.scrollContainer}
@@ -268,4 +275,10 @@ const styles = StyleSheet.create({
   list: { marginBottom: 16 },
   closeButton: { marginTop: 16 },
   modal: { backgroundColor: 'white', margin: 16, padding: 16 },
+  // 薬剤一覧の1行分のスタイル
+  itemRow: { flexDirection: 'row', alignItems: 'center' },
+  // 薬剤名表示部分のスタイル
+  titleArea: { flex: 1, paddingVertical: 12 },
+  // 薬剤名テキストのスタイル
+  itemTitle: { fontSize: 16 },
 });
