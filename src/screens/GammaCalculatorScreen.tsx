@@ -144,10 +144,10 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     setGamma(+g.toFixed(2));
   }, [concentration, weightKg]);
 
-  // γ の値が変わったらスライダーにも反映させる
+  // γ の値、もしくは薬剤が変わったときはスライダーにも反映させる
   useEffect(() => {
     sliderRef.current?.setNativeProps({ value: gamma });
-  }, [gamma]);
+  }, [gamma, initialDrug]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
