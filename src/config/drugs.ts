@@ -1,6 +1,6 @@
 export type DrugType = "norepinephrine" | "dopamine" | "dexmedetomidine";
 
-import { SoluteUnit } from "../types";
+import { SoluteUnit, DoseUnit } from "../types";
 
 export type DrugConfig = {
   // 画面表示用ラベル
@@ -8,7 +8,7 @@ export type DrugConfig = {
   // 初期投与量
   initialDose: number;
   // 投与量の単位
-  doseUnit: "µg/kg/min" | "µg/kg/hr";
+  doseUnit: DoseUnit;
   soluteAmount: number;
   soluteUnit: SoluteUnit;
   solutionVolume: number;

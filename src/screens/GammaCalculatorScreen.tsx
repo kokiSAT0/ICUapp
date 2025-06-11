@@ -47,19 +47,19 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   // 初期濃度から流量を計算
   const initialConc = computeConcentration(doseMg, drug.soluteUnit, volumeMl);
   const [flowMlH, setFlowMlH] = useState(
-    convertDoseToRate(drug.initialDose, weightKg, initialConc)
+    convertDoseToRate(drug.initialDose, weightKg, initialConc, drug.doseUnit)
   );
-  const [gamma, setGamma] = useState(drug.initialDose);
+  const [dose, setDose] = useState(drug.initialDose);
   // スライダーの値を直接操作するための参照
   const sliderRef = useRef<Slider>(null);
   // スライダーの上限
-  const gammaMax = drug.doseMax;
+  const doseMax = drug.doseMax;
 
   /* === 各桁ごとのインクリメント / デクリメント === */
   // ml/h : 3 桁（10, 1, 0.1）
   const flowSteps = [10, 1, 0.1];
-  // γ    : 4 桁（10, 1, 0.1, 0.01）
-  const gammaSteps = [10, 1, 0.1, 0.01];
+  // 投与量 : 4 桁（10, 1, 0.1, 0.01）
+  const doseSteps = [10, 1, 0.1, 0.01];
 
   // 濃度(µg/ml)を都度計算する。useMemo で不要な再計算を避ける
   const concentration = useMemo(
@@ -67,26 +67,26 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     [doseMg, volumeMl, drug.soluteUnit]
   );
 
-  /** ml/h 変更時に γ を自動更新する */
+  /** ml/h 変更時に投与量を自動更新する */
   const updateFromFlow = (value: number): void => {
     const flow = Math.max(0, +value.toFixed(1));
     setFlowMlH(flow);
-    const g = convertRateToDose(flow, weightKg, concentration);
-    setGamma(+g.toFixed(2));
+    const d = convertRateToDose(flow, weightKg, concentration, drug.doseUnit);
+    setDose(+d.toFixed(2));
   };
 
-  /** γ 変更時に ml/h を自動更新する */
-  const updateFromGamma = (value: number): void => {
-    const g = Math.max(0, +value.toFixed(2));
-    setGamma(g);
-    const flow = convertDoseToRate(g, weightKg, concentration);
+  /** 投与量変更時に ml/h を自動更新する */
+  const updateFromDose = (value: number): void => {
+    const d = Math.max(0, +value.toFixed(2));
+    setDose(d);
+    const flow = convertDoseToRate(d, weightKg, concentration, drug.doseUnit);
     setFlowMlH(+flow.toFixed(1));
   };
 
   const incFlow = (idx: number) => updateFromFlow(flowMlH + flowSteps[idx]);
   const decFlow = (idx: number) => updateFromFlow(flowMlH - flowSteps[idx]);
-  const incGamma = (idx: number) => updateFromGamma(gamma + gammaSteps[idx]);
-  const decGamma = (idx: number) => updateFromGamma(gamma - gammaSteps[idx]);
+  const incDose = (idx: number) => updateFromDose(dose + doseSteps[idx]);
+  const decDose = (idx: number) => updateFromDose(dose - doseSteps[idx]);
 
   // メニューで薬剤を選択したときの処理
   const handleSelectDrug = async (drugId: keyof typeof configs) => {
@@ -95,13 +95,18 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     // 数値表示とスライダーがずれないよう先に各値を更新
     setDoseMg(next.soluteAmount);
     setVolumeMl(next.solutionVolume);
-    setGamma(next.initialDose);
+    setDose(next.initialDose);
     const conc = computeConcentration(
       next.soluteAmount,
       next.soluteUnit,
       next.solutionVolume
     );
-    const flow = convertDoseToRate(next.initialDose, weightKg, conc);
+    const flow = convertDoseToRate(
+      next.initialDose,
+      weightKg,
+      conc,
+      next.doseUnit,
+    );
     setFlowMlH(+flow.toFixed(1));
 
     // 表示薬剤を切り替えたあとでメニューを閉じる
@@ -115,10 +120,10 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       setDoseMg(dose);
       setVolumeMl(volume);
       setWeightKg(weight);
-      // 組成や体重が変わったら流量を基準に γ を計算し直す
+      // 組成や体重が変わったら流量を基準に投与量を計算し直す
       const conc = computeConcentration(dose, drug.soluteUnit, volume);
-      const g = convertRateToDose(flowMlH, weight, conc);
-      setGamma(+g.toFixed(2));
+      const d = convertRateToDose(flowMlH, weight, conc, drug.doseUnit);
+      setDose(+d.toFixed(2));
     },
     [flowMlH]
   );
@@ -128,26 +133,31 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     const next = configs[initialDrug];
     setDoseMg(next.soluteAmount);
     setVolumeMl(next.solutionVolume);
-    setGamma(next.initialDose);
+    setDose(next.initialDose);
     const conc = computeConcentration(
       next.soluteAmount,
       next.soluteUnit,
       next.solutionVolume
     );
-    const flow = convertDoseToRate(next.initialDose, weightKg, conc);
+    const flow = convertDoseToRate(
+      next.initialDose,
+      weightKg,
+      conc,
+      next.doseUnit,
+    );
     setFlowMlH(+flow.toFixed(1));
   }, [initialDrug, configs, weightKg]);
 
-  // 組成や体重が変化したときは現在の流量からγを再計算する
+  // 組成や体重が変化したときは現在の流量から投与量を再計算する
   useEffect(() => {
-    const g = convertRateToDose(flowMlH, weightKg, concentration);
-    setGamma(+g.toFixed(2));
+    const d = convertRateToDose(flowMlH, weightKg, concentration, drug.doseUnit);
+    setDose(+d.toFixed(2));
   }, [concentration, weightKg]);
 
-  // γ の値、もしくは薬剤が変わったときはスライダーにも反映させる
+  // 投与量の値、もしくは薬剤が変わったときはスライダーにも反映させる
   useEffect(() => {
-    sliderRef.current?.setNativeProps({ value: gamma });
-  }, [gamma, initialDrug]);
+    sliderRef.current?.setNativeProps({ value: dose });
+  }, [dose, initialDrug]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -248,16 +258,16 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
           </View>
         </Surface>
 
-        {/* ===== ③ γ ===== */}
+        {/* ===== ③ 投与量 ===== */}
         <Surface elevation={2} style={styles.flowCardGreen}>
           {/* ▲ 上段：3 桁ぶん */}
           <View style={styles.arrowRowTop}>
-            {gammaSteps.map((_, i) => (
+            {doseSteps.map((_, i) => (
               <View key={i} style={styles.arrowCell}>
                 <IconButton
                   icon="chevron-up"
                   size={22}
-                  onPress={() => incGamma(i)}
+                  onPress={() => incDose(i)}
                 />
               </View>
             ))}
@@ -265,18 +275,18 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* デジタル数字＋単位を灰色ボックス内に表示 */}
           <View style={styles.displayBox}>
-            {/* γ は「2 整数桁 + 2 小数桁」= 4 桁固定 */}
-            <DigitalNumber value={gamma} intDigits={2} fracDigits={2} />
-            <Text style={styles.unitInside}>γ</Text>
+            {/* 投与量は「2 整数桁 + 2 小数桁」= 4 桁固定 */}
+            <DigitalNumber value={dose} intDigits={2} fracDigits={2} />
+            <Text style={styles.unitInside}>{drug.doseUnit}</Text>
           </View>
           {/* ▼ 下段：3 桁ぶん */}
           <View style={styles.arrowRowBelow}>
-            {gammaSteps.map((_, i) => (
+            {doseSteps.map((_, i) => (
               <View key={i} style={styles.arrowCell}>
                 <IconButton
                   icon="chevron-down"
                   size={22}
-                  onPress={() => decGamma(i)}
+                  onPress={() => decDose(i)}
                 />
               </View>
             ))}
@@ -291,9 +301,9 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 style={[
                   styles.dangerTrack,
                   {
-                    left: `${(drug.dangerDose / gammaMax) * 100}%`,
+                    left: `${(drug.dangerDose / doseMax) * 100}%`,
                     width: `${
-                      ((gammaMax - drug.dangerDose) / gammaMax) * 100
+                      ((doseMax - drug.dangerDose) / doseMax) * 100
                     }%`,
                   },
                 ]}
@@ -307,20 +317,20 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                */
               key={initialDrug}
               minimumValue={0}
-              maximumValue={gammaMax}
+              maximumValue={doseMax}
               step={drug.doseStep}
-              value={gamma}
-              onValueChange={updateFromGamma}
+              value={dose}
+              onValueChange={updateFromDose}
               minimumTrackTintColor="green"
               thumbTintColor="black"
             />
-            <View style={styles.gammaScale}>
+            <View style={styles.doseScale}>
               <Text>0</Text>
-              <Text>{gammaMax}γ</Text>
+              <Text>{doseMax}{drug.doseUnit}</Text>
             </View>
           </View>
           {/* 危険域に入ったら警告メッセージを表示 */}
-          {drug.dangerDose !== undefined && gamma >= drug.dangerDose && (
+          {drug.dangerDose !== undefined && dose >= drug.dangerDose && (
             <Text style={styles.dangerMessage}>
               高用量です。注意して投与して下さい。
             </Text>
@@ -439,7 +449,7 @@ const styles = StyleSheet.create({
     marginHorizontal: DIGIT_SPACING + 1,
   },
 
-  /* ▼ γ 用：灰色ボックス直下に配置 */
+  /* ▼ 投与量用：灰色ボックス直下に配置 */
   arrowRowBelow: {
     flexDirection: "row",
     width: "100%",
@@ -482,7 +492,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     alignSelf: "center",
   },
-  gammaScale: {
+  doseScale: {
     flexDirection: "row",
     justifyContent: "space-between",
   },

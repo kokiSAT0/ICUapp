@@ -14,9 +14,19 @@ const { DRUGS } = require('../src/config/drugs');
 
 describe('flowConversion utilities', () => {
   test('dose-rate roundtrip', () => {
-    const rate = convertDoseToRate(0.03, 50, DEFAULT_CONCENTRATION);
+    const rate = convertDoseToRate(
+      0.03,
+      50,
+      DEFAULT_CONCENTRATION,
+      'µg/kg/min',
+    );
     expect(Math.abs(rate - 0.9)).toBeLessThan(1e-6);
-    const dose = convertRateToDose(rate, 50, DEFAULT_CONCENTRATION);
+    const dose = convertRateToDose(
+      rate,
+      50,
+      DEFAULT_CONCENTRATION,
+      'µg/kg/min',
+    );
     expect(Math.abs(dose - 0.03)).toBeLessThan(1e-6);
   });
 
