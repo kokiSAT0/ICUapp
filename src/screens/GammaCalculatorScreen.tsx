@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   View,
   StyleSheet,
@@ -46,6 +52,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     convertDoseToRate(drug.initialDose, weightKg, initialConc),
   );
   const [gamma, setGamma] = useState(drug.initialDose);
+  // スライダーの値を直接操作するための参照
+  const sliderRef = useRef<Slider>(null);
   // スライダーの上限
   const gammaMax = drug.doseMax;
 
@@ -137,6 +145,11 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     const g = convertRateToDose(flowMlH, weightKg, concentration);
     setGamma(+g.toFixed(2));
   }, [concentration, weightKg]);
+
+  // γ の値が変わったらスライダーにも反映させる
+  useEffect(() => {
+    sliderRef.current?.updateValue(gamma);
+  }, [gamma]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -282,6 +295,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             />
           )}
           <Slider
+            ref={sliderRef}
             /*
              * key に初期薬剤IDを指定することで、薬剤が変わった際に
              * スライダーを再マウントし、初期値を正しく反映させる
