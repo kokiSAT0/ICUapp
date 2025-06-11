@@ -186,7 +186,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             </TouchableRipple>
             <IconButton icon="drag" onPressIn={drag} />
           </View>
-        )}
+        );
+        }}
         style={styles.list}
         contentContainerStyle={styles.scrollContainer}
       />
