@@ -8,7 +8,7 @@ import {
   Button,
   Menu,
   Snackbar,
-  Switch,
+  Checkbox,
   IconButton,
   Portal,
   Modal,
@@ -158,13 +158,17 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         data={drugOrder}
         keyExtractor={(item) => item}
         onDragEnd={({ data }) => setDrugOrder(data)}
-        renderItem={({ item, drag }) => (
-          <View style={styles.itemRow}>
-            <Switch
-              value={localConfigs[item].enabled}
-              onValueChange={() => toggleEnabled(item)}
-            />
-            <TouchableRipple
+        renderItem={({ item, drag }) => {
+          const textColor = localConfigs[item].enabled ? undefined : '#888';
+          return (
+            <View style={styles.itemRow}>
+              <Checkbox
+                status={localConfigs[item].enabled ? 'checked' : 'unchecked'}
+                onPress={() => toggleEnabled(item)}
+                color={textColor}
+                uncheckedColor={textColor}
+              />
+              <TouchableRipple
               onPress={() => {
                 setSelectedDrug(item);
                 setEditVisible(true);
