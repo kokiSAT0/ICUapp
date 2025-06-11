@@ -1,4 +1,15 @@
-export type DrugType = "norepinephrine" | "dopamine" | "dexmedetomidine";
+// ここで定義した配列 DRUG_LIST に薬剤IDを追加するだけで
+// アプリ全体に自動で組み込まれる仕組み。
+// "as const" を付けると配列の中身を固定値として扱えるため、
+// 文字列リテラル型を安全に生成できる。
+export const DRUG_LIST = [
+  "norepinephrine",
+  "dopamine",
+  "dexmedetomidine",
+] as const;
+
+// DRUG_LIST の要素を使って型を生成
+export type DrugType = (typeof DRUG_LIST)[number];
 
 import { SoluteUnit, DoseUnit } from "../types";
 
