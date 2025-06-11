@@ -23,7 +23,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // 流量・投与量表示を “中央基準から” 左にずらすオフセット(px)
 //   -80 はスマホ〜小型タブで程良い位置。端末幅に応じ調整可
 // ────────────────────────────────────────────────
-const DISPLAY_SHIFT = -80;
+const DISPLAY_SHIFT = -50;
 
 import {
   convertDoseToRate,
@@ -247,7 +247,9 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
           {/* デジタル数字＋単位を灰色ボックス内に表示 */}
           <View style={styles.displayBox}>
             {/* ml/h は「3 整数桁 + 1 小数桁」= 4 桁固定 */}
-            <DigitalNumber value={flowMlH} intDigits={3} fracDigits={1} />
+            <View style={styles.numberWrapper}>
+              <DigitalNumber value={flowMlH} intDigits={3} fracDigits={1} />
+            </View>
             <Text style={styles.unitInside}>ml/h</Text>
           </View>
 
@@ -283,7 +285,9 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
           {/* デジタル数字＋単位を灰色ボックス内に表示 */}
           <View style={styles.displayBox}>
             {/* 投与量は「2 整数桁 + 2 小数桁」= 4 桁固定 */}
-            <DigitalNumber value={dose} intDigits={2} fracDigits={2} />
+            <View style={styles.numberWrapper}>
+              <DigitalNumber value={dose} intDigits={2} fracDigits={2} />
+            </View>
             <Text style={styles.unitInside}>{drug.doseUnit}</Text>
           </View>
           {/* ▼ 下段：3 桁ぶん */}
@@ -300,7 +304,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
           </View>
 
           {/* スライダー */}
-          <View style={{ width: "100%", paddingHorizontal: 8, marginTop: 4 }}>
+          <View style={styles.sliderContainer}>
             {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
             {drug.dangerDose !== undefined && (
               <View
@@ -453,7 +457,7 @@ const styles = StyleSheet.create({
     margin: 8,
     paddingHorizontal: 12,
     paddingTop: 48,
-    paddingBottom: 24,
+    paddingBottom: 100,
     borderRadius: 12,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
@@ -463,8 +467,6 @@ const styles = StyleSheet.create({
   arrowRowTop: {
     position: "absolute",
     top: 10,
-    left: "50%",
-    transform: [{ translateX: DISPLAY_SHIFT * 2 }],
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -472,9 +474,7 @@ const styles = StyleSheet.create({
   /* ▼ を桁の真下に配置 (ml/h 用) */
   arrowRowBottom: {
     position: "absolute",
-    bottom: 4,
-    left: "50%",
-    transform: [{ translateX: DISPLAY_SHIFT * 2}],
+    bottom: 10,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -485,6 +485,7 @@ const styles = StyleSheet.create({
   /* 子セル: flex 1 で中央寄せしつつ、左右に桁間の半分ずつ余白 */
   arrowCell: {
     alignItems: "center",
+    transform: [{ translateX: DISPLAY_SHIFT }],
     marginHorizontal: DIGIT_SPACING + 1,
   },
 
@@ -493,9 +494,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    bottom: 16,
-    left: "50%",
-    transform: [{ translateX: DISPLAY_SHIFT * 2}],
+    bottom: 60,                  // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
@@ -510,10 +509,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    alignItems: "flex-start", // ⬅ 数字を左寄せ
+    alignItems: "center",
     justifyContent: "center",
     position: "relative", // ⬅ 単位ラベルを絶対配置するため
     alignSelf: "center",
+  },
+  /* 数値のみを左に寄せるラッパー */
+  numberWrapper: {
+    transform: [{ translateX: DISPLAY_SHIFT }],
   },
   /* ── 単位: 右下に固定 ── */
   unitInside: {
@@ -522,6 +525,14 @@ const styles = StyleSheet.create({
     bottom: 1,
     fontSize: 20,
     fontWeight: "500",
+  },
+  /* ---- スライダーを緑カード下端に固定 ---- */
+  sliderContainer: {
+    position: "absolute",
+    bottom: 8,
+    width: "100%",
+    alignSelf: "center",
+    paddingHorizontal: 8,
   },
   // 危険域バーのスタイル
   dangerTrack: {
