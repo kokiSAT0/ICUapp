@@ -18,6 +18,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
 import { Dimensions } from "react-native";
 
+const WINDOW_WIDTH = Dimensions.get('window').width;
 const { width } = Dimensions.get("window");
 export const DISPLAY_SHIFT = -width * 0.1;
 
@@ -55,6 +56,12 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   // スライダーの上限
   const doseMax = drug.doseMax;
   const showDanger = drug.dangerDose !== undefined && dose >= drug.dangerDose;
+
+  /* ---- 安全域 / 危険域の幅割合を算出 ---- */
+  const dangerRatio = drug.dangerDose
+    ? (doseMax - drug.dangerDose) / doseMax          // 0〜1
+    : 0;                                             // dangerDose 未設定なら赤無し
+  const safeRatio = 1 - dangerRatio;                 // 緑側の割合
 
   /* === 各桁ごとのインクリメント / デクリメント === */
   // ml/h : 4 桁（100, 10, 1, 0.1）
@@ -174,6 +181,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       >
         {/* ===== Header ===== */}
         <View style={styles.header}>
+          {/* 中央：幅 80 % の薬剤名ボタン（Menu の anchor） */}
           <Menu
             visible={drugMenuVisible}
             onDismiss={() => setDrugMenuVisible(false)}
@@ -182,7 +190,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 style={styles.centerButton}
                 onPress={() => setDrugMenuVisible(true)}
               >
-                {/* 薬剤名を設定ファイルから表示 */}
                 <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
                   {drug.label}
                 </Text>
@@ -199,6 +206,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 />
               ))}
           </Menu>
+
+          {/* 右側：設定アイコン（絶対配置） */}
           <Pressable
             style={styles.settingBtn}
             onPress={() => navigation.navigate("Settings")}
@@ -309,37 +318,28 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
-            {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
-            {drug.dangerDose !== undefined && (
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.dangerOverlay,
-                  {
-                    left: `${(drug.dangerDose / doseMax) * 100}%`,
-                    width: `${((doseMax - drug.dangerDose) / doseMax) * 100}%`,
-                  },
-                ]}
-              >
-                <View style={styles.dangerBar} />
-              </View>
-            )}
-            <Slider
-              /*
-               * key に初期薬剤IDを指定することで、薬剤が変わった際に
-               * スライダーを再マウントし、初期値を正しく反映させる
-               */
-              key={initialDrug}
-              minimumValue={0}
-              maximumValue={doseMax}
-              step={doseSliderStep}
-              value={dose}
-              onValueChange={updateFromDose}
-              minimumTrackTintColor="green"
-              thumbTintColor="black"
-              // OS ごとに高さが異なるため固定値で統一
-              style={styles.slider}
-            />
+            {/* ---- 安全域(緑) + 危険域(赤) の 2 色バー ---- */}
+            <View pointerEvents="none" style={styles.trackOverlay}>
+              <View style={[styles.safeBar,   { flexGrow: safeRatio }]} />
+              <View style={[styles.dangerBar, { flexGrow: dangerRatio }]} />
+            </View>
+              <Slider
+                /*
+                 * key に初期薬剤IDを指定することで、薬剤が変わった際に
+                 * スライダーを再マウントし、初期値を正しく反映させる
+                 */
+                key={initialDrug}
+                minimumValue={0}
+                maximumValue={doseMax}
+                step={doseSliderStep}
+                value={dose}
+                onValueChange={updateFromDose}
+                minimumTrackTintColor="transparent"
+                maximumTrackTintColor="transparent"
+                thumbTintColor="black"
+                // OS ごとに高さが異なるため固定値で統一
+                style={styles.slider}
+              />
             <View style={styles.doseScale}>
               <Text>0</Text>
               <Text>
@@ -397,22 +397,27 @@ function WeightBox(props: { value: number; onPress: () => void }) {
 /* ===== StyleSheet ===== */
 const styles = StyleSheet.create({
   header: {
-    flexDirection: "row",
     alignItems: "center",
     paddingVertical: 6,
+    position: "relative",
+    width: "100%",
   },
+  /* 中央ボタン：画面幅の 80 % で固定 */
   centerButton: {
-    flex: 1,
-    alignItems: "center",
     backgroundColor: "#c8f5f0",
-    marginLeft: 50,
-    marginRight: 10,
+    width: WINDOW_WIDTH * 0.75,
     paddingVertical: 4,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 10,
+    alignSelf: "center",
+    alignItems: "center",
   },
+  /* 右上に絶対配置された設定ボタン */
   settingBtn: {
-    paddingHorizontal: 8,
+    position: "absolute",
+    right: 8,
+    top: 12,
+    paddingHorizontal: 2,
   },
   infoCard: {
     margin: 8,
@@ -542,7 +547,6 @@ const styles = StyleSheet.create({
   sliderContainer: {
     width: "100%",
     alignSelf: "center",
-    paddingHorizontal: 8,
     marginTop: 50,
     position: "relative",
     height: 40,
@@ -551,15 +555,26 @@ const styles = StyleSheet.create({
   slider: {
     height: 40,
   },
-  // 危険域バーのスタイル
-  dangerOverlay: {
-    ...StyleSheet.absoluteFillObject, // left, right, top, bottom = 0
-    justifyContent: "center", // ← 縦中央寄せ
+  /* 2 色バー全体をスライダー中央に重ねる */
+  trackOverlay: {
+    position: "absolute",
+    left: 10,
+    right: 10,
+    top: "50%",
+    transform: [{ translateY: -2 }], // 4px 高の半分
+    height: 4,
+    flexDirection: "row",
+    borderRadius: 2,
+    overflow: "hidden",
   },
+  /* 安全域 (左側) */
+  safeBar: {
+    backgroundColor: "green",
+  },
+  /* 危険域 (右側) */
   dangerBar: {
     height: 4,
     backgroundColor: "red",
-    borderRadius: 2,
   },
   // 危険域メッセージのスタイル
   dangerMessage: {
