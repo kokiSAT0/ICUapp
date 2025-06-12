@@ -10,6 +10,12 @@ export const DRUG_LIST = [
   "remifentanil",
   "propofol",
   "rocuronium",
+  "dobutamine",
+  "nicardipine",
+  "nitroglycerin",
+  "phenylephrine",
+  "milrinone",
+  "landiolol",
 ] as const;
 
 // DRUG_LIST の要素を使って型を生成
@@ -157,6 +163,113 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     rateStep: 0.1,
     description:
       "持続注入は 7 µg/kg/min で開始し、筋弛緩モニター（TOF, PTC）を参考に 3–16 µg/kg/min で調節する。深筋弛緩の維持時は高用量となり循環抑制に留意。拮抗にはスガマデクスが第一選択。", //
+    enabled: true,
+  },
+  /* ──── 1. ドブタミン ──── */
+  dobutamine: {
+    label: "ドブタミン",
+    doseUnit: "µg/kg/min",
+    initialDose: 5, // 標準開始 5 µg/kg/min :contentReference[oaicite:0]{index=0}
+    soluteAmount: 250, // 250 mg
+    soluteUnit: "mg",
+    solutionVolume: 50, // 50 mL（5 mg/mL）
+    doseMin: 2,
+    doseMax: 20,
+    dangerDose: 15,
+    doseStep: 0.5,
+    rateStep: 0.1,
+    description:
+      "強心作用により心拍出量を増加させる。2–20 µg/kg/min の範囲で循環動態に応じて調節する。高用量では頻脈・不整脈に注意。", // :contentReference[oaicite:1]{index=1}
+    enabled: true,
+  },
+
+  /* ──── 2. ニカルジピン ──── */
+  nicardipine: {
+    label: "ニカルジピン",
+    doseUnit: "mg/hr",
+    initialDose: 5, // 5 mg/hr で開始 :contentReference[oaicite:2]{index=2}
+    soluteAmount: 25, // 25 mg
+    soluteUnit: "mg",
+    solutionVolume: 25, // 25 mL（1 mg/mL 原液）
+    doseMin: 2.5,
+    doseMax: 15,
+    dangerDose: 10,
+    doseStep: 0.5,
+    rateStep: 0.1,
+    description:
+      "持続血圧管理の第一選択Ca拮抗薬。5 mg/hr から開始し、2.5 mg/hr ごとに5–15分間隔で増量。末梢投与の場合は12 時間毎にルート変更。", // :contentReference[oaicite:3]{index=3}
+    enabled: true,
+  },
+
+  /* ──── 3. ニトログリセリン ──── */
+  nitroglycerin: {
+    label: "ニトログリセリン",
+    doseUnit: "µg/kg/min",
+    initialDose: 0.5, // 0.25–0.5 µg/kg/min で開始 :contentReference[oaicite:4]{index=4}
+    soluteAmount: 50, // 50 mg
+    soluteUnit: "mg",
+    solutionVolume: 50, // 50 mL（1 mg/mL）
+    doseMin: 0.25,
+    doseMax: 5,
+    dangerDose: 3,
+    doseStep: 0.05,
+    rateStep: 0.1,
+    description:
+      "前負荷軽減・冠血流増加目的に用いる。0.25–5 µg/kg/min の範囲で3–5 分毎に漸増し、血圧低下・頭痛に注意。", // :contentReference[oaicite:5]{index=5}
+    enabled: true,
+  },
+
+  /* ──── 4. フェニレフリン ──── */
+  phenylephrine: {
+    label: "フェニレフリン",
+    doseUnit: "µg/kg/min",
+    initialDose: 0.5, // 0.5–1.4 µg/kg/min 維持 :contentReference[oaicite:6]{index=6}
+    soluteAmount: 10, // 10 mg
+    soluteUnit: "mg",
+    solutionVolume: 50, // 50 mL（200 µg/mL）
+    doseMin: 0.1,
+    doseMax: 3,
+    dangerDose: 2,
+    doseStep: 0.05,
+    rateStep: 0.1,
+    description:
+      "純α刺激で血圧を上げる。0.1–3 µg/kg/min を目安に、過大投与では末梢虚血や反射性徐脈に注意。", // :contentReference[oaicite:7]{index=7}
+    enabled: true,
+  },
+
+  /* ──── 5. ミルリノン ──── */
+  milrinone: {
+    label: "ミルリノン",
+    doseUnit: "µg/kg/min",
+    initialDose: 0.375, // 0.375 µg/kg/min 開始 :contentReference[oaicite:8]{index=8}
+    soluteAmount: 50, // 50 mg
+    soluteUnit: "mg",
+    solutionVolume: 50, // 50 mL（1 mg/mL）
+    doseMin: 0.25,
+    doseMax: 1,
+    dangerDose: 0.75,
+    doseStep: 0.05,
+    rateStep: 0.1,
+    description:
+      "PDEⅢ阻害による強心・血管拡張薬。0.25–0.75 µg/kg/min で心拍出量と末梢抵抗を調節。低血圧・不整脈に注意し、腎機能で用量調整が必要。", // :contentReference[oaicite:9]{index=9}
+    enabled: true,
+  },
+
+  /* ──── 6. ランジオロール ──── */
+  landiolol: {
+    label: "ランジオロール",
+    doseUnit: "µg/kg/min",
+    initialDose: 3, // 1–10 µg/kg/min から開始例が多い :contentReference[oaicite:10]{index=10}
+    soluteAmount: 300, // 300 mg
+    soluteUnit: "mg",
+    solutionVolume: 50, // 50 mL（6 mg/mL）
+    doseMin: 1,
+    doseMax: 40,
+    dangerDose: 20,
+    doseStep: 0.5,
+    rateStep: 0.1,
+    description:
+      "超短時間作用型β₁遮断薬。頻拍性不整脈や心拍数コントロールに用い、1–40 µg/kg/min の範囲で titrate。過度の徐脈・低血圧に注意し、効果消失は投与中止後約4分。", // :contentReference[oaicite:11]{index=11}
     enabled: true,
   },
 };
