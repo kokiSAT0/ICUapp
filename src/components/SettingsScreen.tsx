@@ -155,8 +155,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   };
 
   return (
-    // SafeAreaView でステータスバーと重ならないようにする
-    <SafeAreaView style={styles.safeArea}>
+    // SafeAreaView で余白が二重にならないよう top を除外
+    <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
     <Surface style={styles.container}>
       {/* ヘッダー。左に戻るボタン、右にヘルプボタンを配置 */}
       <Appbar.Header>
