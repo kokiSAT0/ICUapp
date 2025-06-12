@@ -39,4 +39,21 @@ describe('flowConversion utilities', () => {
     expect(DRUGS.dexmedetomidine.doseUnit).toBe('µg/kg/hr');
     expect(DRUGS.dexmedetomidine.initialDose).toBe(0.2);
   });
+
+  test('mg/hr conversion without weight', () => {
+    const rate = convertDoseToRate(
+      2,
+      50,
+      DEFAULT_CONCENTRATION,
+      'mg/hr',
+    );
+    expect(Math.abs(rate - 20)).toBeLessThan(1e-6);
+    const dose = convertRateToDose(
+      rate,
+      50,
+      DEFAULT_CONCENTRATION,
+      'mg/hr',
+    );
+    expect(Math.abs(dose - 2)).toBeLessThan(1e-6);
+  });
 });

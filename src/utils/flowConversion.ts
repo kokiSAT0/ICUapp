@@ -97,16 +97,27 @@ export function convertDoseToRate(
   concentration: number,
   unit: DoseUnit,
 ): number {
-  // 体重が 0 以下なら計算できない
-
-  if (weight <= 0) {
-    return NaN;
+  // 投与量の単位に応じて、体重換算や mg→µg 変換を行う
+  let ugPerHour: number;
+  switch (unit) {
+    case 'µg/kg/min':
+      if (weight <= 0) return NaN;
+      ugPerHour = dose * weight * 60; // 分単位なので 60 を掛ける
+      break;
+    case 'µg/kg/hr':
+      if (weight <= 0) return NaN;
+      ugPerHour = dose * weight;
+      break;
+    case 'mg/kg/hr':
+      if (weight <= 0) return NaN;
+      ugPerHour = dose * weight * 1000; // mg を µg に換算
+      break;
+    case 'mg/hr':
+      ugPerHour = dose * 1000; // 体重は関係しない
+      break;
+    default:
+      return NaN;
   }
-  // 投与量の単位に応じて計算方法を分岐
-  const ugPerHour =
-    unit === 'µg/kg/min'
-      ? dose * weight * 60 // µg/kg/min の場合は 60 分を掛ける
-      : dose * weight; // µg/kg/hr はそのまま
   // 濃度(µg/ml)で割って ml/hr を算出
   return ugPerHour / concentration;
 }
@@ -128,15 +139,20 @@ export function convertRateToDose(
   concentration: number,
   unit: DoseUnit,
 ): number {
-  // 体重が 0 以下なら計算できない
-  if (weight <= 0) {
-    return NaN;
-  }
-
   const ugPerHour = rate * concentration; // ml/hr から µg/hr へ
-  const dosePerKg =
-    unit === 'µg/kg/min'
-      ? (ugPerHour / 60) / weight // µg/kg/min へ換算
-      : ugPerHour / weight; // µg/kg/hr へ換算
-  return dosePerKg;
+  switch (unit) {
+    case 'µg/kg/min':
+      if (weight <= 0) return NaN;
+      return (ugPerHour / 60) / weight;
+    case 'µg/kg/hr':
+      if (weight <= 0) return NaN;
+      return ugPerHour / weight;
+    case 'mg/kg/hr':
+      if (weight <= 0) return NaN;
+      return (ugPerHour / 1000) / weight; // mg 単位へ換算
+    case 'mg/hr':
+      return ugPerHour / 1000; // 体重は用いない
+    default:
+      return NaN;
+  }
 }
