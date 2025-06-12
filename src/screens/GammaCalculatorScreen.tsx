@@ -342,6 +342,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
               onValueChange={updateFromDose}
               minimumTrackTintColor="green"
               thumbTintColor="black"
+              // OS ごとに高さが異なるため固定値で統一
+              style={styles.slider}
             />
             <View style={styles.doseScale}>
               <Text>0</Text>
@@ -548,12 +550,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginTop: 50,
   },
+  // スライダー自体の高さを一定に保つ
+  slider: {
+    height: 40,
+  },
   // 危険域バーのスタイル
   dangerTrack: {
     position: "absolute",
     height: 4,
     backgroundColor: "red",
-    top: 12, // スライダーのトラック位置に合わせて調整
+    // スライダー高さの中央に配置することで
+    // 端末ごとの差異を吸収する
+    top: "50%",
+    transform: [{ translateY: -2 }],
     borderRadius: 2,
   },
   // 危険域メッセージのスタイル
