@@ -250,21 +250,25 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
           })()}
         </Modal>
       </Portal>
-      {/* ヘルプダイアログ */}
-      <Portal>
-        <Dialog visible={helpVisible} onDismiss={() => setHelpVisible(false)}>
-          <Dialog.Title>使い方</Dialog.Title>
-          <Dialog.Content>
-            <Text>
-              設定画面では薬剤ごとの初期値を編集できます。表示順はドラッグで並び替え
-              可能です。
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setHelpVisible(false)}>閉じる</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+        {/* ヘルプダイアログ */}
+        <Portal>
+          <Dialog visible={helpVisible} onDismiss={() => setHelpVisible(false)}>
+            <Dialog.Title>使い方</Dialog.Title>
+            <Dialog.Content>
+              <Text>
+                {`設定画面では以下の操作ができます。\n\n` +
+                  "・薬剤名をタップして初期投与量や希釈条件を編集\n" +
+                  "・チェックボックスで計算画面に表示する薬剤を選択\n" +
+                  "・右端のハンドルをドラッグして表示順を変更\n" +
+                  "・編集画面の\"デフォルトに戻す\"で設定をリセット\n" +
+                  "・左上の戻るボタンで並び替えを保存して閉じる"}
+              </Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setHelpVisible(false)}>閉じる</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
       <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>
         {snackbar}
       </Snackbar>
