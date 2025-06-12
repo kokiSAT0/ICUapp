@@ -220,19 +220,17 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         {/* ===== ① 組成 / 体重 ===== */}
         <Pressable onPress={() => setDialogVisible(true)} style={{ marginHorizontal: 8 }}>
           <Surface elevation={1} style={styles.infoCard}>
-            <Text>組成 :</Text>
-            <Text style={styles.inlineValue}>{doseMg}</Text>
-            <Text> {drug.soluteUnit} / </Text>
-            <Text style={styles.inlineValue}>{volumeMl}</Text>
-            <Text> ml </Text>
-            <Text style={{ width: "100%", marginTop: 4 }}>
+            <Text style={styles.infoText}>組成 :</Text>
+            <Text style={[styles.infoText, styles.valueBox]}>{doseMg}</Text>
+            <Text style={styles.infoText}> {drug.soluteUnit} / </Text>
+            <Text style={[styles.infoText, styles.valueBox]}>{volumeMl}</Text>
+            <Text style={styles.infoText}> ml </Text>
+            <Text style={[styles.infoText, styles.concText]}>
               ({concentration.toFixed(0)} µg/ml)
             </Text>
-            <Text style={[styles.inlineValue, styles.weight]}>{weightKg}</Text>
-            {/* kg ラベルを infoCard の右下に固定 */}
-            <Text style={styles.kgLabel}>kg</Text>
-
-
+            <Text style={styles.infoText}>　体重 </Text>
+            <Text style={[styles.infoText, styles.valueBox]}>{weightKg}</Text>
+            <Text style={styles.infoText}> kg</Text>
           </Surface>
         </Pressable>
 
@@ -420,51 +418,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   infoCard: {
+    marginTop: 2,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: "#d7d7d7",
     flexDirection: "row",   // 1 行に並べる
+    justifyContent: 'center',
     flexWrap: "nowrap",     // ★ 折り返し禁止
     alignItems: "center",
     position: "relative",
   },
-  /* 1 行レイアウト用の数値表示 */
-  inlineValue: {
-    backgroundColor: "#9ea29e",
-    paddingHorizontal: 10,
-    borderRadius: 4,
-    fontWeight: "bold",
-    minWidth: 60,
-    textAlign: "center",
-    marginHorizontal: 4,
+  infoText: {
+    fontSize: 14,
   },
-  weight: { minWidth: 72 },
-  editableBox: {
-    backgroundColor: "#9ea29e",
-    paddingHorizontal: 10,
-    borderRadius: 4,
-    fontWeight: "bold",
-  },
-  /* ---- 体重表示用 ---- */
-  weightBox: {
-    backgroundColor: "#9ea29e",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 6,
-    position: "relative",
-  },
-  weightValue: {
-    fontWeight: "bold",
-    fontSize: 26,
-  },
-  kgLabel: {
-    position: "absolute",
-    right: 12,
-    bottom: 8,
+  /* 3 つの数値用 ―― 背景だけ少し濃く統一 */
+  valueBox: {
+    backgroundColor: '#c0c0c0',   // #d7d7d7 より一段濃いグレー
+    paddingHorizontal: 8,
+    borderRadius: 2,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginHorizontal: 2,
     fontSize: 16,
-    fontWeight: "500",
   },
-
+  concText: {
+    marginHorizontal: 2,   // 文字間の余白
+    fontSize: 14,
+    color: '#333',
+  },
   flowCardBlue: {
     marginHorizontal: 8,
     marginTop: 8,
@@ -472,7 +453,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 48, // ▲ の高さぶん余白を確保
     paddingBottom: 48, // ▼ の高さぶん余白を確保
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: "#daf7f9",
     alignItems: "center",
   },
@@ -481,7 +462,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 48,
     paddingBottom: 40,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
   },
@@ -598,7 +579,7 @@ const styles = StyleSheet.create({
   },
   brochure: {
     margin: 8,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: "#d7d7d7",
     padding: 12,
   },
