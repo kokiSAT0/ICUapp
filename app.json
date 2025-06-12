@@ -11,8 +11,12 @@
       [
         "expo-build-properties",
         {
-          "ios": { "jsEngine": "jsc" },
-          "android": { "jsEngine": "jsc" }
+          "ios": {
+            "jsEngine": "jsc"
+          },
+          "android": {
+            "jsEngine": "jsc"
+          }
         }
       ]
     ],
@@ -28,7 +32,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "config": { "usesNonExemptEncryption": false }
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "versionCode": 2,
