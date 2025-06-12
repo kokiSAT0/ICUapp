@@ -64,17 +64,17 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   // 投与量 : 4 桁（10, 1, 0.1, 0.01）
   const doseSteps = [10, 1, 0.1, 0.01];
 
+  // 濃度(µg/ml)を都度計算する。useMemo で不要な再計算を避ける
+  const concentration = useMemo(
+    () => computeConcentration(doseMg, drug.soluteUnit, volumeMl),
+    [doseMg, volumeMl, drug.soluteUnit]
+  );
+
   // スライダー刻み幅：流量 0.1 ml/h 分の投与量に変換
   const doseSliderStep = useMemo(
     () =>
       convertRateToDose(0.1, weightKg, concentration, drug.doseUnit),
     [weightKg, concentration, drug.doseUnit]
-  );
-
-  // 濃度(µg/ml)を都度計算する。useMemo で不要な再計算を避ける
-  const concentration = useMemo(
-    () => computeConcentration(doseMg, drug.soluteUnit, volumeMl),
-    [doseMg, volumeMl, drug.soluteUnit]
   );
 
   /** ml/h 変更時に投与量を自動更新する */
