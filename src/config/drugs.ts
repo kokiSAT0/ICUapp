@@ -8,6 +8,8 @@ export const DRUG_LIST = [
   "dexmedetomidine",
   "fentanyl",
   "remifentanil",
+  "propofol",
+  "rocuronium",
 ] as const;
 
 // DRUG_LIST の要素を使って型を生成
@@ -91,13 +93,13 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     label: "フェンタニル",
     // ICU・術後鎮痛で一般的に用いられる体重当たり投与速度
     doseUnit: "µg/kg/hr",
-    initialDose: 1,          // 推奨初期設定：1 µg/kg/hr
-    soluteAmount: 1000,      // 1 mg（=1000 µg）を
-    soluteUnit: "µg",        // 
-    solutionVolume: 100,      // 100 mL で調製
+    initialDose: 1, // 推奨初期設定：1 µg/kg/hr
+    soluteAmount: 1000, // 1 mg（=1000 µg）を
+    soluteUnit: "µg", //
+    solutionVolume: 100, // 100 mL で調製
     doseMin: 0,
-    doseMax: 6,              // ガイドライン上の上限 5 µg/kg/hr を少し余裕を見て
-    dangerDose: 4,           // 4 µg/kg/hr 超で警告表示
+    doseMax: 6, // ガイドライン上の上限 5 µg/kg/hr を少し余裕を見て
+    dangerDose: 4, // 4 µg/kg/hr 超で警告表示
     doseStep: 0.1,
     rateStep: 0.1,
     description:
@@ -109,17 +111,52 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     label: "レミフェンタニル",
     // 全身麻酔維持で用いる投与速度
     doseUnit: "µg/kg/min",
-    initialDose: 0.25,       // 推奨初期設定：0.25 µg/kg/min
-    soluteAmount: 2,         // 2 mg を（添付製剤 2 mg/バイアルを）
+    initialDose: 0.25, // 推奨初期設定：0.25 µg/kg/min
+    soluteAmount: 2, // 2 mg を（添付製剤 2 mg/バイアルを）
     soluteUnit: "mg",
-    solutionVolume: 20,      // 20 mL シリンジで調製（100 µg/mL）
+    solutionVolume: 20, // 20 mL シリンジで調製（100 µg/mL）
     doseMin: 0,
-    doseMax: 1,              // 実臨床では 0.05〜1 µg/kg/min が多い
+    doseMax: 1, // 実臨床では 0.05〜1 µg/kg/min が多い
     dangerDose: 0.8,
     doseStep: 0.01,
     rateStep: 0.1,
     description:
       "全身麻酔維持には0.25〜0.5 µg/kg/minで開始し、循環動態に応じて0.05〜1 µg/kg/minの範囲で調節する。投与中止後は速やかに効果が消失するため、終了前に術後鎮痛薬を準備する。日本麻酔科学会医薬品ガイドライン第3版4訂より。", // :contentReference[oaicite:1]{index=1}
+    enabled: true,
+  },
+  /* ──── 1. プロポフォール（1 %＝10 mg/mL 原液） ──── */
+  propofol: {
+    label: "プロポフォール",
+    doseUnit: "mg/kg/hr",
+    initialDose: 4, // 全身麻酔維持の推奨開始速度 4 mg/kg/hr :contentReference[oaicite:0]{index=0}
+    soluteAmount: 500, // 50 mL シリンジに原液を充填（10 mg/mL × 50 mL）
+    soluteUnit: "mg",
+    solutionVolume: 50, // mL
+    doseMin: 0.5, // ICU 鎮静 0.5 mg/kg/hr から使用可 :contentReference[oaicite:1]{index=1}
+    doseMax: 10, // 麻酔維持上限 10 mg/kg/hr :contentReference[oaicite:2]{index=2}
+    dangerDose: 8, // 8 mg/kg/hr 超で警告
+    doseStep: 0.1,
+    rateStep: 0.1,
+    description:
+      "全身麻酔維持では通常 4–10 mg/kg/hr の範囲で調節する。人工呼吸管理下の ICU 鎮静では 0.5–3 mg/kg/hr が目安。血圧低下・呼吸抑制に十分注意し、5 分毎の血圧監視とSpO₂連続監視を行う。", //
+    enabled: true,
+  },
+
+  /* ──── 2. ロクロニウム（10 mg/mL 原液） ──── */
+  rocuronium: {
+    label: "ロクロニウム",
+    doseUnit: "µg/kg/min",
+    initialDose: 7, // ガイドライン推奨の開始速度 7 µg/kg/min :contentReference[oaicite:3]{index=3}
+    soluteAmount: 500, // 50 mL シリンジに原液を充填（10 mg/mL × 50 mL）
+    soluteUnit: "mg",
+    solutionVolume: 50, // mL
+    doseMin: 3,
+    doseMax: 16, // 文献上の臨床最大 16 µg/kg/min（迅速導入後の補正を考慮） :contentReference[oaicite:4]{index=4}
+    dangerDose: 12,
+    doseStep: 0.5,
+    rateStep: 0.1,
+    description:
+      "持続注入は 7 µg/kg/min で開始し、筋弛緩モニター（TOF, PTC）を参考に 3–16 µg/kg/min で調節する。深筋弛緩の維持時は高用量となり循環抑制に留意。拮抗にはスガマデクスが第一選択。", //
     enabled: true,
   },
 };
