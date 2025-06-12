@@ -104,6 +104,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   };
 
   // 薬剤を表示対象とするかどうかを切り替える
+  // 非表示にした薬剤は並び順の末尾へ送る
   const toggleEnabled = async (drug: DrugType) => {
     // 新しい表示状態を計算
     const newEnabled = !localConfigs[drug].enabled;
@@ -126,15 +127,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     await setDrugOrder(orderWithoutDrug);
   };
 
-  // 並び順から非表示薬剤を末尾へ移動させる処理
-  // 配列操作 (filter) は条件に合う要素だけを抜き出すメソッド
-  const normalizeOrder = (order: DrugType[]): DrugType[] => {
-    // filter で表示中の薬剤と非表示の薬剤を分ける
-    const enabled = order.filter((d) => localConfigs[d].enabled);
-    const disabled = order.filter((d) => !localConfigs[d].enabled);
-    return [...enabled, ...disabled];
-  };
-
   return (
     // SafeAreaView で余白が二重にならないよう top を除外
     <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
@@ -148,7 +140,9 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       <DraggableFlatList
         data={drugOrder}
         keyExtractor={(item) => item}
-        onDragEnd={({ data }) => setDrugOrder(normalizeOrder(data))}
+        // ドラッグ操作の結果をそのまま保存する
+        // 非表示薬剤を末尾へ移動する処理は toggleEnabled で行う
+        onDragEnd={({ data }) => setDrugOrder(data)}
         renderItem={({ item, drag }) => {
           const textColor = localConfigs[item].enabled ? undefined : '#888';
           return (
