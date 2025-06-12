@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DRUGS, DRUG_LIST, DrugConfig, DrugType } from '../config/drugs';
+import { DRUGS, DRUG_LIST, DrugConfig, DrugType } from '@/config/drugs';
 
 // 設定データを保存するキー名
 const STORAGE_KEY = 'drugConfigs';
