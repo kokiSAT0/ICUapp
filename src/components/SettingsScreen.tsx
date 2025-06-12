@@ -78,6 +78,20 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   // ヘルプダイアログの表示状態
   const [helpVisible, setHelpVisible] = useState(false);
 
+  // 画面を閉じる際に並び順を保存する
+  const handleClose = async () => {
+    // 表示中の薬剤と非表示薬剤に分ける
+    const enabledDrugs: DrugType[] = [];
+    const disabledDrugs: DrugType[] = [];
+    drugOrder.forEach((d) => {
+      if (localConfigs[d].enabled) enabledDrugs.push(d);
+      else disabledDrugs.push(d);
+    });
+    // 表示薬剤→非表示薬剤の順に整理
+    await setDrugOrder([...enabledDrugs, ...disabledDrugs]);
+    onClose();
+  };
+
   // 入力値更新用ヘルパー
   const updateValue = (
     drug: DrugType,
@@ -133,7 +147,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     <Surface style={styles.container}>
       {/* ヘッダー。左に戻るボタン、右にヘルプボタンを配置 */}
       <Appbar.Header>
-        <Appbar.BackAction onPress={onClose} />
+        <Appbar.BackAction onPress={handleClose} />
         <Appbar.Content title="設定" />
         <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
       </Appbar.Header>
