@@ -59,6 +59,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const [dose, setDose] = useState(drug.initialDose);
   // スライダーの上限
   const doseMax = drug.doseMax;
+  const showDanger =
+    drug.dangerDose !== undefined && dose >= drug.dangerDose;
 
   /* === 各桁ごとのインクリメント / デクリメント === */
   // ml/h : 4 桁（100, 10, 1, 0.1）
@@ -269,7 +271,13 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         </Surface>
 
         {/* ===== ③ 投与量 ===== */}
-        <Surface elevation={2} style={styles.flowCardGreen}>
+        <Surface
+          elevation={2}
+          style={[
+            styles.flowCardGreen,
+            showDanger && styles.flowCardGreenExpanded,
+          ]}
+        >
           {/* ▲ 上段：3 桁ぶん */}
           <View style={styles.arrowRowTop}>
             {doseSteps.map((_, i) => (
@@ -304,7 +312,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             ))}
           </View>
 
-          {/* スライダー */}
+          {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
             {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
             {drug.dangerDose !== undefined && (
@@ -337,15 +345,18 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             />
             <View style={styles.doseScale}>
               <Text>0</Text>
-              <Text>{doseMax}{drug.doseUnit}</Text>
+              <Text>
+                {doseMax}
+                {drug.doseUnit}
+              </Text>
             </View>
+            {/* 危険域メッセージ：スライダーのすぐ下に表示 */}
+            {showDanger && (
+              <Text style={styles.dangerMessage}>
+                高用量です。注意して投与して下さい。
+              </Text>
+            )}
           </View>
-          {/* 危険域に入ったら警告メッセージを表示 */}
-          {drug.dangerDose !== undefined && dose >= drug.dangerDose && (
-            <Text style={styles.dangerMessage}>
-              高用量です。注意して投与して下さい。
-            </Text>
-          )}
         </Surface>
 
         {/* ===== ④ 添付文書 / 補足説明 ===== */}
@@ -457,10 +468,14 @@ const styles = StyleSheet.create({
     margin: 8,
     paddingHorizontal: 12,
     paddingTop: 48,
-    paddingBottom: 100,
+    paddingBottom: 30,
     borderRadius: 12,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
+  },
+  /* 危険メッセージぶん下に余白を追加 */
+  flowCardGreenExpanded: {
+    paddingBottom: 20,
   },
   /* ── ▲▼ を数字の上・下に均等配置 ── */
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
@@ -494,7 +509,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    bottom: 60,                  // ↕ スライダーの上に来る
+    top:125,                  // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
@@ -526,13 +541,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
   },
-  /* ---- スライダーを緑カード下端に固定 ---- */
+  /* ---- スライダー：固定位置（marginTop） ---- */
   sliderContainer: {
-    position: "absolute",
-    bottom: 8,
     width: "100%",
     alignSelf: "center",
     paddingHorizontal: 8,
+    marginTop: 50,
   },
   // 危険域バーのスタイル
   dangerTrack: {
@@ -545,7 +559,7 @@ const styles = StyleSheet.create({
   // 危険域メッセージのスタイル
   dangerMessage: {
     color: "red",
-    marginTop: 4,
+    marginTop: 8,
     alignSelf: "center",
   },
   doseScale: {
