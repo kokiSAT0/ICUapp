@@ -13,6 +13,8 @@ import {
   Portal,
   Modal,
   TouchableRipple,
+  Appbar,
+  Dialog,
 } from 'react-native-paper';
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -73,6 +75,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
 
   // 編集ダイアログの表示状態
   const [editVisible, setEditVisible] = useState(false);
+  // ヘルプダイアログの表示状態
+  const [helpVisible, setHelpVisible] = useState(false);
 
   // 入力値更新用ヘルパー
   const updateValue = (
@@ -154,6 +158,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     // SafeAreaView でステータスバーと重ならないようにする
     <SafeAreaView style={styles.safeArea}>
     <Surface style={styles.container}>
+      {/* ヘッダー。左に戻るボタン、右にヘルプボタンを配置 */}
+      <Appbar.Header>
+        <Appbar.BackAction onPress={onClose} />
+        <Appbar.Content title="設定" />
+        <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
+      </Appbar.Header>
       <DraggableFlatList
         data={drugOrder}
         keyExtractor={(item) => item}
@@ -258,6 +268,21 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             );
           })()}
         </Modal>
+      </Portal>
+      {/* ヘルプダイアログ */}
+      <Portal>
+        <Dialog visible={helpVisible} onDismiss={() => setHelpVisible(false)}>
+          <Dialog.Title>使い方</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              設定画面では薬剤ごとの初期値を編集できます。表示順はドラッグで並び替え
+              可能です。
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setHelpVisible(false)}>閉じる</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
       <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>
         {snackbar}
