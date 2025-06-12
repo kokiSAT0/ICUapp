@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useMemo,
   useEffect,
-  useRef,
 } from "react";
 import { View, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Surface, Text, Divider, Menu } from "react-native-paper";
@@ -56,8 +55,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     convertDoseToRate(drug.initialDose, weightKg, initialConc, drug.doseUnit)
   );
   const [dose, setDose] = useState(drug.initialDose);
-  // スライダーの値を直接操作するための参照
-  const sliderRef = useRef<Slider>(null);
   // スライダーの上限
   const doseMax = drug.doseMax;
 
@@ -166,11 +163,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     const d = convertRateToDose(flowMlH, weightKg, concentration, drug.doseUnit);
     setDose(+d.toFixed(2));
   }, [concentration, weightKg]);
-
-  // 投与量の値、もしくは薬剤が変わったときはスライダーにも反映させる
-  useEffect(() => {
-    sliderRef.current?.setNativeProps({ value: dose });
-  }, [dose, initialDrug]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -328,7 +320,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
               />
             )}
             <Slider
-              ref={sliderRef}
               /*
                * key に初期薬剤IDを指定することで、薬剤が変わった際に
                * スライダーを再マウントし、初期値を正しく反映させる
