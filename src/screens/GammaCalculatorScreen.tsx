@@ -455,7 +455,8 @@ const styles = StyleSheet.create({
     margin: 8,
     paddingHorizontal: 12,
     paddingTop: 48,
-    paddingBottom: 100,
+    // 下部に警告メッセージを固定するため余白を拡大
+    paddingBottom: 120,
     borderRadius: 12,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
@@ -527,7 +528,8 @@ const styles = StyleSheet.create({
   /* ---- スライダーを緑カード下端に固定 ---- */
   sliderContainer: {
     position: "absolute",
-    bottom: 8,
+    // 警告メッセージの分だけ上に配置
+    bottom: 36,
     width: "100%",
     alignSelf: "center",
     paddingHorizontal: 8,
@@ -542,9 +544,11 @@ const styles = StyleSheet.create({
   },
   // 危険域メッセージのスタイル
   dangerMessage: {
+    position: "absolute",
+    bottom: 8,
+    width: "100%",
     color: "red",
-    marginTop: 4,
-    alignSelf: "center",
+    textAlign: "center",
   },
   doseScale: {
     flexDirection: "row",
