@@ -207,13 +207,13 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
               ))}
           </Menu>
 
-          {/* 右側：設定アイコン（絶対配置） */}
-          <Pressable
+          {/* 右側：設定アイコン（IconButton に置換） */}
+          <IconButton
+            icon="cog-outline"              // ← ここをお好みのアイコン名に
+            size={28}                // 適宜調整
             style={styles.settingBtn}
             onPress={() => navigation.navigate("Settings")}
-          >
-            <Text variant="titleLarge">⚙️</Text>
-          </Pressable>
+          />
         </View>
         <Divider bold style={{ height: 1 }} />
 
@@ -415,8 +415,8 @@ const styles = StyleSheet.create({
   /* 右上に絶対配置された設定ボタン */
   settingBtn: {
     position: "absolute",
-    right: 8,
-    top: 12,
+    right: 2,
+    top: 0,
     paddingHorizontal: 2,
   },
   infoCard: {
