@@ -42,7 +42,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.infucalc.mobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
