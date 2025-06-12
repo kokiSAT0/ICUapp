@@ -314,21 +314,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
-            {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
-            {drug.dangerDose !== undefined && (
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.dangerTrack,
-                  {
-                    left: `${(drug.dangerDose / doseMax) * 100}%`,
-                    width: `${
-                      ((doseMax - drug.dangerDose) / doseMax) * 100
-                    }%`,
-                  },
-                ]}
-              />
-            )}
+            {/* 右端 20 % を常時赤色にするオーバーレイ */}
+            <View pointerEvents="none" style={styles.dangerOverlay} />
             <Slider
               /*
                * key に初期薬剤IDを指定することで、薬剤が変わった際に
@@ -547,13 +534,17 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 8,
     marginTop: 50,
+    position: "relative",
   },
-  // 危険域バーのスタイル
-  dangerTrack: {
+  /* スライダー右端 20 % を赤く塗る */
+  dangerOverlay: {
     position: "absolute",
+    right: 0,
+    width: "20%",       // ← ここで割合調整
     height: 4,
     backgroundColor: "red",
-    top: 12, // スライダーのトラック位置に合わせて調整
+    top: "50%",
+    transform: [{ translateY: -2 }],
     borderRadius: 2,
   },
   // 危険域メッセージのスタイル
