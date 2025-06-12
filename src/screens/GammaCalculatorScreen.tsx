@@ -465,14 +465,14 @@ const styles = StyleSheet.create({
     margin: 8,
     paddingHorizontal: 12,
     paddingTop: 48,
-    paddingBottom: 30,
+    paddingBottom: 40,
     borderRadius: 12,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
   },
   /* 危険メッセージぶん下に余白を追加 */
   flowCardGreenExpanded: {
-    paddingBottom: 20,
+    paddingBottom: 80,
   },
   /* ── ▲▼ を数字の上・下に均等配置 ── */
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
