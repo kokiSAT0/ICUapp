@@ -18,6 +18,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
 import { Dimensions } from "react-native";
 
+const WINDOW_WIDTH = Dimensions.get('window').width;
 const { width } = Dimensions.get("window");
 export const DISPLAY_SHIFT = -width * 0.1;
 
@@ -180,6 +181,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       >
         {/* ===== Header ===== */}
         <View style={styles.header}>
+          {/* 中央：幅 80 % の薬剤名ボタン（Menu の anchor） */}
           <Menu
             visible={drugMenuVisible}
             onDismiss={() => setDrugMenuVisible(false)}
@@ -188,7 +190,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 style={styles.centerButton}
                 onPress={() => setDrugMenuVisible(true)}
               >
-                {/* 薬剤名を設定ファイルから表示 */}
                 <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
                   {drug.label}
                 </Text>
@@ -205,6 +206,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 />
               ))}
           </Menu>
+
+          {/* 右側：設定アイコン（絶対配置） */}
           <Pressable
             style={styles.settingBtn}
             onPress={() => navigation.navigate("Settings")}
@@ -315,8 +318,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
-            {/* スライダーと 2 色バーを同じラッパーに入れる */}
-            <View style={styles.trackWrapper}>
             {/* ---- 安全域(緑) + 危険域(赤) の 2 色バー ---- */}
             <View pointerEvents="none" style={styles.trackOverlay}>
               <View style={[styles.safeBar,   { flexGrow: safeRatio }]} />
@@ -339,7 +340,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 // OS ごとに高さが異なるため固定値で統一
                 style={styles.slider}
               />
-            </View>
             <View style={styles.doseScale}>
               <Text>0</Text>
               <Text>
@@ -397,22 +397,27 @@ function WeightBox(props: { value: number; onPress: () => void }) {
 /* ===== StyleSheet ===== */
 const styles = StyleSheet.create({
   header: {
-    flexDirection: "row",
     alignItems: "center",
     paddingVertical: 6,
+    position: "relative",
+    width: "100%",
   },
+  /* 中央ボタン：画面幅の 80 % で固定 */
   centerButton: {
-    flex: 1,
-    alignItems: "center",
     backgroundColor: "#c8f5f0",
-    marginLeft: 50,
-    marginRight: 10,
+    width: WINDOW_WIDTH * 0.75,
     paddingVertical: 4,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 10,
+    alignSelf: "center",
+    alignItems: "center",
   },
+  /* 右上に絶対配置された設定ボタン */
   settingBtn: {
-    paddingHorizontal: 8,
+    position: "absolute",
+    right: 8,
+    top: 12,
+    paddingHorizontal: 2,
   },
   infoCard: {
     margin: 8,
