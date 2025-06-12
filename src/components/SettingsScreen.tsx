@@ -22,7 +22,14 @@ import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from '../config/drugs';
 
 // 数値項目のキー名
-type NumericKey = 'initialDose' | 'soluteAmount' | 'solutionVolume';
+// 文字列で保持したい数値項目のキー一覧
+// ここに追加すると自動的に変換処理が拡張される
+type NumericKey =
+  | 'initialDose'
+  | 'soluteAmount'
+  | 'solutionVolume'
+  | 'doseMax'
+  | 'dangerDose';
 // 入力用設定データ。数値項目を文字列で保持する
 type DrugConfigInput = Omit<DrugConfig, NumericKey> & {
   [K in NumericKey]: string;
@@ -34,6 +41,9 @@ const toInputConfig = (cfg: DrugConfig): DrugConfigInput => ({
   initialDose: String(cfg.initialDose),
   soluteAmount: String(cfg.soluteAmount),
   solutionVolume: String(cfg.solutionVolume),
+  // 最大投与量・危険閾値も文字列に変換して保持
+  doseMax: String(cfg.doseMax),
+  dangerDose: cfg.dangerDose !== undefined ? String(cfg.dangerDose) : '',
 });
 
 // DrugConfigInput から DrugConfig へ変換
@@ -42,6 +52,9 @@ const fromInputConfig = (cfg: DrugConfigInput): DrugConfig => ({
   initialDose: parseFloat(cfg.initialDose),
   soluteAmount: parseFloat(cfg.soluteAmount),
   solutionVolume: parseFloat(cfg.solutionVolume),
+  doseMax: parseFloat(cfg.doseMax),
+  // 空文字列の場合は undefined を返す
+  dangerDose: cfg.dangerDose === '' ? undefined : parseFloat(cfg.dangerDose),
 });
 
 export type SettingsScreenProps = {
@@ -209,6 +222,24 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   keyboardType="numeric"
                   value={cfg.initialDose}
                   onChangeText={(v) => updateValue(key, 'initialDose', v)}
+                />
+                {/* 最大投与量を編集する入力欄 */}
+                <TextInput
+                  mode="outlined"
+                  label={`最大投与量(${cfg.doseUnit})`}
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={cfg.doseMax}
+                  onChangeText={(v) => updateValue(key, 'doseMax', v)}
+                />
+                {/* 危険な投与量の目安。空欄にすると警告バーを非表示にできる */}
+                <TextInput
+                  mode="outlined"
+                  label={`危険閾値(${cfg.doseUnit})`}
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={cfg.dangerDose}
+                  onChangeText={(v) => updateValue(key, 'dangerDose', v)}
                 />
                 <View style={styles.row}>
                   <TextInput
