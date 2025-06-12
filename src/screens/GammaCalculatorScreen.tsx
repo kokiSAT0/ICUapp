@@ -218,23 +218,23 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         <Divider bold style={{ height: 1 }} />
 
         {/* ===== ① 組成 / 体重 ===== */}
-        <Surface elevation={1} style={styles.infoCard}>
-          <Text>組成：</Text>
-          <EditableBox value={doseMg} onPress={() => setDialogVisible(true)} />
-          <Text> {drug.soluteUnit} / </Text>
-          <EditableBox
-            value={volumeMl}
-            onPress={() => setDialogVisible(true)}
-          />
-          <Text> ml　体重 </Text>
-          <WeightBox value={weightKg} onPress={() => setDialogVisible(true)} />
-          {/* kg ラベルを infoCard の右下に固定 */}
-          <Text style={styles.kgLabel}>kg</Text>
+        <Pressable onPress={() => setDialogVisible(true)} style={{ marginHorizontal: 8 }}>
+          <Surface elevation={1} style={styles.infoCard}>
+            <Text>組成 :</Text>
+            <Text style={styles.inlineValue}>{doseMg}</Text>
+            <Text> {drug.soluteUnit} / </Text>
+            <Text style={styles.inlineValue}>{volumeMl}</Text>
+            <Text> ml </Text>
+            <Text style={{ width: "100%", marginTop: 4 }}>
+              ({concentration.toFixed(0)} µg/ml)
+            </Text>
+            <Text style={[styles.inlineValue, styles.weight]}>{weightKg}</Text>
+            {/* kg ラベルを infoCard の右下に固定 */}
+            <Text style={styles.kgLabel}>kg</Text>
 
-          <Text style={{ width: "100%", marginTop: 4 }}>
-            濃度：{concentration.toFixed(0)} µg/ml
-          </Text>
-        </Surface>
+
+          </Surface>
+        </Pressable>
 
         {/* ===== ② 流量 (ml/h) ===== */}
         <Surface elevation={2} style={styles.flowCardBlue}>
@@ -420,15 +420,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   infoCard: {
-    margin: 8,
     padding: 12,
     borderRadius: 12,
     backgroundColor: "#d7d7d7",
-    flexWrap: "wrap",
-    flexDirection: "row",
+    flexDirection: "row",   // 1 行に並べる
+    flexWrap: "nowrap",     // ★ 折り返し禁止
     alignItems: "center",
     position: "relative",
   },
+  /* 1 行レイアウト用の数値表示 */
+  inlineValue: {
+    backgroundColor: "#9ea29e",
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    fontWeight: "bold",
+    minWidth: 60,
+    textAlign: "center",
+    marginHorizontal: 4,
+  },
+  weight: { minWidth: 72 },
   editableBox: {
     backgroundColor: "#9ea29e",
     paddingHorizontal: 10,
