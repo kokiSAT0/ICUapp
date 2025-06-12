@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useEffect,
-} from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Surface, Text, Divider, Menu } from "react-native-paper";
 import Slider from "@react-native-community/slider";
@@ -59,8 +54,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   const [dose, setDose] = useState(drug.initialDose);
   // スライダーの上限
   const doseMax = drug.doseMax;
-  const showDanger =
-    drug.dangerDose !== undefined && dose >= drug.dangerDose;
+  const showDanger = drug.dangerDose !== undefined && dose >= drug.dangerDose;
 
   /* === 各桁ごとのインクリメント / デクリメント === */
   // ml/h : 4 桁（100, 10, 1, 0.1）
@@ -76,8 +70,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
   // スライダー刻み幅：流量 0.1 ml/h 分の投与量に変換
   const doseSliderStep = useMemo(
-    () =>
-      convertRateToDose(0.1, weightKg, concentration, drug.doseUnit),
+    () => convertRateToDose(0.1, weightKg, concentration, drug.doseUnit),
     [weightKg, concentration, drug.doseUnit]
   );
 
@@ -119,7 +112,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       next.initialDose,
       weightKg,
       conc,
-      next.doseUnit,
+      next.doseUnit
     );
     setFlowMlH(+flow.toFixed(1));
 
@@ -157,14 +150,19 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       next.initialDose,
       weightKg,
       conc,
-      next.doseUnit,
+      next.doseUnit
     );
     setFlowMlH(+flow.toFixed(1));
   }, [initialDrug, configs, weightKg]);
 
   // 組成や体重が変化したときは現在の流量から投与量を再計算する
   useEffect(() => {
-    const d = convertRateToDose(flowMlH, weightKg, concentration, drug.doseUnit);
+    const d = convertRateToDose(
+      flowMlH,
+      weightKg,
+      concentration,
+      drug.doseUnit
+    );
     setDose(+d.toFixed(2));
   }, [concentration, weightKg]);
 
@@ -220,10 +218,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
             onPress={() => setDialogVisible(true)}
           />
           <Text> ml　体重 </Text>
-          <WeightBox
-            value={weightKg}
-            onPress={() => setDialogVisible(true)}
-          />
+          <WeightBox value={weightKg} onPress={() => setDialogVisible(true)} />
           {/* kg ラベルを infoCard の右下に固定 */}
           <Text style={styles.kgLabel}>kg</Text>
 
@@ -314,8 +309,21 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
-            {/* 右端 20 % を常時赤色にするオーバーレイ */}
-            <View pointerEvents="none" style={styles.dangerOverlay} />
+            {/* 危険域を示す赤いバーをスライダーの下に重ねる */}
+            {drug.dangerDose !== undefined && (
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.dangerOverlay,
+                  {
+                    left: `${(drug.dangerDose / doseMax) * 100}%`,
+                    width: `${((doseMax - drug.dangerDose) / doseMax) * 100}%`,
+                  },
+                ]}
+              >
+                <View style={styles.dangerBar} />
+              </View>
+            )}
             <Slider
               /*
                * key に初期薬剤IDを指定することで、薬剤が変わった際に
@@ -329,6 +337,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
               onValueChange={updateFromDose}
               minimumTrackTintColor="green"
               thumbTintColor="black"
+              // OS ごとに高さが異なるため固定値で統一
+              style={styles.slider}
             />
             <View style={styles.doseScale}>
               <Text>0</Text>
@@ -496,7 +506,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    top:125,                  // ↕ スライダーの上に来る
+    top: 125, // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
@@ -505,7 +515,7 @@ const styles = StyleSheet.create({
     width: "90%",
     /* 桁数に合わせて自動サイズ。
        端末幅が広い場合でも “中央から DISPLAY_SHIFT だけ左” へ配置 */
-    minWidth: 220,           // 必要に応じて調整
+    minWidth: 220, // 必要に応じて調整
     maxWidth: "100%",
     backgroundColor: "#c0c0c0",
     borderRadius: 10,
@@ -535,16 +545,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginTop: 50,
     position: "relative",
+    height: 40,
   },
-  /* スライダー右端 20 % を赤く塗る */
+  // スライダー自体の高さを一定に保つ
+  slider: {
+    height: 40,
+  },
+  // 危険域バーのスタイル
   dangerOverlay: {
-    position: "absolute",
-    right: 0,
-    width: "20%",       // ← ここで割合調整
+    ...StyleSheet.absoluteFillObject, // left, right, top, bottom = 0
+    justifyContent: "center", // ← 縦中央寄せ
+  },
+  dangerBar: {
     height: 4,
     backgroundColor: "red",
-    top: "50%",
-    transform: [{ translateY: -2 }],
     borderRadius: 2,
   },
   // 危険域メッセージのスタイル

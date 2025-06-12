@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Gammaapp",
-    "slug": "ICUapp",
+    "name": "InfuCalc",
+    "slug": "InfuCalc",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "1"
+      "bundleIdentifier": "com.infucalc.mobile",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": { "usesNonExemptEncryption": false }
     },
     "android": {
       "versionCode": 1,
@@ -26,6 +31,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "da6f94f7-d344-4c2b-9634-d32c1980de6a"
+      }
     }
   }
 }
