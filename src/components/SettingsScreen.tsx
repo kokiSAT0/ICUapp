@@ -93,33 +93,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     });
   };
 
-  const handleSave = async () => {
-    // すべての薬剤設定をオブジェクトへ変換
-    // reduce は配列をまとめる処理。ここでは {id: config} の形を作る
-    const parsed = DRUG_LIST.reduce((acc, key) => {
-      acc[key] = fromInputConfig(localConfigs[key]);
-      return acc;
-    }, {} as Record<DrugType, DrugConfig>);
-
-    // 入力された数値に NaN がないか確認
-    // flatMap は配列を展開して一つにまとめる関数
-    const numbers = DRUG_LIST.flatMap((d) => [
-      parsed[d].initialDose,
-      parsed[d].soluteAmount,
-      parsed[d].solutionVolume,
-    ]);
-    if (numbers.some((v) => Number.isNaN(v))) {
-      setSnackbar('数値を正しく入力してください');
-      return;
-    }
-    try {
-      await setConfigs(parsed);
-      setSnackbar('保存しました');
-      onClose();
-    } catch {
-      setSnackbar('保存に失敗しました');
-    }
-  };
 
   const handleReset = async () => {
     await resetDrugToDefault(selectedDrug);
@@ -132,17 +105,16 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
 
   // 薬剤を表示対象とするかどうかを切り替える
   const toggleEnabled = async (drug: DrugType) => {
-    // 新しい状態を計算
+    // 新しい表示状態を計算
     const newEnabled = !localConfigs[drug].enabled;
     setLocalConfigs({
       ...localConfigs,
       [drug]: { ...localConfigs[drug], enabled: newEnabled },
     });
 
-    // 並び順を更新。表示しない薬剤は末尾へ移動
+    // 並び順を更新。非表示薬剤は末尾に集める
     const orderWithoutDrug = drugOrder.filter((d) => d !== drug);
     if (newEnabled) {
-      // 先頭から非表示の薬剤を探し、その直前に挿入
       const firstDisabled = orderWithoutDrug.findIndex(
         (d) => !localConfigs[d].enabled,
       );
@@ -152,6 +124,15 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       orderWithoutDrug.push(drug);
     }
     await setDrugOrder(orderWithoutDrug);
+  };
+
+  // 並び順から非表示薬剤を末尾へ移動させる処理
+  // 配列操作 (filter) は条件に合う要素だけを抜き出すメソッド
+  const normalizeOrder = (order: DrugType[]): DrugType[] => {
+    // filter で表示中の薬剤と非表示の薬剤を分ける
+    const enabled = order.filter((d) => localConfigs[d].enabled);
+    const disabled = order.filter((d) => !localConfigs[d].enabled);
+    return [...enabled, ...disabled];
   };
 
   return (
@@ -167,7 +148,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       <DraggableFlatList
         data={drugOrder}
         keyExtractor={(item) => item}
-        onDragEnd={({ data }) => setDrugOrder(data)}
+        onDragEnd={({ data }) => setDrugOrder(normalizeOrder(data))}
         renderItem={({ item, drag }) => {
           const textColor = localConfigs[item].enabled ? undefined : '#888';
           return (
@@ -201,14 +182,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         style={styles.list}
         contentContainerStyle={styles.scrollContainer}
       />
-      <View style={styles.buttonRow}>
-        <Button mode="contained" onPress={handleSave} style={styles.button}>
-          保存
-        </Button>
-        <Button onPress={onClose} style={styles.button}>
-          閉じる
-        </Button>
-      </View>
       <Portal>
         <Modal
           visible={editVisible}
