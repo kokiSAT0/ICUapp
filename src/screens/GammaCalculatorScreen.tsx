@@ -315,8 +315,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* スライダー（固定位置） */}
           <View style={styles.sliderContainer}>
-            {/* スライダーと 2 色バーを同じラッパーに入れる */}
-            <View style={styles.trackWrapper}>
             {/* ---- 安全域(緑) + 危険域(赤) の 2 色バー ---- */}
             <View pointerEvents="none" style={styles.trackOverlay}>
               <View style={[styles.safeBar,   { flexGrow: safeRatio }]} />
@@ -339,7 +337,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 // OS ごとに高さが異なるため固定値で統一
                 style={styles.slider}
               />
-            </View>
             <View style={styles.doseScale}>
               <Text>0</Text>
               <Text>
