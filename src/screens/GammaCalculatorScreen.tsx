@@ -23,7 +23,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // 流量・投与量表示を “中央基準から” 左にずらすオフセット(px)
 //   -80 はスマホ〜小型タブで程良い位置。端末幅に応じ調整可
 // ────────────────────────────────────────────────
-const DISPLAY_SHIFT = -50;
+const DISPLAY_SHIFT = -30;
 
 import {
   convertDoseToRate,
@@ -500,11 +500,11 @@ const styles = StyleSheet.create({
   /* ==== new ==== */
   /* ── 灰色ボックス ── */
   displayBox: {
-    width: "95%",
+    width: "90%",
     /* 桁数に合わせて自動サイズ。
        端末幅が広い場合でも “中央から DISPLAY_SHIFT だけ左” へ配置 */
     minWidth: 220,           // 必要に応じて調整
-    maxWidth: "90%",
+    maxWidth: "100%",
     backgroundColor: "#c0c0c0",
     borderRadius: 10,
     paddingVertical: 8,
