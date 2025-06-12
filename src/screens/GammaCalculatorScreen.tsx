@@ -19,17 +19,19 @@ import CompositionDialog from "@/components/CompositionDialog";
 
 import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
-// 流量・投与量表示を “中央基準から” 左にずらすオフセット(px)
-//   -80 はスマホ〜小型タブで程良い位置。端末幅に応じ調整可
+// 流量・投与量表示を “中央基準から” 左にずらすオフセット(%)
 // ────────────────────────────────────────────────
-const DISPLAY_SHIFT = -30;
+import { Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
+export const DISPLAY_SHIFT = -width * 0.1;
 
 import {
   convertDoseToRate,
   convertRateToDose,
   computeConcentration,
 } from "@/utils/flowConversion";
-import { useDrugConfigs } from "../contexts/DrugConfigContext";
+import { useDrugConfigs } from "@/contexts/DrugConfigContext";
 
 export type GammaCalculatorScreenProps = {};
 export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
