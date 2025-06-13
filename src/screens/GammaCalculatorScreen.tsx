@@ -422,7 +422,7 @@ function WeightBox(props: { value: number; onPress: () => void }) {
 const styles = StyleSheet.create({
   header: {
     alignItems: "center",
-    paddingVertical: 6,
+    paddingVertical: 4,
     position: "relative",
     width: "100%",
   },
@@ -441,11 +441,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 2,
     top: 0,
+    paddingBottom: 8,
     paddingHorizontal: 2,
   },
   infoCard: {
-    marginTop: 2,
-    padding: 12,
+    marginTop: 4,
+    padding: 6,
     borderRadius: 10,
     backgroundColor: "#d7d7d7",
     flexDirection: "row",   // 1 行に並べる
@@ -476,18 +477,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginTop: 8,
     /* 矢印を灰色ボックスの上下に“はみ出さず”置くため縦方向の余白を拡張 */
-    paddingHorizontal: 12,
-    paddingTop: 48, // ▲ の高さぶん余白を確保
-    paddingBottom: 48, // ▼ の高さぶん余白を確保
+    paddingHorizontal: 8,
+    paddingTop: 28, // ▲ の高さぶん余白を確保
+    paddingBottom: 28, // ▼ の高さぶん余白を確保
     borderRadius: 10,
     backgroundColor: "#daf7f9",
     alignItems: "center",
   },
   flowCardGreen: {
-    margin: 8,
-    paddingHorizontal: 12,
-    paddingTop: 48,
-    paddingBottom: 40,
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingTop: 28,
+    paddingBottom: 28,
     borderRadius: 10,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
@@ -500,7 +502,7 @@ const styles = StyleSheet.create({
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
   arrowRowTop: {
     position: "absolute",
-    top: 10,
+    top: -8,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -508,14 +510,13 @@ const styles = StyleSheet.create({
   /* ▼ を桁の真下に配置 (ml/h 用) */
   arrowRowBottom: {
     position: "absolute",
-    bottom: 10,
+    bottom: -10,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
   },
 
   /* ▲▼ を桁の中央に置くためのラッパー */
-
   /* 子セル: flex 1 で中央寄せしつつ、左右に桁間の半分ずつ余白 */
   arrowCell: {
     alignItems: "center",
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    top: 125, // ↕ スライダーの上に来る
+    top: 105, // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
@@ -564,7 +565,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     width: "100%",
     alignSelf: "center",
-    marginTop: 50,
+    marginTop: 30,
     position: "relative",
     height: 40,
   },
@@ -590,7 +591,6 @@ const styles = StyleSheet.create({
   },
   /* 危険域 (右側) */
   dangerBar: {
-    height: 4,
     backgroundColor: "red",
   },
   doseScale: {
