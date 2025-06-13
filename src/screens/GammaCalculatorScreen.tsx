@@ -477,17 +477,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginTop: 8,
     /* 矢印を灰色ボックスの上下に“はみ出さず”置くため縦方向の余白を拡張 */
-    paddingHorizontal: 12,
-    paddingTop: 48, // ▲ の高さぶん余白を確保
-    paddingBottom: 48, // ▼ の高さぶん余白を確保
+    paddingHorizontal: 8,
+    paddingTop: 28, // ▲ の高さぶん余白を確保
+    paddingBottom: 28, // ▼ の高さぶん余白を確保
     borderRadius: 10,
     backgroundColor: "#daf7f9",
     alignItems: "center",
   },
   flowCardGreen: {
-    margin: 8,
-    paddingHorizontal: 12,
-    paddingTop: 48,
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingTop: 28,
     paddingBottom: 40,
     borderRadius: 10,
     backgroundColor: "#ddf9e8",
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
   arrowRowTop: {
     position: "absolute",
-    top: 10,
+    top: -8,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -509,7 +510,7 @@ const styles = StyleSheet.create({
   /* ▼ を桁の真下に配置 (ml/h 用) */
   arrowRowBottom: {
     position: "absolute",
-    bottom: 10,
+    bottom: -10,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    top: 125, // ↕ スライダーの上に来る
+    top: 105, // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
