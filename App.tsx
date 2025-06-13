@@ -28,12 +28,17 @@ export default function App(_: AppProps) {
   const [fontsLoaded] = useFonts({
     DSEG7Classic: require("./assets/fonts/DSEG7Classic.ttf"),
   });
-  if (!fontsLoaded) return null;
-
-  // AdMob SDK を初期化する
+  // フックは常に同じ順序で呼び出す必要があるため、
+  // フォントが未読込みの場合でも useEffect を先に宣言しておく
   React.useEffect(() => {
-    mobileAds().initialize();
-  }, []);
+    if (fontsLoaded) {
+      // AdMob SDK を初期化する
+      mobileAds().initialize();
+    }
+  }, [fontsLoaded]);
+
+  // フォント読込みが終わるまでは何も表示しない
+  if (!fontsLoaded) return null;
 
   return (
     // GestureHandlerRootView でジェスチャー操作を有効化する
