@@ -16,6 +16,7 @@ import GammaCalculatorScreen, {
 } from './src/screens/GammaCalculatorScreen';
 import WebViewScreen from './src/screens/WebViewScreen';
 import { DrugConfigProvider } from './src/contexts/DrugConfigContext';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 // アプリのエントリーポイント
 export type AppProps = {};
@@ -38,8 +39,9 @@ export default function App(_: AppProps) {
         {/* PaperProvider は内部で SafeAreaProvider をラップしている */}
         <DrugConfigProvider>
           <PaperProvider>
-            <NavigationContainer>
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <ErrorBoundary>
+              <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {/* ホーム画面を GammaCalculatorScreen に変更 */}
                 <Stack.Screen
                   name="Home"
@@ -57,8 +59,9 @@ export default function App(_: AppProps) {
                     gestureEnabled: true,
                   }}
                 />
-              </Stack.Navigator>
-            </NavigationContainer>
+                </Stack.Navigator>
+              </NavigationContainer>
+            </ErrorBoundary>
           </PaperProvider>
         </DrugConfigProvider>
       </SafeAreaProvider>
