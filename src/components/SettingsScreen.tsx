@@ -54,7 +54,6 @@ export type SettingsScreenProps = {
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const {
     configs,
-    setConfigs,
     resetDrugToDefault,
     drugOrder,
     setDrugOrder,
