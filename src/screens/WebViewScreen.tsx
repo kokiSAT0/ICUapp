@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
+import DrugConfigSnackbar from '@/components/DrugConfigSnackbar';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 
@@ -27,6 +28,8 @@ export default function WebViewScreen({ route }: WebViewScreenProps) {
       </Appbar.Header>
       {/* WebView で PDF や Web ページを表示 */}
       <WebView source={{ uri: route.params.uri }} style={styles.webview} />
+      {/* 共有エラーメッセージ用 */}
+      <DrugConfigSnackbar />
     </View>
   );
 }

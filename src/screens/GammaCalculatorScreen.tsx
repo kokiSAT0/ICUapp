@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import DigitalNumber from "@/components/DigitalNumber";
 import { IconButton } from "react-native-paper";
 import CompositionDialog from "@/components/CompositionDialog";
+import DrugConfigSnackbar from "@/components/DrugConfigSnackbar";
 
 import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
@@ -395,6 +396,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         weightKg={weightKg}
         onSubmit={handleSubmitValues}
       />
+      {/* AsyncStorage エラー通知用 */}
+      <DrugConfigSnackbar />
     </SafeAreaView>
   );
 }
