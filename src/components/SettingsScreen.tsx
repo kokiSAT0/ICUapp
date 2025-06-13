@@ -158,8 +158,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     // SafeAreaView で余白が二重にならないよう top を除外
     <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
     <Surface style={styles.container}>
-      {/* ヘッダー。左に戻るボタン、右にヘルプボタンを配置 */}
-      <Appbar.Header>
+      {/* ヘッダー。メイン画面と高さをそろえるためスタイルを指定 */}
+      <Appbar.Header style={styles.header}>
         <Appbar.BackAction onPress={handleClose} />
         <Appbar.Content title="設定" />
         <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
@@ -330,4 +330,11 @@ const styles = StyleSheet.create({
   titleArea: { flex: 1, paddingVertical: 12 },
   // 薬剤名テキストのスタイル
   itemTitle: { fontSize: 16 },
+  // メイン画面とそろえたヘッダーのスタイル
+  header: {
+    alignItems: 'center',
+    paddingVertical: 4,
+    width: '100%',
+    minHeight: 40,
+  },
 });
