@@ -45,9 +45,19 @@ export default function CompositionDialog({
 
     /*
      * 入力チェック
+     * - 数値に変換できるか？
      * - 組成(溶質量・溶液量)は 0 より大きいか？
      * - 体重は 1～200 の範囲か？
      */
+    if (
+      Number.isNaN(doseVal) ||
+      Number.isNaN(volumeVal) ||
+      Number.isNaN(weightVal)
+    ) {
+      // 数値以外が入力された場合はエラーを表示
+      Alert.alert('入力エラー', '値は必ず数値で入力してください');
+      return;
+    }
     if (doseVal <= 0 || volumeVal <= 0 || weightVal < 1 || weightVal > 200) {
       // Alert でエラーメッセージを表示して処理を中断
       Alert.alert('入力エラー', '体重は1～200kg、組成は正の数で入力してください。');
