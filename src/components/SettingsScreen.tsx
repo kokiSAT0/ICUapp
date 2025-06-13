@@ -47,6 +47,16 @@ const toInputConfig = (cfg: DrugConfig): DrugConfigInput => ({
   dangerDose: cfg.dangerDose !== undefined ? String(cfg.dangerDose) : '',
 });
 
+// 入力用設定から数値を取り出して元の型へ戻す
+const fromInputConfig = (cfg: DrugConfigInput): DrugConfig => ({
+  ...cfg,
+  initialDose: parseFloat(cfg.initialDose) || 0,
+  soluteAmount: parseFloat(cfg.soluteAmount) || 0,
+  solutionVolume: parseFloat(cfg.solutionVolume) || 0,
+  doseMax: parseFloat(cfg.doseMax) || 0,
+  dangerDose: cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined,
+});
+
 
 export type SettingsScreenProps = {
   onClose: () => void;
@@ -55,6 +65,7 @@ export type SettingsScreenProps = {
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const {
     configs,
+    setConfigs,
     resetDrugToDefault,
     drugOrder,
     setDrugOrder,
@@ -81,8 +92,21 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   // ヘルプダイアログの表示状態
   const [helpVisible, setHelpVisible] = useState(false);
 
-  // 画面を閉じる際に並び順を保存する
+  // ローカル設定を保存するヘルパー
+  const saveConfigs = async () => {
+    const updated: Record<DrugType, DrugConfig> = DRUG_LIST.reduce(
+      (acc, key) => {
+        acc[key] = fromInputConfig(localConfigs[key]);
+        return acc;
+      },
+      {} as Record<DrugType, DrugConfig>,
+    );
+    await setConfigs(updated);
+  };
+
+  // 画面を閉じる際に編集内容を保存する
   const handleClose = async () => {
+    await saveConfigs();
     // 表示中の薬剤と非表示薬剤に分ける
     const enabledDrugs: DrugType[] = [];
     const disabledDrugs: DrugType[] = [];
@@ -262,7 +286,14 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   <Button mode="outlined" onPress={handleReset} style={styles.button}>
                     デフォルトに戻す
                   </Button>
-                  <Button mode="contained" onPress={() => setEditVisible(false)} style={styles.button}>
+                  <Button
+                    mode="contained"
+                    onPress={async () => {
+                      await saveConfigs();
+                      setEditVisible(false);
+                    }}
+                    style={styles.button}
+                  >
                     閉じる
                   </Button>
                 </View>
