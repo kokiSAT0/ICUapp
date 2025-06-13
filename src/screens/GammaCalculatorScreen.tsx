@@ -400,24 +400,6 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   );
 }
 
-/* ===== 数値入力可能なラベル ===== */
-function EditableBox(props: { value: number; onPress: () => void }) {
-  return (
-    <Pressable onPress={props.onPress}>
-      <Text style={styles.editableBox}>{props.value}</Text>
-    </Pressable>
-  );
-}
-
-/* ===== 体重専用：値を大きくし、kg を右下に配置 ===== */
-function WeightBox(props: { value: number; onPress: () => void }) {
-  return (
-    <Pressable onPress={props.onPress} style={styles.weightBox}>
-      <Text style={styles.weightValue}>{props.value}</Text>
-    </Pressable>
-  );
-}
-
 /* ===== StyleSheet ===== */
 const styles = StyleSheet.create({
   header: {
@@ -440,7 +422,7 @@ const styles = StyleSheet.create({
   settingBtn: {
     position: "absolute",
     right: 2,
-    top: 0,
+    top: -2,
     paddingBottom: 8,
     paddingHorizontal: 2,
   },
