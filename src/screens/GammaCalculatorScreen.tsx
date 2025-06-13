@@ -422,7 +422,7 @@ function WeightBox(props: { value: number; onPress: () => void }) {
 const styles = StyleSheet.create({
   header: {
     alignItems: "center",
-    paddingVertical: 6,
+    paddingVertical: 4,
     position: "relative",
     width: "100%",
   },
@@ -441,11 +441,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 2,
     top: 0,
+    paddingBottom: 8,
     paddingHorizontal: 2,
   },
   infoCard: {
-    marginTop: 2,
-    padding: 12,
+    marginTop: 4,
+    padding: 6,
     borderRadius: 10,
     backgroundColor: "#d7d7d7",
     flexDirection: "row",   // 1 行に並べる
