@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingHorizontal: 8,
     paddingTop: 28,
-    paddingBottom: 40,
+    paddingBottom: 28,
     borderRadius: 10,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
@@ -517,7 +517,6 @@ const styles = StyleSheet.create({
   },
 
   /* ▲▼ を桁の中央に置くためのラッパー */
-
   /* 子セル: flex 1 で中央寄せしつつ、左右に桁間の半分ずつ余白 */
   arrowCell: {
     alignItems: "center",
@@ -566,7 +565,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     width: "100%",
     alignSelf: "center",
-    marginTop: 50,
+    marginTop: 30,
     position: "relative",
     height: 40,
   },
@@ -592,7 +591,6 @@ const styles = StyleSheet.create({
   },
   /* 危険域 (右側) */
   dangerBar: {
-    height: 4,
     backgroundColor: "red",
   },
   doseScale: {
