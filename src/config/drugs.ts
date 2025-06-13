@@ -5,17 +5,17 @@
 export const DRUG_LIST = [
   "norepinephrine",
   "dopamine",
-  "dexmedetomidine",
-  "fentanyl",
-  "remifentanil",
-  "propofol",
-  "rocuronium",
   "dobutamine",
+  "milrinone",
   "nicardipine",
   "nitroglycerin",
-  "phenylephrine",
-  "milrinone",
   "landiolol",
+  "dexmedetomidine",
+  "propofol",
+  "midazolam",
+  "fentanyl",
+  "remifentanil",
+  "rocuronium",
 ] as const;
 
 // DRUG_LIST の要素を使って型を生成
@@ -54,7 +54,7 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     doseMax: 0.3,
     dangerDose: 0.2,
     description:
-      "通常0.01\uFF5E0.2µg/kg/minであるが，さらに高用量が必要なこともある．血圧を経時的に測定し，適宜調節する．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+      "通常0.01\uFF5E0.2µg/kg/minであるが、さらに高用量が必要なこともある。血圧を経時的に測定し、適宜調節する。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
   dopamine: {
@@ -68,7 +68,7 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     doseMax: 20,
     dangerDose: 10,
     description:
-      "循環維持を目的とした一般的な初期投与量は3\uFF5E5µg/kg/minであり，患者の心拍出量，血圧，心拍数および尿量により適宜増減する．患者の病態に応じて，最大20µg/kg/minまで増量することができるが，8\uFF5E10µg/kg/min以上では血管抵抗の上昇が強くなるので，さらなる心収縮力の増強を期待する場合は他の薬剤との併用を考慮する．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+      "循環維持を目的とした一般的な初期投与量は3\uFF5E5µg/kg/minであり、患者の心拍出量、血圧、心拍数および尿量により適宜増減する。患者の病態に応じて、最大20µg/kg/minまで増量することができるが、8\uFF5E10µg/kg/min以上では血管抵抗の上昇が強くなるので、さらなる心収縮力の増強を期待する場合は他の薬剤との併用を考慮する。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
   dexmedetomidine: {
@@ -82,154 +82,68 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     doseMax: 1.2,
     dangerDose: 0.7,
     description:
-      "初期負荷投与は通常行わないが，実施する場合は循環動態の変動に十分注意する．維持投与速度は，0.2\uFF5E0.7µg/kg/hrを目安とするが，目的とする鎮静度を得るために，より多量を必要とする症例もある．(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+      "初期負荷投与は通常行わないが、実施する場合は循環動態の変動に十分注意する。維持投与速度は、0.2\uFF5E0.7µg/kg/hrを目安とするが、目的とする鎮静度を得るために、より多量を必要とする症例もある。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
   fentanyl: {
     label: "フェンタニル",
-    // ICU・術後鎮痛で一般的に用いられる体重当たり投与速度
     doseUnit: "µg/kg/hr",
-    initialDose: 1, // 推奨初期設定：1 µg/kg/hr
-    soluteAmount: 1000, // 1 mg（=1000 µg）を
+    initialDose: 1,
+    soluteAmount: 1000,
     soluteUnit: "µg",
-    solutionVolume: 100, // 100 mL で調製
+    solutionVolume: 100,
     doseMin: 0,
-    doseMax: 6, // ガイドライン上の上限 5 µg/kg/hr を少し余裕を見て
-    dangerDose: 5,
+    doseMax: 5,
+    dangerDose: 2,
     description:
-      "術後鎮痛では通常1〜2 µg/kg/hrで開始し、呼吸抑制・徐脈に注意しながら0.5〜5 µg/kg/hrで調節する。大量投与では胸壁筋硬直が起こり得る。日本麻酔科学会医薬品ガイドライン第3版4訂より。", // :contentReference[oaicite:0]{index=0}
+      "術後痛に対しては、初回投与量として1\uFF5E2μg/kg を静注し、引き続き1\uFF5E2μg/kg/hr で持続静注する。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
 
   remifentanil: {
     label: "レミフェンタニル",
-    // 全身麻酔維持で用いる投与速度
     doseUnit: "µg/kg/min",
-    initialDose: 0.25, // 推奨初期設定：0.25 µg/kg/min
-    soluteAmount: 2, // 2 mg を（添付製剤 2 mg/バイアルを）
-    soluteUnit: "mg",
-    solutionVolume: 20, // 20 mL シリンジで調製（100 µg/mL）
-    doseMin: 0,
-    doseMax: 1, // 実臨床では 0.05〜1 µg/kg/min が多い
-    dangerDose: 0.5,
-    description:
-      "全身麻酔維持には0.25〜0.5 µg/kg/minで開始し、循環動態に応じて0.05〜1 µg/kg/minの範囲で調節する。投与中止後は速やかに効果が消失するため、終了前に術後鎮痛薬を準備する。日本麻酔科学会医薬品ガイドライン第3版4訂より。", // :contentReference[oaicite:1]{index=1}
-    enabled: true,
-  },
-  /* ──── 1. プロポフォール（1 %＝10 mg/mL 原液） ──── */
-  propofol: {
-    label: "プロポフォール",
-    doseUnit: "mg/kg/hr",
-    initialDose: 4, // 全身麻酔維持の推奨開始速度 4 mg/kg/hr :contentReference[oaicite:0]{index=0}
-    soluteAmount: 500, // 50 mL シリンジに原液を充填（10 mg/mL × 50 mL）
-    soluteUnit: "mg",
-    solutionVolume: 50, // mL
-    doseMin: 0, // ICU 鎮静 0.5 mg/kg/hr から使用可 :contentReference[oaicite:1]{index=1}
-    doseMax: 10, // 麻酔維持上限 10 mg/kg/hr :contentReference[oaicite:2]{index=2}
-    dangerDose: 8, // 8 mg/kg/hr 超で警告
-    description:
-      "全身麻酔維持では通常 4–10 mg/kg/hr の範囲で調節する。人工呼吸管理下の ICU 鎮静では 0.5–3 mg/kg/hr が目安。血圧低下・呼吸抑制に十分注意し、5 分毎の血圧監視とSpO₂連続監視を行う。", //
-    enabled: true,
-  },
-
-  /* ──── 2. ロクロニウム（10 mg/mL 原液） ──── */
-  rocuronium: {
-    label: "ロクロニウム",
-    doseUnit: "µg/kg/min",
-    initialDose: 7, // ガイドライン推奨の開始速度 7 µg/kg/min :contentReference[oaicite:3]{index=3}
-    soluteAmount: 50,
-    soluteUnit: "mg",
-    solutionVolume: 5, // mL
-    doseMin: 3,
-    doseMax: 16, // 文献上の臨床最大 16 µg/kg/min（迅速導入後の補正を考慮） :contentReference[oaicite:4]{index=4}
-    dangerDose: 12,
-    description:
-      "持続注入は 7 µg/kg/min で開始し、筋弛緩モニター（TOF, PTC）を参考に 3–16 µg/kg/min で調節する。深筋弛緩の維持時は高用量となり循環抑制に留意。拮抗にはスガマデクスが第一選択。", //
-    enabled: true,
-  },
-  /* ──── 1. ドブタミン ──── */
-  dobutamine: {
-    label: "ドブタミン",
-    doseUnit: "µg/kg/min",
-    initialDose: 5, // 標準開始 5 µg/kg/min :contentReference[oaicite:0]{index=0}
-    soluteAmount: 150,
-    soluteUnit: "mg",
-    solutionVolume: 50,
-    doseMin: 0,
-    doseMax: 20,
-    dangerDose: 5,
-    description:
-      "強心作用により心拍出量を増加させる。1–20 µg/kg/min の範囲で循環動態に応じて調節する。高用量では頻脈・不整脈に注意。", // :contentReference[oaicite:1]{index=1}
-    enabled: true,
-  },
-
-  /* ──── 2. ニカルジピン ──── */
-  nicardipine: {
-    label: "ニカルジピン",
-    doseUnit: "mg/hr",
-    initialDose: 5, // 5 mg/hr で開始 :contentReference[oaicite:2]{index=2}
-    soluteAmount: 20,
+    initialDose: 0.025,
+    soluteAmount: 2,
     soluteUnit: "mg",
     solutionVolume: 20,
     doseMin: 0,
-    doseMax: 15,
-    dangerDose: 10,
+    doseMax: 0.5,
+    dangerDose: 0.2,
     description:
-      "持続血圧管理の第一選択Ca拮抗薬。5 mg/hr から開始し、2.5 mg/hr ごとに5–15分間隔で増量。末梢投与の場合は12 時間毎にルート変更。", // :contentReference[oaicite:3]{index=3}
+      "集中治療における人工呼吸中の鎮痛:通常、成人には、レミフェンタニルとして0.025µg/kg/分の速さで持続静脈内投与を開始し、患者の全身状態を観察しながら、適切な鎮痛が得られるよう、投与速度を適宜調節する。投与速度の調節は5分以上の間隔で、0.1µg/kg/分までは最大0.025µg/kg/分ずつ加速又は減速させ、0.1µg/kg/分を超える場合は25\uFF5E50%の範囲で加速又は最大25%の範囲で減速させるが、投与速度の上限は0.5µg/kg/分とする。(添付文書)",
     enabled: true,
   },
-
-  /* ──── 3. ニトログリセリン ──── */
-  nitroglycerin: {
-    label: "ニトログリセリン",
-    doseUnit: "µg/kg/min",
-    initialDose: 0.25, // 0.25–0.5 µg/kg/min で開始 :contentReference[oaicite:4]{index=4}
-    soluteAmount: 50,
+  propofol: {
+    label: "プロポフォール",
+    doseUnit: "mg/kg/hr",
+    initialDose: 1,
+    soluteAmount: 500,
     soluteUnit: "mg",
-    solutionVolume: 100,
+    solutionVolume: 50,
     doseMin: 0,
     doseMax: 5,
     dangerDose: 3,
     description:
-      "前負荷軽減・冠血流増加目的に用いる。0.25–5 µg/kg/min の範囲で3–5 分毎に漸増し、血圧低下・頭痛に注意。", // :contentReference[oaicite:5]{index=5}
+      "プロポフォールを用いた集中治療における人工呼吸中の鎮静量は0.5 ～3mg/kg/hr である。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
-
-  /* ──── 4. フェニレフリン ──── */
-  phenylephrine: {
-    label: "フェニレフリン",
+  rocuronium: {
+    label: "ロクロニウム",
     doseUnit: "µg/kg/min",
-    initialDose: 0.5, // 0.5–1.4 µg/kg/min 維持 :contentReference[oaicite:6]{index=6}
-    soluteAmount: 1,
+    initialDose: 7,
+    soluteAmount: 50,
     soluteUnit: "mg",
-    solutionVolume: 10,
-    doseMin: 0,
-    doseMax: 3,
-    dangerDose: 2,
+    solutionVolume: 5,
+    doseMin: 3,
+    doseMax: 12,
+    dangerDose: 10,
     description:
-      "純α刺激で血圧を上げる。0.1–3 µg/kg/min を目安に、過大投与では末梢虚血や反射性徐脈に注意。", // :contentReference[oaicite:7]{index=7}
+      "持続注入により投与する場合は、7μg/kg/min の投与速度で持続注入を開始する。年齢、症状に応じて適宜増減する。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
-
-  /* ──── 5. ミルリノン ──── */
-  milrinone: {
-    label: "ミルリノン",
-    doseUnit: "µg/kg/min",
-    initialDose: 0.375, // 0.375 µg/kg/min 開始 :contentReference[oaicite:8]{index=8}
-    soluteAmount: 10,
-    soluteUnit: "mg",
-    solutionVolume: 10,
-    doseMin: 0.25,
-    doseMax: 1,
-    dangerDose: 0.75,
-    description:
-      "PDEⅢ阻害による強心・血管拡張薬。0.25–0.75 µg/kg/min で心拍出量と末梢抵抗を調節。低血圧・不整脈に注意し、腎機能で用量調整が必要。", // :contentReference[oaicite:9]{index=9}
-    enabled: true,
-  },
-
-  /* ──── 6. ランジオロール ──── */
-  landiolol: {
-    label: "ランジオロール",
+  dobutamine: {
+    label: "ドブタミン",
     doseUnit: "µg/kg/min",
     initialDose: 2,
     soluteAmount: 150,
@@ -239,7 +153,77 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     doseMax: 20,
     dangerDose: 10,
     description:
-      "超短時間作用型β₁遮断薬。頻拍性不整脈や心拍数コントロールに用い、循環機能が良好な患者に緊急処置として投与する場合5～20μg/kg/min で持続静注する。循環機能が不良な患者では，最初から1～10μg/kg/min で持続静注を開始し，循環動態監視下に投与量を調節するのがよい。", // :contentReference[oaicite:11]{index=11}
+      "初期量として2\uFF5E10μg/kg/min で投与されるが、0.5μg/kg/min で効果が発現することもある。また、必要に応じて20μg/kg/minまで増量することができる。心拍数、血圧、尿量、心拍出量などの推移をみながら増減する。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  nicardipine: {
+    label: "ニカルジピン",
+    doseUnit: "µg/kg/min",
+    initialDose: 2,
+    soluteAmount: 20,
+    soluteUnit: "mg",
+    solutionVolume: 20,
+    doseMin: 0,
+    doseMax: 15,
+    dangerDose: 3,
+    description:
+      "成人では2\uFF5E10μg/kg/minの速度で開始し、目標値まで血圧を下げ、以後、血圧を監視しながら速度を調節する。緩徐な血圧下降をはかるときは、0.5\uFF5E2μg/kg/minで開始する。維持速度は0.5\uFF5E3μg/kg/minである。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  nitroglycerin: {
+    label: "ニトログリセリン",
+    doseUnit: "µg/kg/min",
+    initialDose: 0.1,
+    soluteAmount: 50,
+    soluteUnit: "mg",
+    solutionVolume: 100,
+    doseMin: 0,
+    doseMax: 5,
+    dangerDose: 2,
+    description:
+      "不安定狭心症では0.1\uFF5E0.2μg/kg/minで開始し、発作の経過、血圧をみながら約5分ごとに0.1\uFF5E0.2μg/kg/minずつ増量し、1\uFF5E2μg/kg/minで維持する(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  milrinone: {
+    label: "ミルリノン",
+    doseUnit: "µg/kg/min",
+    initialDose: 0.1,
+    soluteAmount: 10,
+    soluteUnit: "mg",
+    solutionVolume: 10,
+    doseMin: 0,
+    doseMax: 0.3,
+    dangerDose: 0.75,
+    description:
+      "高用量での血圧低下や不整脈発生などの副作用を避けるために、最近では、低用量の0.1μg/kg/min で開始し、0.2\uFF5E0.3μg/kg/minを目標とすることで症状の改善が得られるという米国のガイドラインが策定されているように、初期負荷投与を行わずに最初から持続投与を行うことが多くなっている。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  landiolol: {
+    label: "ランジオロール",
+    doseUnit: "µg/kg/min",
+    initialDose: 1,
+    soluteAmount: 150,
+    soluteUnit: "mg",
+    solutionVolume: 50,
+    doseMin: 0,
+    doseMax: 20,
+    dangerDose: 10,
+    description:
+      "循環機能が不良な患者では、最初から1\uFF5E10μg/kg/min で持続静注を開始し、循環動態監視下に投与量を調節するのがよい。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
+    enabled: true,
+  },
+  midazolam: {
+    label: "ミダゾラム",
+    doseUnit: "mg/kg/hr",
+    initialDose: 0.03,
+    soluteAmount: 10,
+    soluteUnit: "mg",
+    solutionVolume: 10,
+    doseMin: 0,
+    doseMax: 0.3,
+    dangerDose: 0.18,
+    description:
+      "集中治療における人工呼吸中の鎮静では、通常、成人には0.03\uFF5E0.06mg/kg/hrより持続静注を開始し、患者の鎮静状態をみながら適宜増減する。（0.03\uFF5E0.18mg/kg/hr の範囲が推奨される）。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
     enabled: true,
   },
 };
