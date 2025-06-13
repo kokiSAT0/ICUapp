@@ -75,6 +75,20 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
     [doseMg, volumeMl, drug.soluteUnit]
   );
 
+  // ───────────────────────────────────────
+  // dangerDose → ml/h 換算値を計算
+  // ───────────────────────────────────────
+  const dangerDoseVal = drug.dangerDose;   // 高容量閾値 (μg/kg/min 等)
+  const dangerFlowMlH = useMemo(() => {
+    if (dangerDoseVal === undefined) return null;
+    return convertDoseToRate(
+      dangerDoseVal,
+      weightKg,
+      concentration,
+      drug.doseUnit
+    );
+  }, [dangerDoseVal, weightKg, concentration, drug.doseUnit]);
+
   // スライダー刻み幅：流量 0.1 ml/h 分の投与量に変換
   const doseSliderStep = useMemo(
     () => convertRateToDose(0.1, weightKg, concentration, drug.doseUnit),
@@ -190,7 +204,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 style={styles.centerButton}
                 onPress={() => setDrugMenuVisible(true)}
               >
-                <Text variant="titleMedium" style={{ fontWeight: "bold" }}>
+                <Text variant="titleMedium" style={{fontSize: 20, fontWeight: "normal" }}>
                   {drug.label}
                 </Text>
               </Pressable>
@@ -273,13 +287,13 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
         </Surface>
 
         {/* ===== ③ 投与量 ===== */}
-        <Surface
-          elevation={2}
-          style={[
-            styles.flowCardGreen,
-            showDanger && styles.flowCardGreenExpanded,
-          ]}
-        >
+          <Surface
+            elevation={2}
+            style={[
+              styles.flowCardGreen,
+              showDanger && styles.flowCardDanger,      // ★ 背景色を上書き
+            ]}
+          >
           {/* ▲ 上段：3 桁ぶん */}
           <View style={styles.arrowRowTop}>
             {doseSteps.map((_, i) => (
@@ -345,13 +359,25 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
                 {drug.doseUnit}
               </Text>
             </View>
-            {/* 危険域メッセージ：スライダーのすぐ下に表示 */}
-            {showDanger && (
-              <Text style={styles.dangerMessage}>
-                高用量です。注意して投与して下さい。
-              </Text>
-            )}
           </View>
+        </Surface>
+
+        {/* ===== DangerDose Card ===== */}
+        <Surface elevation={1} style={styles.dangerCard}>
+          <Text style={styles.infoText}>閾値 :</Text>
+
+          {/* 閾値が無い薬剤では “—” 表示 */}
+          <Text style={[styles.infoText, styles.dangerBox]}>
+            {dangerDoseVal !== undefined
+              ? `${dangerDoseVal}${drug.doseUnit}`
+              : '—'}
+          </Text>
+
+          <Text style={styles.infoText}> = </Text>
+
+          <Text style={[styles.infoText, styles.dangerBox]}>
+            {dangerFlowMlH !== null ? `${dangerFlowMlH.toFixed(1)} ml/h` : '—'}
+          </Text>
         </Surface>
 
         {/* ===== ④ 添付文書 / 補足説明 ===== */}
@@ -415,11 +441,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 2,
     top: 0,
+    paddingBottom: 4,
     paddingHorizontal: 2,
   },
   infoCard: {
     marginTop: 2,
-    padding: 12,
+    padding: 8,
     borderRadius: 10,
     backgroundColor: "#d7d7d7",
     flexDirection: "row",   // 1 行に並べる
@@ -450,9 +477,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginTop: 8,
     /* 矢印を灰色ボックスの上下に“はみ出さず”置くため縦方向の余白を拡張 */
-    paddingHorizontal: 12,
-    paddingTop: 48, // ▲ の高さぶん余白を確保
-    paddingBottom: 48, // ▼ の高さぶん余白を確保
+    paddingHorizontal: 8,
+    paddingTop: 40, // ▲ の高さぶん余白を確保
+    paddingBottom: 40, // ▼ の高さぶん余白を確保
     borderRadius: 10,
     backgroundColor: "#daf7f9",
     alignItems: "center",
@@ -460,21 +487,21 @@ const styles = StyleSheet.create({
   flowCardGreen: {
     margin: 8,
     paddingHorizontal: 12,
-    paddingTop: 48,
-    paddingBottom: 40,
+    paddingTop: 40,
+    paddingBottom: 36,
     borderRadius: 10,
     backgroundColor: "#ddf9e8",
     alignItems: "center",
   },
-  /* 危険メッセージぶん下に余白を追加 */
-  flowCardGreenExpanded: {
-    paddingBottom: 80,
+  /* ★ 高容量時：背景を淡い赤に上書き */
+  flowCardDanger: {
+    backgroundColor: '#ffecec',    // 好みで #ffefef などに調整
   },
   /* ── ▲▼ を数字の上・下に均等配置 ── */
   /* ▲ を桁の真上に配置（数字列の中央を基準に等間隔） */
   arrowRowTop: {
     position: "absolute",
-    top: 10,
+    top: 6,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
@@ -482,14 +509,11 @@ const styles = StyleSheet.create({
   /* ▼ を桁の真下に配置 (ml/h 用) */
   arrowRowBottom: {
     position: "absolute",
-    bottom: 10,
+    bottom: 4,
     flexDirection: "row",
     justifyContent: "center",
     zIndex: 10,
   },
-
-  /* ▲▼ を桁の中央に置くためのラッパー */
-
   /* 子セル: flex 1 で中央寄せしつつ、左右に桁間の半分ずつ余白 */
   arrowCell: {
     alignItems: "center",
@@ -502,7 +526,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
-    top: 125, // ↕ スライダーの上に来る
+    top: 115, // ↕ スライダーの上に来る
     zIndex: 10,
   },
   /* ==== new ==== */
@@ -540,11 +564,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 50,
     position: "relative",
-    height: 40,
+    height: 20,
   },
   // スライダー自体の高さを一定に保つ
   slider: {
-    height: 40,
+    height: 20,
   },
   /* 2 色バー全体をスライダー中央に重ねる */
   trackOverlay: {
@@ -567,15 +591,28 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: "red",
   },
-  // 危険域メッセージのスタイル
-  dangerMessage: {
-    color: "red",
-    marginTop: 8,
-    alignSelf: "center",
-  },
   doseScale: {
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  dangerCard: {
+    marginHorizontal: 8,
+    marginTop: 2,
+    padding: 6,
+    borderRadius: 10,
+    backgroundColor: '#f9e4e4',  // 任意：薄い赤で注意を示す
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dangerBox: {
+    backgroundColor: '#f9e4e4',  // 任意：薄い赤で注意を示す
+    paddingHorizontal: 8,
+    borderRadius: 2,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginHorizontal: 2,
+    fontSize: 16,
   },
   brochure: {
     margin: 8,
