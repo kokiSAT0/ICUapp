@@ -6,17 +6,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
-    "jsEngine": "jsc",
+    "newArchEnabled": true,
+    "jsEngine": "hermes",
     "plugins": [
       [
         "expo-build-properties",
         {
           "ios": {
-            "jsEngine": "jsc"
+            "jsEngine": "hermes"
           },
           "android": {
-            "jsEngine": "jsc"
+            "jsEngine": "hermes"
           }
         }
       ]
