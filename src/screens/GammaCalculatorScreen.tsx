@@ -102,16 +102,35 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
   /** ml/h 変更時に投与量を自動更新する */
   const updateFromFlow = (value: number): void => {
     const flow = Math.max(0, +value.toFixed(1));
-    setFlowMlH(flow);
     const d = convertRateToDose(flow, weightKg, concentration, drug.doseUnit);
-    setDose(+d.toFixed(2));
+    // 流量から換算した投与量が上限を超えた場合は doseMax に丸める
+    if (d > doseMax) {
+      setDose(doseMax);
+      const maxFlow = convertDoseToRate(
+        doseMax,
+        weightKg,
+        concentration,
+        drug.doseUnit
+      );
+      setFlowMlH(+maxFlow.toFixed(1));
+    } else {
+      setFlowMlH(flow);
+      setDose(+d.toFixed(2));
+    }
   };
 
   /** 投与量変更時に ml/h を自動更新する */
   const updateFromDose = (value: number): void => {
+    // 入力値が上限を超えたら doseMax に制限する
     const d = Math.max(0, +value.toFixed(2));
-    setDose(d);
-    const flow = convertDoseToRate(d, weightKg, concentration, drug.doseUnit);
+    const capped = Math.min(d, doseMax);
+    setDose(capped);
+    const flow = convertDoseToRate(
+      capped,
+      weightKg,
+      concentration,
+      drug.doseUnit
+    );
     setFlowMlH(+flow.toFixed(1));
   };
 
