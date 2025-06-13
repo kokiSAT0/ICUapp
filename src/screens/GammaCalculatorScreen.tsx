@@ -223,7 +223,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* 右側：設定アイコン（IconButton に置換） */}
           <IconButton
-            icon="cog-outline"              // ← ここをお好みのアイコン名に
+            icon="cog"              // ← ここをお好みのアイコン名に
             size={28}                // 適宜調整
             style={styles.settingBtn}
             onPress={() => navigation.navigate("Settings")}
