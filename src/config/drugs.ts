@@ -192,7 +192,7 @@ export const DRUGS: Record<DrugType, DrugConfig> = {
     soluteUnit: "mg",
     solutionVolume: 10,
     doseMin: 0,
-    doseMax: 0.3,
+    doseMax: 1,
     dangerDose: 0.75,
     description:
       "高用量での血圧低下や不整脈発生などの副作用を避けるために、最近では、低用量の0.1μg/kg/min で開始し、0.2\uFF5E0.3μg/kg/minを目標とすることで症状の改善が得られるという米国のガイドラインが策定されているように、初期負荷投与を行わずに最初から持続投与を行うことが多くなっている。(日本麻酔科学会医薬品ガイドライン第3版4訂)",
