@@ -66,7 +66,7 @@ export default function CompositionDialog({
             keyboardType="numeric"
             value={weight}
             onChangeText={setWeight}
-            style={styles.input}
+            style={[styles.input, styles.weightInput]}
           />
         </Dialog.Content>
         <Dialog.Actions>
@@ -80,4 +80,8 @@ export default function CompositionDialog({
 
 const styles = StyleSheet.create({
   input: { marginBottom: 8 },
+  // 体重入力だけ下に余白を広げる
+  weightInput: {
+    marginTop: 16,
+  },
 });
