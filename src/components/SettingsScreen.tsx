@@ -182,6 +182,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     setSnackbar('デフォルトに戻しました');
   };
 
+  const handleEditDismiss = async () => {
+    if (await saveConfigs()) {
+      setEditVisible(false);
+    }
+  };
+
   // 薬剤を表示対象とするかどうかを切り替える
   // 非表示にした薬剤は並び順の末尾へ送る
   const toggleEnabled = async (drug: DrugType) => {
@@ -258,7 +264,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       <Portal>
         <Modal
           visible={editVisible}
-          onDismiss={() => setEditVisible(false)}
+          onDismiss={handleEditDismiss}
           contentContainerStyle={styles.modal}
         >
           {(() => {
@@ -266,7 +272,16 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             const cfg = localConfigs[key];
             return (
               <View key={key} style={styles.section}>
-                <Text style={styles.heading}>{cfg.label}</Text>
+                <View style={styles.titleRow}>
+                  <Text style={styles.heading}>{cfg.label}</Text>
+                  <Button
+                    mode="outlined"
+                    onPress={handleReset}
+                    style={styles.button}
+                  >
+                    デフォルトに戻す
+                  </Button>
+                </View>
                 <TextInput
                   mode="outlined"
                   label={`初期投与量(${cfg.doseUnit})`}
@@ -313,28 +328,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   <Text style={styles.inlineText}>/</Text>
                   <TextInput
                     mode="outlined"
-                    label="溶液量(ml)"
+                    label="溶液量"
                     style={styles.smallInput}
                     keyboardType="numeric"
                     value={cfg.solutionVolume}
                     onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
                   />
-                </View>
-                <View style={styles.buttonRow}>
-                  <Button mode="outlined" onPress={handleReset} style={styles.button}>
-                    デフォルトに戻す
-                  </Button>
-                  <Button
-                    mode="contained"
-                    onPress={async () => {
-                      if (await saveConfigs()) {
-                        setEditVisible(false);
-                      }
-                    }}
-                    style={styles.button}
-                  >
-                    閉じる
-                  </Button>
+                  <Text style={styles.inlineText}>ml</Text>
                 </View>
               </View>
             );
@@ -375,14 +375,18 @@ const styles = StyleSheet.create({
   scrollContainer: { padding: 16 },
   section: { marginBottom: 24 },
   heading: { fontSize: 16, marginBottom: 8 },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   input: { marginBottom: 8 },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   smallInput: { width: 80, marginRight: 8 },
   inlineText: { marginHorizontal: 4, fontSize: 14 },
-  buttonRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
   button: { marginHorizontal: 4 },
   list: { marginBottom: 16 },
-  closeButton: { marginTop: 16 },
   modal: { backgroundColor: 'white', margin: 16, padding: 16 },
   // 薬剤一覧の1行分のスタイル
   itemRow: { flexDirection: 'row', alignItems: 'center' },
