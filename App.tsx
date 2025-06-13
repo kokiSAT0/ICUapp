@@ -14,7 +14,6 @@ import SettingsScreen from './src/components/SettingsScreen';
 import GammaCalculatorScreen, {
   type GammaCalculatorScreenProps,
 } from './src/screens/GammaCalculatorScreen';
-import WebViewScreen from './src/screens/WebViewScreen';
 import { DrugConfigProvider } from './src/contexts/DrugConfigContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 
@@ -49,7 +48,6 @@ export default function App(_: AppProps) {
                     GammaCalculatorScreen as React.ComponentType<GammaCalculatorScreenProps>
                   }
                 />
-                <Stack.Screen name="WebView" component={WebViewScreen} />
                 <Stack.Screen
                   name="Settings"
                   component={SettingsScreenWrapper}
