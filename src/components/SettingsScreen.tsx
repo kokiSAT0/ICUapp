@@ -17,10 +17,14 @@ import {
   Dialog,
 } from 'react-native-paper';
 import DrugConfigSnackbar from './DrugConfigSnackbar';
+import AdBanner from './AdBanner';
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from '../config/drugs';
+
+// テスト用バナー広告ユニットID
+const AD_UNIT_ID = 'ca-app-pub-3940256099942544/2435281174';
 
 // 数値項目のキー名
 // 文字列で保持したい数値項目のキー一覧
@@ -363,6 +367,10 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       </Snackbar>
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
+      {/* 広告バナーを画面下部に表示 */}
+      <View style={styles.banner}>
+        <AdBanner unitId={AD_UNIT_ID} />
+      </View>
     </Surface>
     </SafeAreaView>
   );
@@ -400,5 +408,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     width: '100%',
     minHeight: 40,
+  },
+  banner: {
+    alignSelf: 'center',
+    marginVertical: 8,
   },
 });

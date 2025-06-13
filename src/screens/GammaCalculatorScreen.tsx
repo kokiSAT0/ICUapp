@@ -12,6 +12,7 @@ import DigitalNumber from "@/components/DigitalNumber";
 import { IconButton } from "react-native-paper";
 import CompositionDialog from "@/components/CompositionDialog";
 import DrugConfigSnackbar from "@/components/DrugConfigSnackbar";
+import AdBanner from "@/components/AdBanner";
 
 import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
@@ -28,6 +29,9 @@ import {
   computeConcentration,
 } from "@/utils/flowConversion";
 import { useDrugConfigs } from "@/contexts/DrugConfigContext";
+
+// テスト用バナー広告ユニットID
+const AD_UNIT_ID = "ca-app-pub-3940256099942544/2435281174";
 
 export type GammaCalculatorScreenProps = {};
 export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
@@ -398,6 +402,10 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       />
       {/* AsyncStorage エラー通知用 */}
       <DrugConfigSnackbar />
+      {/* 広告バナーを画面下部に表示 */}
+      <View style={styles.banner}>
+        <AdBanner unitId={AD_UNIT_ID} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -606,5 +614,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#d7d7d7",
     padding: 12,
+  },
+  banner: {
+    alignSelf: "center",
+    marginVertical: 8,
   },
 });
