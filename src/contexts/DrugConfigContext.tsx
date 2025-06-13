@@ -22,6 +22,9 @@ export type DrugConfigContextType = {
   // 並び順を保存する
   setDrugOrder: (order: DrugType[]) => Promise<void>;
   loadConfigs: () => Promise<void>;
+  // AsyncStorage 失敗時に表示するメッセージ
+  snackbar: string;
+  setSnackbar: (msg: string) => void;
 };
 
 // デフォルト値としては設定ファイルの内容をそのまま用いる
@@ -33,6 +36,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
   const [initialDrug, setInitialDrugState] = useState<DrugType>(DRUG_LIST[0]);
   // 薬剤の表示順。デフォルトは設定ファイルと同じ順序
   const [drugOrder, setDrugOrderState] = useState<DrugType[]>([...DRUG_LIST]);
+  // エラーメッセージ表示用
+  const [snackbar, setSnackbar] = useState('');
 
   // 保存された設定を読み込む
   const loadConfigs = async (): Promise<void> => {
@@ -66,6 +71,7 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
       setConfigsState(DRUGS);
       setInitialDrugState(DRUG_LIST[0]);
       setDrugOrderState([...DRUG_LIST]);
+      setSnackbar('設定の読み込みに失敗しました');
     }
   };
 
@@ -75,7 +81,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newConfigs));
     } catch {
-      // 保存に失敗してもアラートは出さない
+      // 保存に失敗したらメッセージを表示
+      setSnackbar('設定の保存に失敗しました');
     }
   };
 
@@ -85,7 +92,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     try {
       await AsyncStorage.setItem(INITIAL_DRUG_KEY, drug);
     } catch {
-      // 保存失敗時はエラーを無視
+      // 保存失敗時はメッセージ表示
+      setSnackbar('設定の保存に失敗しました');
     }
   };
 
@@ -97,7 +105,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
     try {
       await AsyncStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
     } catch {
-      // 保存失敗時はエラーを無視
+      // 保存に失敗した場合は通知
+      setSnackbar('設定の保存に失敗しました');
     }
   };
 
@@ -130,6 +139,8 @@ export function DrugConfigProvider({ children }: { children: React.ReactNode }) 
         resetToDefault,
         resetDrugToDefault,
         loadConfigs,
+        snackbar,
+        setSnackbar,
       }}
     >
       {children}

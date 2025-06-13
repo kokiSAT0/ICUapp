@@ -8,6 +8,8 @@ export default {
   // TypeScript ファイルを Sucrase で変換する
   transform: {
     '^.+\\.(ts|tsx)$': ['<rootDir>/scripts/jestTransformer.cjs']
-
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
   }
 };

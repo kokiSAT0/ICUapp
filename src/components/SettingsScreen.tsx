@@ -16,6 +16,7 @@ import {
   Appbar,
   Dialog,
 } from 'react-native-paper';
+import DrugConfigSnackbar from './DrugConfigSnackbar';
 // リストをドラッグ操作で並び替えるためのコンポーネント
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
@@ -292,6 +293,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>
         {snackbar}
       </Snackbar>
+      {/* 共有エラーメッセージ用 */}
+      <DrugConfigSnackbar />
     </Surface>
     </SafeAreaView>
   );
