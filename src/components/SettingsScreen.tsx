@@ -46,16 +46,6 @@ const toInputConfig = (cfg: DrugConfig): DrugConfigInput => ({
   dangerDose: cfg.dangerDose !== undefined ? String(cfg.dangerDose) : '',
 });
 
-// DrugConfigInput から DrugConfig へ変換
-const fromInputConfig = (cfg: DrugConfigInput): DrugConfig => ({
-  ...cfg,
-  initialDose: parseFloat(cfg.initialDose),
-  soluteAmount: parseFloat(cfg.soluteAmount),
-  solutionVolume: parseFloat(cfg.solutionVolume),
-  doseMax: parseFloat(cfg.doseMax),
-  // 空文字列の場合は undefined を返す
-  dangerDose: cfg.dangerDose === '' ? undefined : parseFloat(cfg.dangerDose),
-});
 
 export type SettingsScreenProps = {
   onClose: () => void;
