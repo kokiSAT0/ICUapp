@@ -92,8 +92,45 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   // ヘルプダイアログの表示状態
   const [helpVisible, setHelpVisible] = useState(false);
 
+  // 入力値を検証する関数。問題があればメッセージを返す
+  const validateConfigs = (
+    configs: Record<DrugType, DrugConfigInput>,
+  ): string | null => {
+    for (const key of DRUG_LIST) {
+      const cfg = configs[key];
+      const initialDose = parseFloat(cfg.initialDose);
+      const doseMax = parseFloat(cfg.doseMax);
+      const dangerDose = cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined;
+      const soluteAmount = parseFloat(cfg.soluteAmount);
+      const solutionVolume = parseFloat(cfg.solutionVolume);
+
+      if (!initialDose || initialDose <= 0)
+        return `${cfg.label}の初期投与量は正の数で入力してください`;
+      if (!doseMax || doseMax <= 0)
+        return `${cfg.label}の最大投与量は正の数で入力してください`;
+      if (initialDose > doseMax)
+        return `${cfg.label}の初期投与量は最大投与量以下にしてください`;
+      if (dangerDose !== undefined) {
+        if (dangerDose <= 0)
+          return `${cfg.label}の危険閾値は正の数で入力してください`;
+        if (dangerDose > doseMax)
+          return `${cfg.label}の危険閾値は最大投与量以下にしてください`;
+      }
+      if (!soluteAmount || soluteAmount <= 0)
+        return `${cfg.label}の溶質量は正の数で入力してください`;
+      if (!solutionVolume || solutionVolume <= 0)
+        return `${cfg.label}の溶液量は正の数で入力してください`;
+    }
+    return null;
+  };
+
   // ローカル設定を保存するヘルパー
   const saveConfigs = async () => {
+    const error = validateConfigs(localConfigs);
+    if (error) {
+      setSnackbar(error);
+      return false;
+    }
     const updated: Record<DrugType, DrugConfig> = DRUG_LIST.reduce(
       (acc, key) => {
         acc[key] = fromInputConfig(localConfigs[key]);
@@ -102,11 +139,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       {} as Record<DrugType, DrugConfig>,
     );
     await setConfigs(updated);
+    return true;
   };
 
   // 画面を閉じる際に編集内容を保存する
   const handleClose = async () => {
-    await saveConfigs();
+    if (!(await saveConfigs())) return;
     // 表示中の薬剤と非表示薬剤に分ける
     const enabledDrugs: DrugType[] = [];
     const disabledDrugs: DrugType[] = [];
@@ -289,8 +327,9 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
                   <Button
                     mode="contained"
                     onPress={async () => {
-                      await saveConfigs();
-                      setEditVisible(false);
+                      if (await saveConfigs()) {
+                        setEditVisible(false);
+                      }
                     }}
                     style={styles.button}
                   >
