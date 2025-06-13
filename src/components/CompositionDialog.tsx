@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+// Alert はエラーをポップアップ表示するための仕組み
+import { StyleSheet, Alert } from 'react-native';
 import { Portal, Dialog, TextInput, Button } from 'react-native-paper';
 
 // 値編集モーダルのプロパティ型
@@ -37,8 +38,28 @@ export default function CompositionDialog({
 
   // OK ボタンを押したときの処理
   const handleSubmit = () => {
-    // parseFloat で数値に変換。失敗したら 0
-    onSubmit(parseFloat(dose) || 0, parseFloat(volume) || 0, parseFloat(weight) || 0);
+    // TextInput の内容を数値へ変換。parseFloat は失敗すると NaN を返す
+    const doseVal = parseFloat(dose);
+    const volumeVal = parseFloat(volume);
+    const weightVal = parseFloat(weight);
+
+    /*
+     * 入力チェック
+     * - 組成(溶質量・溶液量)は 0 より大きいか？
+     * - 体重は 1～200 の範囲か？
+     */
+    if (doseVal <= 0 || volumeVal <= 0 || weightVal < 1 || weightVal > 200) {
+      // Alert でエラーメッセージを表示して処理を中断
+      Alert.alert('入力エラー', '体重は1～200kg、組成は正の数で入力してください。');
+      return;
+    }
+
+    try {
+      onSubmit(doseVal, volumeVal, weightVal);
+    } catch (err) {
+      // エラー内容をユーザーへ知らせる
+      Alert.alert('保存エラー', '値の保存中に問題が発生しました');
+    }
     onDismiss();
   };
 
