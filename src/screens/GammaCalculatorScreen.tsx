@@ -487,6 +487,7 @@ const styles = StyleSheet.create({
   flowCardGreen: {
     marginTop: 16,
     marginBottom: 8,
+    marginHorizontal: 8,
     paddingHorizontal: 8,
     paddingTop: 28,
     paddingBottom: 28,
