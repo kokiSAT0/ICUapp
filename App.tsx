@@ -51,7 +51,11 @@ export default function App(_: AppProps) {
                 <Stack.Screen
                   name="Settings"
                   component={SettingsScreenWrapper}
-                  options={{ title: '設定' }}
+                  options={{
+                    title: '設定',
+                    // スワイプ操作で前の画面へ戻れるようにする
+                    gestureEnabled: true,
+                  }}
                 />
               </Stack.Navigator>
             </NavigationContainer>
