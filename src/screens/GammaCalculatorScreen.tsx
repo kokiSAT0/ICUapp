@@ -19,8 +19,7 @@ import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 import { Dimensions } from "react-native";
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
-const { width } = Dimensions.get("window");
-export const DISPLAY_SHIFT = -width * 0.1;
+export const DISPLAY_SHIFT = -WINDOW_WIDTH * 0.1;
 
 import {
   convertDoseToRate,
