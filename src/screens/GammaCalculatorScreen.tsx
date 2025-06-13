@@ -223,7 +223,7 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
 
           {/* 右側：設定アイコン（IconButton に置換） */}
           <IconButton
-            icon="cog-outline"              // ← ここをお好みのアイコン名に
+            icon="cog"              // ← ここをお好みのアイコン名に
             size={28}                // 適宜調整
             style={styles.settingBtn}
             onPress={() => navigation.navigate("Settings")}
@@ -487,6 +487,7 @@ const styles = StyleSheet.create({
   flowCardGreen: {
     marginTop: 16,
     marginBottom: 8,
+    marginHorizontal: 8,
     paddingHorizontal: 8,
     paddingTop: 28,
     paddingBottom: 28,
