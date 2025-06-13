@@ -305,15 +305,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         {/* ヘルプダイアログ */}
         <Portal>
           <Dialog visible={helpVisible} onDismiss={() => setHelpVisible(false)}>
-            <Dialog.Title>使い方</Dialog.Title>
+            <Dialog.Title>このアプリについて</Dialog.Title>
             <Dialog.Content>
               <Text>
-                {`設定画面では以下の操作ができます。\n\n` +
-                  "・薬剤名をタップして初期投与量や希釈条件を編集\n" +
-                  "・チェックボックスで計算画面に表示する薬剤を選択\n" +
-                  "・右端のハンドルをドラッグして表示順を変更\n" +
-                  "・編集画面の\"デフォルトに戻す\"で設定をリセット\n" +
-                  "・左上の戻るボタンで並び替えを保存して閉じる"}
+                {`このアプリは昇圧薬の投与量と流量を相互に換算するツールです。\n\n` +
+                  "設定画面では薬剤の初期値や表示順を調整できます。\n" +
+                  "計算結果は参考情報として利用し、治療は必ず医療専門家の指示に従ってください。\n\n" +
+                  "MIT License で公開されています。Icons by Pictogrammers, Font by DSEG."}
               </Text>
             </Dialog.Content>
             <Dialog.Actions>
