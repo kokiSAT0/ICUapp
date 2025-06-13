@@ -16,6 +16,7 @@ import GammaCalculatorScreen, {
 } from "./src/screens/GammaCalculatorScreen";
 import { DrugConfigProvider } from "./src/contexts/DrugConfigContext";
 import ErrorBoundary from "./src/components/ErrorBoundary";
+import mobileAds from "react-native-google-mobile-ads";
 
 // アプリのエントリーポイント
 export type AppProps = {};
@@ -28,6 +29,11 @@ export default function App(_: AppProps) {
     DSEG7Classic: require("./assets/fonts/DSEG7Classic.ttf"),
   });
   if (!fontsLoaded) return null;
+
+  // AdMob SDK を初期化する
+  React.useEffect(() => {
+    mobileAds().initialize();
+  }, []);
 
   return (
     // GestureHandlerRootView でジェスチャー操作を有効化する
