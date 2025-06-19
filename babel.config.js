@@ -1,20 +1,17 @@
-// Expo 向けの標準設定を使用するため `babel-preset-expo` を利用する
-// `api.cache(true)` を呼び出すことでビルド速度を改善する
-export default function (api) {
-  api.cache(true);
+// babel.config.js  ★書き換え後
+/** @type {import('@babel/core').ConfigFunction} */
+module.exports = function (api) {
+  api.cache(true);                 // ビルドキャッシュ
   return {
     presets: ['babel-preset-expo'],
-    // モジュール解決を簡単にするためのプラグイン設定
     plugins: [
       [
         'module-resolver',
         {
           root: ['./'],
-          alias: {
-            '@': './src'
-          }
-        }
-      ]
-    ]
+          alias: { '@': './src' },
+        },
+      ],
+    ],
   };
-}
+};
