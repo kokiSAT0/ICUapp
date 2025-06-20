@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Surface,
   Text,
@@ -74,6 +74,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     drugOrder,
     setDrugOrder,
   } = useDrugConfigs();
+  // 端末のセーフエリア（ノッチやホームバーの余白）を取得
+  const insets = useSafeAreaInsets();
   // 設定値を文字列に変換したローカルステート
   // DrugList を走査して初期設定を作る
   // こうしておくと薬剤を追加しても自動で画面に反映される
@@ -95,6 +97,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const [editVisible, setEditVisible] = useState(false);
   // ヘルプダイアログの表示状態
   const [helpVisible, setHelpVisible] = useState(false);
+  // バナーの高さ。リストの余白計算に利用
+  const [bannerHeight, setBannerHeight] = useState(0);
 
   // 入力値を検証する関数。問題があればメッセージを返す
   const validateConfigs = (
@@ -263,7 +267,11 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         );
         }}
         style={styles.list}
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[
+          styles.scrollContainer,
+          // バナーとセーフエリア分だけ下に余白を設ける
+          { paddingBottom: bannerHeight + insets.bottom },
+        ]}
       />
       <Portal>
         <Modal
@@ -368,8 +376,17 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
       {/* 広告バナーを画面下部に表示 */}
-      <View style={styles.banner}>
-        <AdBanner unitId={AD_UNIT_ID} />
+      <View
+        style={[
+          styles.banner,
+          {
+            // セーフエリアと広告の高さを考慮して固定表示
+            bottom: insets.bottom,
+            marginBottom: bannerHeight ? 8 : 0,
+          },
+        ]}
+      >
+        <AdBanner unitId={AD_UNIT_ID} onHeightChange={setBannerHeight} />
       </View>
     </Surface>
     </SafeAreaView>
@@ -394,7 +411,7 @@ const styles = StyleSheet.create({
   smallInput: { width: 80, marginRight: 8 },
   inlineText: { marginHorizontal: 4, fontSize: 14 },
   button: { marginHorizontal: 4 },
-  list: { marginBottom: 16 },
+  list: { flex: 1 },
   modal: { backgroundColor: 'white', margin: 16, padding: 16 },
   // 薬剤一覧の1行分のスタイル
   itemRow: { flexDirection: 'row', alignItems: 'center' },
@@ -410,7 +427,10 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   banner: {
-    alignSelf: 'center',
-    marginVertical: 8,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    // 下端にスペースをあけるため marginBottom は動的に指定
   },
 });
