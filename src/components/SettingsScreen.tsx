@@ -265,7 +265,14 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         );
         }}
         style={styles.list}
-        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 16 + bannerHeight }]}
+        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 16 }]}
+        // リストの末尾に広告バナーを配置
+        ListFooterComponent={
+          <View style={[styles.banner, { minHeight: bannerHeight }]}
+          >
+            <AdBanner unitId={AD_UNIT_ID} onHeightChange={setBannerHeight} />
+          </View>
+        }
       />
       <Portal>
         <Modal
@@ -369,10 +376,6 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       </Snackbar>
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
-      {/* 広告バナーを画面下部に表示 */}
-      <View style={[styles.banner, { minHeight: bannerHeight }] }>
-        <AdBanner unitId={AD_UNIT_ID} onHeightChange={setBannerHeight} />
-      </View>
     </Surface>
     </SafeAreaView>
   );
