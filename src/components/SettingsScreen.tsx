@@ -230,8 +230,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         <Appbar.Content title="設定" />
         <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
       </Appbar.Header>
+      {/*
+        drugOrder が空配列になると一覧が表示できないため
+        Fallback として DRUG_LIST を使用する
+      */}
       <DraggableFlatList
-        data={drugOrder}
+        data={drugOrder.length > 0 ? drugOrder : DRUG_LIST}
         keyExtractor={(item) => item}
         // ドラッグ操作の結果をそのまま保存する
         // 非表示薬剤を末尾へ移動する処理は toggleEnabled で行う
