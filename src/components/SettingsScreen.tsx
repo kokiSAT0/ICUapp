@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// SafeAreaView だけでなく画面下端の余白取得にも useSafeAreaInsets を使う
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Surface,
   Text,
@@ -67,6 +68,8 @@ export type SettingsScreenProps = {
 };
 
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
+  // 画面下の安全領域（iPhone のホームバー等）を考慮するため取得
+  const insets = useSafeAreaInsets();
   const {
     configs,
     setConfigs,
@@ -226,6 +229,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         <Appbar.Content title="設定" />
         <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
       </Appbar.Header>
+      {/* ヘッダーの下にリスト専用ラッパーを置き、高さを残り領域に広げる */}
+      <View style={styles.body}>
       <DraggableFlatList
         data={drugOrder}
         keyExtractor={(item) => item}
@@ -265,6 +270,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         style={styles.list}
         contentContainerStyle={styles.scrollContainer}
       />
+      </View>
       <Portal>
         <Modal
           visible={editVisible}
@@ -367,8 +373,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       </Snackbar>
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
-      {/* 広告バナーを画面下部に表示 */}
-      <View style={styles.banner}>
+      {/* 広告バナーを画面下部に表示。ホームバーと重ならないよう余白を追加 */}
+      <View style={[styles.banner, { paddingBottom: insets.bottom }]}>
         <AdBanner unitId={AD_UNIT_ID} />
       </View>
     </Surface>
@@ -380,7 +386,9 @@ const styles = StyleSheet.create({
   // SafeAreaView 用のスタイル
   safeArea: { flex: 1 },
   container: { flex: 1 },
-  scrollContainer: { padding: 16 },
+  // ヘッダー以外の領域を埋めるラッパー
+  body: { flex: 1 },
+  scrollContainer: { padding: 16, paddingBottom: 16 },
   section: { marginBottom: 24 },
   heading: { fontSize: 16, marginBottom: 8 },
   titleRow: {
@@ -394,7 +402,7 @@ const styles = StyleSheet.create({
   smallInput: { width: 80, marginRight: 8 },
   inlineText: { marginHorizontal: 4, fontSize: 14 },
   button: { marginHorizontal: 4 },
-  list: { marginBottom: 16 },
+  list: {},
   modal: { backgroundColor: 'white', margin: 16, padding: 16 },
   // 薬剤一覧の1行分のスタイル
   itemRow: { flexDirection: 'row', alignItems: 'center' },
