@@ -23,6 +23,7 @@ import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useDrugConfigs } from '../contexts/DrugConfigContext';
 import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from '../config/drugs';
 
+
 // テスト用バナー広告ユニットID
 const AD_UNIT_ID = 'ca-app-pub-3940256099942544/2435281174';
 
@@ -67,6 +68,9 @@ export type SettingsScreenProps = {
 };
 
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
+
+  const [bannerHeight, setBannerHeight] = useState(0);
+
   const {
     configs,
     setConfigs,
@@ -263,7 +267,10 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         );
         }}
         style={styles.list}
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[
+            styles.scrollContainer,
+            { paddingBottom: bannerHeight },
+        ]}
       />
       <Portal>
         <Modal
@@ -367,11 +374,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       </Snackbar>
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
-      {/* 広告バナーを画面下部に表示 */}
-      <View style={styles.banner}>
-        <AdBanner unitId={AD_UNIT_ID} />
-      </View>
+
     </Surface>
+    <View
+      onLayout={(e) => setBannerHeight(e.nativeEvent.layout.height)}
+    >
+      <AdBanner unitId={AD_UNIT_ID} />
+    </View>
     </SafeAreaView>
   );
 }
@@ -408,9 +417,5 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     width: '100%',
     minHeight: 40,
-  },
-  banner: {
-    alignSelf: 'center',
-    marginVertical: 8,
   },
 });
