@@ -42,7 +42,8 @@
       },
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "icon": "./assets/icon.png"
     },
     "android": {
       "versionCode": 8,
