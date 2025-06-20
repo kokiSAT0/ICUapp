@@ -13,19 +13,19 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/6300978111"
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/2435281174"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/6300978111"
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/2435281174"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx"
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-4177731053735768/7854577277"
       }
     },
 
@@ -43,9 +43,7 @@
   "submit": {
     "production": {},
     "production-ios": {
-      "ios": {
-
-      }
+      "ios": {}
     }
   }
 }
