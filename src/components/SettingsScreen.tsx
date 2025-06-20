@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
 // SafeAreaView だけでなく画面下端の余白取得にも useSafeAreaInsets を使う
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   Surface,
   Text,
@@ -16,26 +19,26 @@ import {
   TouchableRipple,
   Appbar,
   Dialog,
-} from 'react-native-paper';
-import DrugConfigSnackbar from './DrugConfigSnackbar';
-import AdBanner from './AdBanner';
+} from "react-native-paper";
+import DrugConfigSnackbar from "./DrugConfigSnackbar";
+import AdBanner from "./AdBanner";
 // リストをドラッグ操作で並び替えるためのコンポーネント
-import DraggableFlatList from 'react-native-draggable-flatlist';
-import { useDrugConfigs } from '../contexts/DrugConfigContext';
-import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from '../config/drugs';
+import DraggableFlatList from "react-native-draggable-flatlist";
+import { useDrugConfigs } from "../contexts/DrugConfigContext";
+import { DrugType, DRUGS, DRUG_LIST, DrugConfig } from "../config/drugs";
 
 // テスト用バナー広告ユニットID
-const AD_UNIT_ID = 'ca-app-pub-3940256099942544/2435281174';
+const AD_UNIT_ID = "ca-app-pub-3940256099942544/2435281174";
 
 // 数値項目のキー名
 // 文字列で保持したい数値項目のキー一覧
 // ここに追加すると自動的に変換処理が拡張される
 type NumericKey =
-  | 'initialDose'
-  | 'soluteAmount'
-  | 'solutionVolume'
-  | 'doseMax'
-  | 'dangerDose';
+  | "initialDose"
+  | "soluteAmount"
+  | "solutionVolume"
+  | "doseMax"
+  | "dangerDose";
 // 入力用設定データ。数値項目を文字列で保持する
 type DrugConfigInput = Omit<DrugConfig, NumericKey> & {
   [K in NumericKey]: string;
@@ -49,7 +52,7 @@ const toInputConfig = (cfg: DrugConfig): DrugConfigInput => ({
   solutionVolume: String(cfg.solutionVolume),
   // 最大投与量・危険閾値も文字列に変換して保持
   doseMax: String(cfg.doseMax),
-  dangerDose: cfg.dangerDose !== undefined ? String(cfg.dangerDose) : '',
+  dangerDose: cfg.dangerDose !== undefined ? String(cfg.dangerDose) : "",
 });
 
 // 入力用設定から数値を取り出して元の型へ戻す
@@ -59,9 +62,9 @@ const fromInputConfig = (cfg: DrugConfigInput): DrugConfig => ({
   soluteAmount: parseFloat(cfg.soluteAmount) || 0,
   solutionVolume: parseFloat(cfg.solutionVolume) || 0,
   doseMax: parseFloat(cfg.doseMax) || 0,
-  dangerDose: cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined,
+  dangerDose:
+    cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined,
 });
-
 
 export type SettingsScreenProps = {
   onClose: () => void;
@@ -70,13 +73,8 @@ export type SettingsScreenProps = {
 export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   // 画面下の安全領域（iPhone のホームバー等）を考慮するため取得
   const insets = useSafeAreaInsets();
-  const {
-    configs,
-    setConfigs,
-    resetDrugToDefault,
-    drugOrder,
-    setDrugOrder,
-  } = useDrugConfigs();
+  const { configs, setConfigs, resetDrugToDefault, drugOrder, setDrugOrder } =
+    useDrugConfigs();
   // 設定値を文字列に変換したローカルステート
   // DrugList を走査して初期設定を作る
   // こうしておくと薬剤を追加しても自動で画面に反映される
@@ -86,12 +84,12 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       return acc;
     }, {} as Record<DrugType, DrugConfigInput>);
 
-  const [localConfigs, setLocalConfigs] = useState<Record<DrugType, DrugConfigInput>>(
-    createLocalConfigs(),
-  );
+  const [localConfigs, setLocalConfigs] = useState<
+    Record<DrugType, DrugConfigInput>
+  >(createLocalConfigs());
   // 現在編集対象の薬剤。配列の先頭を初期値とする
   const [selectedDrug, setSelectedDrug] = useState<DrugType>(DRUG_LIST[0]);
-  const [snackbar, setSnackbar] = useState('');
+  const [snackbar, setSnackbar] = useState("");
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
 
   // 編集ダイアログの表示状態
@@ -101,13 +99,14 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
 
   // 入力値を検証する関数。問題があればメッセージを返す
   const validateConfigs = (
-    configs: Record<DrugType, DrugConfigInput>,
+    configs: Record<DrugType, DrugConfigInput>
   ): string | null => {
     for (const key of DRUG_LIST) {
       const cfg = configs[key];
       const initialDose = parseFloat(cfg.initialDose);
       const doseMax = parseFloat(cfg.doseMax);
-      const dangerDose = cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined;
+      const dangerDose =
+        cfg.dangerDose.length > 0 ? parseFloat(cfg.dangerDose) : undefined;
       const soluteAmount = parseFloat(cfg.soluteAmount);
       const solutionVolume = parseFloat(cfg.solutionVolume);
 
@@ -143,7 +142,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         acc[key] = fromInputConfig(localConfigs[key]);
         return acc;
       },
-      {} as Record<DrugType, DrugConfig>,
+      {} as Record<DrugType, DrugConfig>
     );
     await setConfigs(updated);
     return true;
@@ -168,7 +167,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const updateValue = (
     drug: DrugType,
     key: keyof DrugConfigInput,
-    value: string | boolean,
+    value: string | boolean
   ) => {
     setLocalConfigs({
       ...localConfigs,
@@ -179,14 +178,13 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     });
   };
 
-
   const handleReset = async () => {
     await resetDrugToDefault(selectedDrug);
     setLocalConfigs({
       ...localConfigs,
       [selectedDrug]: toInputConfig(DRUGS[selectedDrug]),
     });
-    setSnackbar('デフォルトに戻しました');
+    setSnackbar("デフォルトに戻しました");
   };
 
   const handleEditDismiss = async () => {
@@ -209,9 +207,10 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
     const orderWithoutDrug = drugOrder.filter((d) => d !== drug);
     if (newEnabled) {
       const firstDisabled = orderWithoutDrug.findIndex(
-        (d) => !localConfigs[d].enabled,
+        (d) => !localConfigs[d].enabled
       );
-      const insertIndex = firstDisabled === -1 ? orderWithoutDrug.length : firstDisabled;
+      const insertIndex =
+        firstDisabled === -1 ? orderWithoutDrug.length : firstDisabled;
       orderWithoutDrug.splice(insertIndex, 0, drug);
     } else {
       orderWithoutDrug.push(drug);
@@ -222,135 +221,156 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   return (
     // SafeAreaView で余白が二重にならないよう top を除外
     <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
-    <Surface style={styles.container}>
-      {/* ヘッダー。メイン画面と高さをそろえるためスタイルを指定 */}
-      <Appbar.Header style={styles.header}>
-        <Appbar.BackAction onPress={handleClose} />
-        <Appbar.Content title="設定" />
-        <Appbar.Action icon="help-circle" onPress={() => setHelpVisible(true)} />
-      </Appbar.Header>
-      {/* ヘッダーの下にリスト専用ラッパーを置き、高さを残り領域に広げる */}
-      <View style={styles.body}>
-      <DraggableFlatList
-        data={drugOrder}
-        keyExtractor={(item) => item}
-        // ドラッグ操作の結果をそのまま保存する
-        // 非表示薬剤を末尾へ移動する処理は toggleEnabled で行う
-        onDragEnd={({ data }) => setDrugOrder(data)}
-        renderItem={({ item, drag }) => {
-          const textColor = localConfigs[item].enabled ? undefined : '#888';
-          return (
-            <View style={styles.itemRow}>
-              <Checkbox
-                status={localConfigs[item].enabled ? 'checked' : 'unchecked'}
-                onPress={() => toggleEnabled(item)}
-                color={textColor}
-                uncheckedColor={textColor}
-              />
-              <TouchableRipple
-              onPress={() => {
-                setSelectedDrug(item);
-                setEditVisible(true);
-              }}
-              style={styles.titleArea}
-            >
-              <Text
-                style={[
-                  styles.itemTitle,
-                  { color: localConfigs[item].enabled ? undefined : '#888' },
-                ]}
-              >
-                {localConfigs[item].label}
-              </Text>
-            </TouchableRipple>
-            <IconButton icon="drag" onPressIn={drag} />
-          </View>
-        );
-        }}
-        style={styles.list}
-        contentContainerStyle={styles.scrollContainer}
-      />
-      </View>
-      <Portal>
-        <Modal
-          visible={editVisible}
-          onDismiss={handleEditDismiss}
-          contentContainerStyle={styles.modal}
-        >
-          {(() => {
-            const key = selectedDrug;
-            const cfg = localConfigs[key];
-            return (
-              <View key={key} style={styles.section}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.heading}>{cfg.label}</Text>
-                  <Button
-                    mode="outlined"
-                    onPress={handleReset}
-                    style={styles.button}
+      <Surface style={styles.container}>
+        {/* ヘッダー。メイン画面と高さをそろえるためスタイルを指定 */}
+        <Appbar.Header style={styles.header}>
+          <Appbar.BackAction onPress={handleClose} />
+          <Appbar.Content title="設定" />
+          <Appbar.Action
+            icon="help-circle"
+            onPress={() => setHelpVisible(true)}
+          />
+        </Appbar.Header>
+        {/* ヘッダーの下にリスト専用ラッパーを置き、高さを残り領域に広げる */}
+        <View style={styles.body}>
+          <DraggableFlatList
+            data={drugOrder}
+            keyExtractor={(item) => item}
+            // ドラッグ操作の結果をそのまま保存する
+            // 非表示薬剤を末尾へ移動する処理は toggleEnabled で行う
+            onDragEnd={({ data }) => setDrugOrder(data)}
+            renderItem={({ item, drag }) => {
+              const textColor = localConfigs[item].enabled ? undefined : "#888";
+              return (
+                <View style={styles.itemRow}>
+                  <Checkbox
+                    status={
+                      localConfigs[item].enabled ? "checked" : "unchecked"
+                    }
+                    onPress={() => toggleEnabled(item)}
+                    color={textColor}
+                    uncheckedColor={textColor}
+                  />
+                  <TouchableRipple
+                    onPress={() => {
+                      setSelectedDrug(item);
+                      setEditVisible(true);
+                    }}
+                    style={styles.titleArea}
                   >
-                    デフォルトに戻す
-                  </Button>
+                    <Text
+                      style={[
+                        styles.itemTitle,
+                        {
+                          color: localConfigs[item].enabled
+                            ? undefined
+                            : "#888",
+                        },
+                      ]}
+                    >
+                      {localConfigs[item].label}
+                    </Text>
+                  </TouchableRipple>
+                  <IconButton icon="drag" onPressIn={drag} />
                 </View>
-                <TextInput
-                  mode="outlined"
-                  label={`初期投与量(${cfg.doseUnit})`}
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={cfg.initialDose}
-                  onChangeText={(v) => updateValue(key, 'initialDose', v)}
-                />
-                {/* 最大投与量を編集する入力欄 */}
-                <TextInput
-                  mode="outlined"
-                  label={`最大投与量(${cfg.doseUnit})`}
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={cfg.doseMax}
-                  onChangeText={(v) => updateValue(key, 'doseMax', v)}
-                />
-                {/* 危険な投与量の目安。空欄にすると警告バーを非表示にできる */}
-                <TextInput
-                  mode="outlined"
-                  label={`危険閾値(${cfg.doseUnit})`}
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={cfg.dangerDose}
-                  onChangeText={(v) => updateValue(key, 'dangerDose', v)}
-                />
-                <View style={styles.row}>
+              );
+            }}
+            style={styles.list}
+            contentContainerStyle={styles.scrollContainer}
+          />
+        </View>
+        <Portal>
+          <Modal
+            visible={editVisible}
+            onDismiss={handleEditDismiss}
+            contentContainerStyle={styles.modal}
+          >
+            {(() => {
+              const key = selectedDrug;
+              const cfg = localConfigs[key];
+              return (
+                <View key={key} style={styles.section}>
+                  <View style={styles.titleRow}>
+                    <Text style={styles.heading}>{cfg.label}</Text>
+                    <Button
+                      mode="outlined"
+                      onPress={handleReset}
+                      style={styles.button}
+                    >
+                      デフォルトに戻す
+                    </Button>
+                  </View>
                   <TextInput
                     mode="outlined"
-                    label="溶質量"
-                    style={styles.smallInput}
+                    label={`初期投与量(${cfg.doseUnit})`}
+                    style={styles.input}
                     keyboardType="numeric"
-                    value={cfg.soluteAmount}
-                    onChangeText={(v) => updateValue(key, 'soluteAmount', v)}
+                    value={cfg.initialDose}
+                    onChangeText={(v) => updateValue(key, "initialDose", v)}
                   />
-                  <Menu
-                    visible={unitMenuVisible}
-                    onDismiss={() => setUnitMenuVisible(false)}
-                    anchor={<Button onPress={() => setUnitMenuVisible(true)}>{cfg.soluteUnit}</Button>}
-                  >
-                    <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'mg')} title="mg" />
-                    <Menu.Item onPress={() => updateValue(key, 'soluteUnit', 'µg')} title="µg" />
-                  </Menu>
-                  <Text style={styles.inlineText}>/</Text>
+                  {/* 最大投与量を編集する入力欄 */}
                   <TextInput
                     mode="outlined"
-                    label="溶液量"
-                    style={styles.smallInput}
+                    label={`最大投与量(${cfg.doseUnit})`}
+                    style={styles.input}
                     keyboardType="numeric"
-                    value={cfg.solutionVolume}
-                    onChangeText={(v) => updateValue(key, 'solutionVolume', v)}
+                    value={cfg.doseMax}
+                    onChangeText={(v) => updateValue(key, "doseMax", v)}
                   />
-                  <Text style={styles.inlineText}>ml</Text>
+                  {/* 危険な投与量の目安。空欄にすると警告バーを非表示にできる */}
+                  <TextInput
+                    mode="outlined"
+                    label={`危険閾値(${cfg.doseUnit})`}
+                    style={styles.input}
+                    keyboardType="numeric"
+                    value={cfg.dangerDose}
+                    onChangeText={(v) => updateValue(key, "dangerDose", v)}
+                  />
+                  <View style={styles.row}>
+                    <TextInput
+                      mode="outlined"
+                      label="溶質量"
+                      style={styles.smallInput}
+                      keyboardType="numeric"
+                      value={cfg.soluteAmount}
+                      onChangeText={(v) => updateValue(key, "soluteAmount", v)}
+                    />
+                    <Menu
+                      visible={unitMenuVisible}
+                      onDismiss={() => setUnitMenuVisible(false)}
+                      anchor={
+                        <Button onPress={() => setUnitMenuVisible(true)}>
+                          {cfg.soluteUnit}
+                        </Button>
+                      }
+                    >
+                      <Menu.Item
+                        onPress={() => updateValue(key, "soluteUnit", "mg")}
+                        title="mg"
+                      />
+                      <Menu.Item
+                        onPress={() => updateValue(key, "soluteUnit", "µg")}
+                        title="µg"
+                      />
+                    </Menu>
+                    <Text style={styles.inlineText}>/</Text>
+                    <TextInput
+                      mode="outlined"
+                      label="溶液量"
+                      style={styles.smallInput}
+                      keyboardType="numeric"
+                      value={cfg.solutionVolume}
+                      onChangeText={(v) =>
+                        updateValue(key, "solutionVolume", v)
+                      }
+                    />
+                    <Text style={styles.inlineText}>ml</Text>
+                  </View>
                 </View>
-              </View>
-            );
-          })()}
-        </Modal>
-      </Portal>
+              );
+            })()}
+          </Modal>
+        </Portal>
         {/* ヘルプダイアログ */}
         <Portal>
           <Dialog visible={helpVisible} onDismiss={() => setHelpVisible(false)}>
@@ -368,16 +388,19 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-      <Snackbar visible={snackbar.length > 0} onDismiss={() => setSnackbar('')}>
-        {snackbar}
-      </Snackbar>
-      {/* 共有エラーメッセージ用 */}
-      <DrugConfigSnackbar />
-      {/* 広告バナーを画面下部に表示。ホームバーと重ならないよう余白を追加 */}
-      <View style={[styles.banner, { paddingBottom: insets.bottom }]}>
-        <AdBanner unitId={AD_UNIT_ID} />
-      </View>
-    </Surface>
+        <Snackbar
+          visible={snackbar.length > 0}
+          onDismiss={() => setSnackbar("")}
+        >
+          {snackbar}
+        </Snackbar>
+        {/* 共有エラーメッセージ用 */}
+        <DrugConfigSnackbar />
+        {/* 広告バナーを画面下部に表示。ホームバーと重ならないよう余白を追加 */}
+        <View style={[styles.banner, { paddingBottom: 0 }]}>
+          <AdBanner unitId={AD_UNIT_ID} />
+        </View>
+      </Surface>
     </SafeAreaView>
   );
 }
@@ -388,37 +411,37 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   // ヘッダー以外の領域を埋めるラッパー
   body: { flex: 1 },
-  scrollContainer: { padding: 16, paddingBottom: 16 },
+  scrollContainer: { padding: 8, paddingBottom: 0 },
   section: { marginBottom: 24 },
   heading: { fontSize: 16, marginBottom: 8 },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   input: { marginBottom: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  row: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
   smallInput: { width: 80, marginRight: 8 },
   inlineText: { marginHorizontal: 4, fontSize: 14 },
   button: { marginHorizontal: 4 },
   list: {},
-  modal: { backgroundColor: 'white', margin: 16, padding: 16 },
+  modal: { backgroundColor: "white", margin: 16, padding: 16 },
   // 薬剤一覧の1行分のスタイル
-  itemRow: { flexDirection: 'row', alignItems: 'center' },
+  itemRow: { flexDirection: "row", alignItems: "center" },
   // 薬剤名表示部分のスタイル
   titleArea: { flex: 1, paddingVertical: 12 },
   // 薬剤名テキストのスタイル
   itemTitle: { fontSize: 16 },
   // メイン画面とそろえたヘッダーのスタイル
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 4,
-    width: '100%',
+    width: "100%",
     minHeight: 40,
   },
   banner: {
-    alignSelf: 'center',
-    marginVertical: 8,
+    alignSelf: "center",
+    marginVertical: 0,
   },
 });
