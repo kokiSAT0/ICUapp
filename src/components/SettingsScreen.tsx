@@ -379,8 +379,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
               <Text>
                 {`このアプリは昇圧薬の投与量と流量を相互に換算するツールです。\n\n` +
                   "設定画面では薬剤の初期値や表示順を調整できます。\n" +
-                  "計算結果は参考情報として利用し、治療は必ず医療専門家の指示に従ってください。\n\n" +
-                  "MIT License で公開されています。Icons by Pictogrammers, Font by DSEG."}
+                  "計算結果は参考情報として利用し、治療は必ず医師の指示に従ってください。\n\n" +
+                  "MIT License で公開されています。\nIcons by Pictogrammers, Font by DSEG."}
               </Text>
             </Dialog.Content>
             <Dialog.Actions>
