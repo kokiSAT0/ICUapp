@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "InfuCalc",
-    "slug": "InfuCalc",
+    "slug": "infucalc",
     "version": "0.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -58,8 +58,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "da6f94f7-d344-4c2b-9634-d32c1980de6a"
+        "projectId": "1236f7ee-5347-4e85-9927-2677d219b94a"
       }
-    }
+    },
+    "owner": "kurohyou3"
   }
 }
