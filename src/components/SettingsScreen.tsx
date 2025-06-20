@@ -95,6 +95,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   const [editVisible, setEditVisible] = useState(false);
   // ヘルプダイアログの表示状態
   const [helpVisible, setHelpVisible] = useState(false);
+  // バナー広告の高さ。ロード完了後に更新される
+  const [bannerHeight, setBannerHeight] = useState(0);
 
   // 入力値を検証する関数。問題があればメッセージを返す
   const validateConfigs = (
@@ -263,7 +265,7 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         );
         }}
         style={styles.list}
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 16 + bannerHeight }]}
       />
       <Portal>
         <Modal
@@ -368,8 +370,8 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
       {/* 共有エラーメッセージ用 */}
       <DrugConfigSnackbar />
       {/* 広告バナーを画面下部に表示 */}
-      <View style={styles.banner}>
-        <AdBanner unitId={AD_UNIT_ID} />
+      <View style={[styles.banner, { minHeight: bannerHeight }] }>
+        <AdBanner unitId={AD_UNIT_ID} onHeightChange={setBannerHeight} />
       </View>
     </Surface>
     </SafeAreaView>
@@ -380,7 +382,10 @@ const styles = StyleSheet.create({
   // SafeAreaView 用のスタイル
   safeArea: { flex: 1 },
   container: { flex: 1 },
-  scrollContainer: { padding: 16 },
+  scrollContainer: {
+    padding: 16,
+    // 下部の余白はバナー高さに応じて動的に追加
+  },
   section: { marginBottom: 24 },
   heading: { fontSize: 16, marginBottom: 8 },
   titleRow: {
@@ -394,7 +399,8 @@ const styles = StyleSheet.create({
   smallInput: { width: 80, marginRight: 8 },
   inlineText: { marginHorizontal: 4, fontSize: 14 },
   button: { marginHorizontal: 4 },
-  list: { marginBottom: 16 },
+  // 一覧部分は画面全体を使う
+  list: { flex: 1 },
   modal: { backgroundColor: 'white', margin: 16, padding: 16 },
   // 薬剤一覧の1行分のスタイル
   itemRow: { flexDirection: 'row', alignItems: 'center' },
@@ -412,5 +418,7 @@ const styles = StyleSheet.create({
   banner: {
     alignSelf: 'center',
     marginVertical: 8,
+    // 高さは外から指定
+    minHeight: 0,
   },
 });
