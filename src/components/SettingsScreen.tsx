@@ -380,9 +380,9 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
         style={[
           styles.banner,
           {
-            // セーフエリアと広告の高さを考慮して固定表示
-            bottom: insets.bottom,
-            marginBottom: bannerHeight ? 8 : 0,
+            // 底に配置しつつセーフエリア分の余白を確保
+            bottom: 0,
+            marginBottom: insets.bottom + (bannerHeight ? 8 : 0),
           },
         ]}
       >
