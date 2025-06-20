@@ -14,5 +14,9 @@ export default ({ config }) => ({
     ...(appJson.expo.extra ?? {}),
     // 環境変数から薬液濃度を読み込む
     DRUG_CONCENTRATION: process.env.DRUG_CONCENTRATION,
+    // 広告バナー用 ID
+    AD_UNIT_BANNER_ID: process.env.EXPO_PUBLIC_AD_UNIT_BANNER_ID,
+    // テスト端末 ID（任意）
+    AD_TEST_DEVICE_ID: process.env.AD_TEST_DEVICE_ID,
   },
 });
