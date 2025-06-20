@@ -2,7 +2,7 @@
   "expo": {
     "name": "InfuCalc",
     "slug": "infucalc",
-    "version": "0.2.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -61,6 +61,6 @@
         "projectId": "1236f7ee-5347-4e85-9927-2677d219b94a"
       }
     },
-    "owner": "kurohyou3"
+    "owner": "kokisato"
   }
 }

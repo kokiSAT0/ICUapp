@@ -84,14 +84,6 @@ my-expo-app/
 - 内部配布: TestFlight (iOS) / Google Play Internal Testing (Android)
 - バージョン: SemVer (`1.0.0` → `1.0.1`)
 
-## 10. コミュニケーション
-
-- メンバー 2 名は毎日対面で共有する。追加ツールは不要。
-
-## 11. ADR (Architecture Decision Record)
-
-- 重要な技術選定は `docs/adr/` に Markdown で記録。
-
 ---
 
 _Last updated: 2025‑06‑04_
