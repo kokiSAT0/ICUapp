@@ -17,6 +17,7 @@ import GammaCalculatorScreen, {
 import { DrugConfigProvider } from "./src/contexts/DrugConfigContext";
 import ErrorBoundary from "./src/components/ErrorBoundary";
 import mobileAds from "react-native-google-mobile-ads";
+import { AD_TEST_DEVICE_ID } from "@/constants/admob";
 
 // アプリのエントリーポイント
 export type AppProps = {};
@@ -34,6 +35,10 @@ export default function App(_: AppProps) {
     if (fontsLoaded) {
       // AdMob SDK を初期化する
       mobileAds().initialize();
+      // テスト端末を登録して安全に広告を確認する
+      mobileAds().setRequestConfiguration({
+        testDeviceIds: [AD_TEST_DEVICE_ID || 'YOUR_TEST_DEVICE_ID'],
+      });
     }
   }, [fontsLoaded]);
 

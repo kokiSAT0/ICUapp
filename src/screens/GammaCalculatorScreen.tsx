@@ -13,6 +13,7 @@ import { IconButton } from "react-native-paper";
 import CompositionDialog from "@/components/CompositionDialog";
 import DrugConfigSnackbar from "@/components/DrugConfigSnackbar";
 import AdBanner from "@/components/AdBanner";
+import { AD_UNIT_BANNER_ID } from "@/constants/admob";
 
 import { DIGIT_SPACING } from "@/components/DigitalNumber"; // ← 追加
 // ────────────────────────────────────────────────
@@ -30,8 +31,6 @@ import {
 } from "@/utils/flowConversion";
 import { useDrugConfigs } from "@/contexts/DrugConfigContext";
 
-// テスト用バナー広告ユニットID
-const AD_UNIT_ID = "ca-app-pub-3940256099942544/2435281174";
 
 export type GammaCalculatorScreenProps = {};
 export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
@@ -423,7 +422,8 @@ export default function GammaCalculatorScreen(_: GammaCalculatorScreenProps) {
       <DrugConfigSnackbar />
       {/* 広告バナーを画面下部に表示 */}
       <View style={styles.banner}>
-        <AdBanner unitId={AD_UNIT_ID} />
+        {/* 環境変数から取得した広告ユニットIDを使用 */}
+        <AdBanner unitId={AD_UNIT_BANNER_ID} />
       </View>
     </SafeAreaView>
   );
