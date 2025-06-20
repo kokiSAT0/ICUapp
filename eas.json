@@ -11,10 +11,23 @@
     },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/6300978111"
+      }
     },
-    "preview": { "distribution": "internal" },
-    "production": { "autoIncrement": true },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-3940256099942544/6300978111"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_AD_UNIT_BANNER_ID": "ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx"
+      }
+    },
 
     "development-ios": {
       "developmentClient": true,
